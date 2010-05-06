@@ -28,6 +28,7 @@
 	<?php
 		echo $this->Html->meta('icon');
 
+		echo $this->Html->css('reset');
 		echo $this->Html->css('generic');
 
 		echo $scripts_for_layout;
@@ -36,7 +37,7 @@
 <body>
 	<div id="container">
 		<div id="header">
-			<h1><?php echo $this->Html->link(__('SS2', true), 'http://www.sagestats.com/ss2'); ?></h1>
+			<h1><?php echo $this->Html->link($this->Html->image('logo.png', array('alt' => 'logo')), 'http://www.sagestats.com/ss2', array('escape' => false)); ?></h1>
 		</div>
 		<div id="content">
 
@@ -44,11 +45,11 @@
 
 			<?php echo $content_for_layout; ?>
 
+			<?php echo $this->element('sql_dump'); ?>
 		</div>
 		<div id="footer">
 			&copy;2010 <a href="http://www.cameroncomputer.com">CameronComputer.com</a>
 		</div>
 	</div>
-	<?php echo $this->element('sql_dump'); ?>
 </body>
 </html>
