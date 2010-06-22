@@ -1,3 +1,4 @@
 #!/bin/sh
+CONSOLE=/home/loyd/ss2/src/cake/console
 cd app
-./vendors/cakeshell scores -cli /usr/bin -console /home/loyd/Development/ss2/src/cake/console -time now
+./vendors/cakeshell scores -cli /usr/bin -console $CONSOLE -time `date`
