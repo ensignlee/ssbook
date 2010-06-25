@@ -17,6 +17,8 @@ class Espn {
 		}
 		$this->types = array();
 		$this->types[] = new Espn_MLB();
+		$this->types[] = new Espn_NBA();
+
 		$this->setSourceId();
 		$this->date = $this->shell->Score->getLastGameDate($this->sourceid);
 		if (empty($this->date)) {
@@ -71,6 +73,7 @@ class Espn {
 		$type->setLeague();
 		$this->cur = $type;
 		$url = $this->cur->getUrl($this->date);
+		echo "Looking up $url\n";
 		$this->html = curl_file_get_contents($url);
 	}
 }
@@ -108,24 +111,74 @@ class Espn_MLB extends Espn_Scorer {
 		$scores = pq('.mod-scorebox-final');
 		$out = array();
 		foreach ($scores as $score) {
-			$row = array();
-			$away = pq("tr[id$='awayHeader']", $score);
-			$home = pq("tr[id$='homeHeader']", $score);
-			$row['visitor'] = pq('.team-name', $away)->text();
-			$row['home'] = pq('.team-name', $home)->text();
-			$row['visitor_score_total'] = pq('.team-score', $away)->text();
-			$row['home_score_total'] = pq('.team-score', $home)->text();
+			$row = $this->parseScore($score);
 			$row['game_date'] = $time;
-			$row['league'] = $this->league;
-			
-			$id = pq($score)->attr('id');
-			if (preg_match('/[0-9]+/', $id, $m)) {
-				$row['source_gameid'] = $m[0];
-			} else {
-				throw new Exception('Unable to find source_gameid');
-			}
 			$out[] = $row;
 		}
 		return $out;
+	}
+
+	protected function parseScore($score) {
+		$row = array();
+		$away = pq("tr[id$='awayHeader']", $score);
+		$home = pq("tr[id$='homeHeader']", $score);
+		$row['visitor'] = pq('.team-name', $away)->text();
+		$row['home'] = pq('.team-name', $home)->text();
+		$row['visitor_score_total'] = pq('.team-score', $away)->text();
+		$row['home_score_total'] = pq('.team-score', $home)->text();
+		$row['league'] = $this->league;
+		
+		$id = pq($score)->attr('id');
+		if (preg_match('/[0-9]+/', $id, $m)) {
+			$row['source_gameid'] = $m[0];
+		} else {
+			throw new Exception('Unable to find source_gameid');
+		}
+		return $row;
+	}
+}
+
+class ESPN_NBA extends Espn_MLB {
+	
+	public $leagueName = 'NBA';
+
+	public function getUrl($date) {
+		return  sprintf('http://scores.espn.go.com/nba/scoreboard?date=%s', date('Ymd', strtotime($date)));
+	}
+	
+	protected function parseScore($score) {
+		$row = parent::parseScore($score);
+		list($visitor, $home) = $this->getHalf($score);
+		$row['visitor_score_half'] = $visitor;
+		$row['home_score_half'] = $home;
+		return $row;
+	}
+
+	protected function getHalf($score) {
+		$titles = pq('th[id*="lsh"]', $score);
+		$periods = array();
+		foreach ($titles as $title) {
+			$id = pq($title)->attr('id');
+			if (!preg_match('/[0-9T]$/', $id, $m)) {
+				throw new Exception('Unable to find scores');
+			}
+			$cid = $m[0];
+			$periods[$cid] = pq($title)->text();
+		}
+		$one = $two = null;
+		foreach ($periods as $num => $p) {
+			if ($p === "1") {
+				$one = $num;
+			}
+			if ($p === "2") {
+				$two = $num;
+			}
+		}
+		if (empty($one) || empty($two)) {
+			throw new Exception('Unable to locate periods 1 and 2');
+		}
+		$visitor = pq("td[id$=als{$one}]", $score)->text() + pq("td[id$=als{$two}]", $score)->text();
+		$home = pq("td[id$=hls{$one}]", $score)->text() + pq("td[id$=hls{$two}]", $score)->text();
+		return array($visitor, $home);
 	}
 }
