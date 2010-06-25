@@ -1,22 +1,31 @@
 <?php
 
 class ScoresShell extends Shell {
-	var $uses = array();
+	var $uses = array('Score');
 
 	public function main() {
-		$time = empty($this->params['time']) ? false : $this->params['time'];
-		if (empty($time)) {
+		$type = empty($this->params['type']) ? false : $this->params['type'];
+		if (empty($type)) {
 			$this->usage();
 			return 1;
 		}
-
-		$this->out("TIME=$time");
+		switch ($type) {
+		case 'espn':
+			App::import('Vendor', 'scorer/espn');
+			$scorer = new Espn($this);
+			break;
+		default:
+			$this->usage();
+			return 1;
+		}
+		$scorer->score();
+			
 		return 0;
 	}
 
 	public function startup() {}
 
 	public function usage() {
-		$this->out("-time <date>");
+		$this->out("-type <espn>");
 	}
 }

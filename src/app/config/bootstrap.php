@@ -48,4 +48,23 @@
  * Inflector::rules('plural', array('rules' => array(), 'irregular' => array(), 'uninflected' => array()));
  *
  */
-?>
+
+if (!function_exists('curl_get_file_contents')) {
+function curl_file_get_contents($url, $post = null) {
+	$fp = curl_init();
+	curl_setopt($fp, CURLOPT_URL, $url);
+	curl_setopt($fp, CURLOPT_FAILONERROR, 1);
+	curl_setopt($fp, CURLOPT_FOLLOWLOCATION, 1);
+	curl_setopt($fp, CURLOPT_RETURNTRANSFER, 1);
+	curl_setopt($fp, CURLOPT_TIMEOUT, 15);
+	curl_setopt($fp, CURLOPT_HTTPGET, true);
+	$result = curl_exec($fp);
+	curl_close($fp);
+
+	if ($result) {
+		return $result;
+	} else {
+		return false;
+	}
+}
+}
