@@ -18,7 +18,14 @@ class ScoresShell extends Shell {
 			$this->usage();
 			return 1;
 		}
-		$scorer->score();
+
+		$date = null;
+		if (!empty($this->params['date']) && strtotime($this->params['date']) > 0) {
+			$date = $this->params['date'];
+		}
+	
+		
+		$scorer->score($date);
 			
 		return 0;
 	}
@@ -26,6 +33,6 @@ class ScoresShell extends Shell {
 	public function startup() {}
 
 	public function usage() {
-		$this->out("-type <espn>");
+		$this->out("-type <espn> [-date YYYY-MM-DD]");
 	}
 }

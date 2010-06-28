@@ -3,7 +3,14 @@
 // In PEAR
 require('phpQuery.php');
 
-class Espn {
+class Espn_Log extends Object {
+	public function log($str, $type = 'debug') {
+		$str = "ESPN: $str";
+		parent::log($str, $type);
+	}
+}
+
+class Espn extends Espn_Log {
 
 	private $types = null;
 	private $cur = null;
@@ -34,11 +41,26 @@ class Espn {
 		$this->sourceid = $st->getOrSet('ESPN');
 	}
 
-	public function score() {
+	public static function replaceNull($str) {
+		$tstr = mb_trim($str);
+		// Match number or letter
+		if ($tstr == "" || !preg_match('/[A-Za-z_0-9]+/', $tstr)) {
+			return null;
+		}
+		return $tstr;
+	}
+
+	public function score($date = null) {
+		if (!empty($date)) {
+			$this->date = $date;
+		}
+
 		foreach ($this->types as $type) {
 			$this->loadType($type);
 			$this->parseType();
-			$this->saveType();
+			$success = $this->saveType();
+			$this->log("Saving $success game(s)");
+			sleep(1);
 		}
 	}
 
@@ -48,8 +70,13 @@ class Espn {
 			foreach ($this->scores as $score) {
 				$score['sourceid'] = $this->sourceid;
 				$this->shell->Score->setToRecord('source_gameid', $score['source_gameid']);
+				if (!empty($this->shell->Score->id)) {
+					unset($score['game_date']);
+				}
 				if ($this->shell->Score->save($score)) {
 					$success++;
+				} else {
+					throw new Exception('Unable to save game'.json_encode(array($score, $this->shell->Score->validationErrors)));
 				}
 			}
 		}
@@ -73,12 +100,12 @@ class Espn {
 		$type->setLeague();
 		$this->cur = $type;
 		$url = $this->cur->getUrl($this->date);
-		echo "Looking up $url\n";
+		$this->log("Looking up $url");
 		$this->html = curl_file_get_contents($url);
 	}
 }
 
-abstract class Espn_Scorer {
+abstract class Espn_Scorer extends Espn_Log {
 	protected $league;
 	public $leagueName;
 
@@ -111,22 +138,30 @@ class Espn_MLB extends Espn_Scorer {
 		$scores = pq('.mod-scorebox-final');
 		$out = array();
 		foreach ($scores as $score) {
-			$row = $this->parseScore($score);
-			$row['game_date'] = $time;
+			$row = $this->parseScore($score, $time);
 			$out[] = $row;
 		}
+
+		$scores = pq('.mod-scorebox-pregame');
+		foreach ($scores as $score) {
+			$row = $this->parseScore($score, $time);
+			$out[] = $row;
+		}
+
 		return $out;
 	}
 
-	protected function parseScore($score) {
+	protected function parseScore($score, $gametime) {
 		$row = array();
 		$away = pq("tr[id$='awayHeader']", $score);
 		$home = pq("tr[id$='homeHeader']", $score);
 		$row['visitor'] = pq('.team-name', $away)->text();
 		$row['home'] = pq('.team-name', $home)->text();
-		$row['visitor_score_total'] = pq('.team-score', $away)->text();
-		$row['home_score_total'] = pq('.team-score', $home)->text();
+		$row['visitor_score_total'] = Espn::replaceNull(pq('.team-score', $away)->text());
+		$row['home_score_total'] = Espn::replaceNull(pq('.team-score', $home)->text());
 		$row['league'] = $this->league;
+		$status = Espn::replaceNull(pq("span[id$='statusLine2']", $score)->text());
+		$row['game_date'] = self::createDate("$gametime $status");
 		
 		$id = pq($score)->attr('id');
 		if (preg_match('/[0-9]+/', $id, $m)) {
@@ -135,6 +170,11 @@ class Espn_MLB extends Espn_Scorer {
 			throw new Exception('Unable to find source_gameid');
 		}
 		return $row;
+	}
+
+	protected static function createDate($str) {
+		$out = date('Y-m-d H:i:s', strtotime(str_replace('ET', '', $str)));
+		return $out;
 	}
 }
 

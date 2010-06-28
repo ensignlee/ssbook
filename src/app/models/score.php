@@ -14,7 +14,11 @@ class Score extends AppModel {
 
 	public function getLastGameDate($sourceid) {
 		$this->order = 'game_date DESC';
-		$out = $this->find('first', array('conditions' => array('sourceid' => $sourceid)));
+		$out = $this->find('first', array('conditions' => 
+			array(
+				'sourceid' => $sourceid, 
+				'not' => array('home_score_total' => null)
+			), 'order' => array('game_date DESC')));
 		if (empty($out)) {
 			return false;
 		} else {
