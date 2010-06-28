@@ -294,5 +294,7 @@
  *	));
  *
  */
-	Cache::config('default', array('engine' => 'File'));
-?>
+Cache::config('default', array(
+	'engine' => 'File', 
+	'duration' => 3600
+));

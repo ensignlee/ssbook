@@ -173,7 +173,7 @@ class Espn_MLB extends Espn_Scorer {
 	}
 
 	protected static function createDate($str) {
-		$out = date('Y-m-d H:i:s', strtotime(str_replace('ET', '', $str)));
+		$out = date('Y-m-d H:i:s', strtotime(str_replace('ET', 'EDT', $str)));
 		return $out;
 	}
 }
@@ -186,8 +186,8 @@ class ESPN_NBA extends Espn_MLB {
 		return  sprintf('http://scores.espn.go.com/nba/scoreboard?date=%s', date('Ymd', strtotime($date)));
 	}
 	
-	protected function parseScore($score) {
-		$row = parent::parseScore($score);
+	protected function parseScore($score, $gametime) {
+		$row = parent::parseScore($score, $gametime);
 		list($visitor, $home) = $this->getHalf($score);
 		$row['visitor_score_half'] = $visitor;
 		$row['home_score_half'] = $home;
