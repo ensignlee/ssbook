@@ -50,7 +50,7 @@ class Score extends AppModel {
 				$conds['visitor LIKE'] = "%$option%";
 				break;
 			case 'league':
-				$conds['league_id'] = $option;
+				$conds['league'] = $option;
 				break;
 			default:
 				throw new Exception("$option is not supported");

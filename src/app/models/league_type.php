@@ -4,7 +4,7 @@ class LeagueType extends AppModel {
 	var $name = 'LeagueType';
 
 	public function contains($name) {
-		$out = $this->find('first', array('conditions' => array('name' => $name)));
+		$out = $this->find('first', array('conditions' => array('name' => trim($name))));
 		if (empty($out)) {
 			return false;
 		} else {
