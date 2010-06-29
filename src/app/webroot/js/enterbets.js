@@ -7,9 +7,11 @@ if (typeof SS == 'undefined') {
 SS.Superbar = function(selector, jDateSelector) {
 	this.jSelect = $(selector);
 	this.jDateSelector = jDateSelector;
+	this.jSelect.keydown($.proxy(this.onKeyPress, this));
 	this.jSelect.keyup($.proxy(this.onKeyUp, this));
 	this.url = SS.Cake.base + '/bets/ajax/superbar';
 	this.divHeight = '300px';
+	this.lastVal = '';
 }
 
 $.extend(SS.Superbar.prototype, {
@@ -20,18 +22,26 @@ $.extend(SS.Superbar.prototype, {
 
 	onKeyUp : function(e) {
 		var val = this.getValue();
+		if (val != this.lastVal) {
+			this.request(val);
+			this.lastVal = val;
+		}
+	},
+
+	onKeyPress : function(e) {
 		switch (e.which) {
 		case 38: // Up
 			this.goUp();
+			e.stopPropagation();
 			return false;
 		case 40: // Down
 			this.goDown();
+			e.stopPropagation();
 			return false;
 		case 13: // Enter
 			this.selectCurrent();
+			e.stopPropagation();
 			return false;
-		default:
-			this.request(val);
 		}
 	},
 
@@ -50,7 +60,7 @@ $.extend(SS.Superbar.prototype, {
 	selectCurrent : function () {
 		var hli = this.getHoverLi();
 		if (hli) {
-			this.jSelect.val(hli.text());
+			this.jSelect.val($.trim(hli.text()));
 		}
 		this.hideDiv();
 	},
@@ -83,6 +93,11 @@ $.extend(SS.Superbar.prototype, {
 	},
 
 	showDropdown : function (data) {
+		if (!data.length) {
+			this.hideDiv();
+			return false;
+		}
+
 		var p = this.jSelect.position();
 		var h = this.jSelect.outerHeight();
 		var w = this.jSelect.innerWidth();

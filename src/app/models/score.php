@@ -26,20 +26,40 @@ class Score extends AppModel {
 		}
 	}
 
-	public function matchName($name, $closedate, $limit=20) {
-		$days = 2;
-		$closeafter = date('Y-m-d', strtotime("$closedate + $days days"));
-		$closebefore = date('Y-m-d', strtotime("$closedate - $days days"));
-		$resAfter = $this->find('all', array('conditions' => array(
-			'or' => array('home LIKE' => "%$name%", 'visitor LIKE' => "%$name%"),
-			'game_date BETWEEN ? AND ?' => array($closedate, "$closeafter 23:59:59"),
-		), 'order' => 'game_date ASC'));
-		$resBefore = $this->find('all', array('conditions' => array(
-			'or' => array('home LIKE' => "%$name%", 'visitor LIKE' => "%$name%"),
-			'game_date BETWEEN ? AND ?' => array($closebefore, "$closedate 23:59:59"),
-		), 'order' => 'game_date DESC'));
+	public function matchOption($options, $limit=20) {
+
+		$conds = array();
+		foreach ($options as $key => $option) {
+			switch($key) {
+			case 'close_date': 
+				$days = 2;
+				$closeafter = date('Y-m-d 23:59:59', strtotime("$option + $days days"));
+				$conds['game_date BETWEEN ? AND ?'] = array($option, $closeafter);
+				break;
+			case 'game_date':
+				$enddate = date('Y-m-d 23:59:59', strtotime($option));
+				$conds['game_date BETWEEN ? AND ?'] = array($option, $enddate);
+				break;
+			case 'name':
+				$conds['or'] = array('home LIKE' => "%$option%", 'visitor LIKE' => "%$option%");
+				break;
+			case 'home':
+				$conds['home LIKE'] = "%$option%";
+				break;
+			case 'visitor':
+				$conds['visitor LIKE'] = "%$option%";
+				break;
+			case 'league':
+				$conds['league_id'] = $option;
+				break;
+			default:
+				throw new Exception("$option is not supported");
+			}
+		}
+
+		$resAfter = $this->find('all', array('conditions' => $conds, 'order' => 'game_date ASC'));
 		$out = array();
-		foreach (array($resAfter, $resBefore) as $res) {
+		foreach (array($resAfter) as $res) {
 			foreach ($res as $row) {	
 				if (count($out) >= $limit) {
 					break;
