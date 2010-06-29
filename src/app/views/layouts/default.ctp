@@ -31,6 +31,15 @@
 		echo $this->Html->css('reset');
 		echo $this->Html->css('generic');
 
+		echo $this->Javascript->link('http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js');?>
+<script type='text/javascript'>
+var SS = {};
+SS.Cake = {
+	base : '<?= $this->base ?>',
+	here : '<?= $this->here ?>'
+};
+</script>
+	<?php
 		echo $scripts_for_layout;
 	?>
 </head>

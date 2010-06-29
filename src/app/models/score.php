@@ -26,6 +26,31 @@ class Score extends AppModel {
 		}
 	}
 
+	public function matchName($name, $closedate, $limit=20) {
+		$days = 2;
+		$closeafter = date('Y-m-d', strtotime("$closedate + $days days"));
+		$closebefore = date('Y-m-d', strtotime("$closedate - $days days"));
+		$resAfter = $this->find('all', array('conditions' => array(
+			'or' => array('home LIKE' => "%$name%", 'visitor LIKE' => "%$name%"),
+			'game_date BETWEEN ? AND ?' => array($closedate, "$closeafter 23:59:59"),
+		), 'order' => 'game_date ASC'));
+		$resBefore = $this->find('all', array('conditions' => array(
+			'or' => array('home LIKE' => "%$name%", 'visitor LIKE' => "%$name%"),
+			'game_date BETWEEN ? AND ?' => array($closebefore, "$closedate 23:59:59"),
+		), 'order' => 'game_date DESC'));
+		$out = array();
+		foreach (array($resAfter, $resBefore) as $res) {
+			foreach ($res as $row) {	
+				if (count($out) >= $limit) {
+					break;
+				}
+				$row = $row[$this->name];
+				$out[$row['id']] = $row;
+			}
+		}
+		return $out;
+	}
+
 	public function findMatching($game, $timeframe = 1800) {
 		$start = date('Y-m-d H:i:s', strtotime($game['game_date']) - $timeframe);
 		$end = date('Y-m-d H:i:s', strtotime($game['game_date']) + $timeframe);

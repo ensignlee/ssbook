@@ -1,0 +1,15 @@
+#superbar {
+	width: 600px;
+}
+.dropdown {
+	position: absolute;
+	background-color: white;
+	border: 1px solid black;
+}
+.dropdown li {
+	padding: 4px;
+}
+.dropdown li.hover {
+	background-color: grey;
+	cursor: pointer;
+}
