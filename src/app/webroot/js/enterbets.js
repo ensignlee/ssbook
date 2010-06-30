@@ -4,20 +4,29 @@ if (typeof SS == 'undefined') {
 
 (function ($) {
 
-SS.Superbar = function(selector, jDateSelector) {
+SS.Superbar = function(selector, Enterbets) {
 	this.jSelect = $(selector);
-	this.jDateSelector = jDateSelector;
+
 	this.jSelect.keydown($.proxy(this.onKeyPress, this));
 	this.jSelect.keyup($.proxy(this.onKeyUp, this));
+	this.jSelect.focus($.proxy(this.onFocus, this));
+
 	this.url = SS.Cake.base + '/bets/ajax/superbar';
 	this.divHeight = '300px';
 	this.lastVal = '';
+
+	this.Enterbets = Enterbets;
 }
 
 $.extend(SS.Superbar.prototype, {
 
 	getValue : function() {
 		return this.jSelect.val();
+	},
+
+	onFocus : function(e) {
+		this.lastVal = null;
+		this.onKeyUp();
 	},
 
 	onKeyUp : function(e) {
@@ -59,8 +68,21 @@ $.extend(SS.Superbar.prototype, {
 
 	selectCurrent : function () {
 		var hli = this.getHoverLi();
+
 		if (hli) {
 			this.jSelect.val($.trim(hli.text()));
+			var clazzez = hli.attr('class').split(' ');
+			var _this = this;
+
+			$.each(clazzez, function (key, clazz) {
+				if (!clazz.match(/scoreid_/)) {
+					return false;
+				}
+				var scoreid = clazz.replace('scoreid_', '');
+				_this.gameClick(scoreid);
+			});
+		} else {
+			this.createGame(null);
 		}
 		this.hideDiv();
 	},
@@ -112,21 +134,21 @@ $.extend(SS.Superbar.prototype, {
 			html += '<li class="scoreid_'+v.scoreid+'">'+v.html+'</li>';
 		});
 		html += '</ul>';
-		this.dropdownDiv.html(html).find('li').click(function() {
-			var clazzez = $(this).attr('class').split(' ');
-			$.each(clazzez, function (key, clazz) {
-				if (!clazz.match(/scoreid_/)) {
-					return false;
-				}
-				var scoreid = clazz.replace('scoreid_', '');
-				_this.gameClick(scoreid);
-			});
-		}).hover(function() { $(this).addClass('hover') }, function() { $(this).removeClass('hover') });
+		this.dropdownDiv.html(html).find('li')
+			.click($.proxy(this.selectCurrent, this))
+			.hover(function() { $(this).addClass('hover') }, function() { $(this).removeClass('hover') });
 	},
 
 	gameClick : function (scoreid) {
-		console.debug('scoreid', scoreid);
-		this.selectCurrent();
+		this.createGame(scoreid);
+	},
+
+	createGame : function (scoreid) {
+		var data = { scoreid : scoreid };
+		if (!scoreid) {
+			data['text'] = this.getValue();
+		}
+		this.Enterbets.add(data);
 	},
 
 	createOrShowDiv : function(t, l, w) {
@@ -141,7 +163,7 @@ $.extend(SS.Superbar.prototype, {
 			this.dropdownDiv = ndiv;
 		}
 		this.dropdownDiv.css('display', 'block');		
-		$('body').one('click', $.proxy(this.hideDiv, this));
+		$(window).one('click', $.proxy(this.hideDiv, this));
 	},
 
 	hideDiv : function() {
@@ -160,8 +182,24 @@ $.extend(SS.Superbar.prototype, {
 
 });
 
+SS.Enterbets = function(selector) {
+	this.jSelect = $(selector);
+}
+
+$.extend(SS.Enterbets.prototype, {
+
+	/**
+         * Adding a bet with {scoreid, [text]}
+         */
+	add : function (data) {
+		console.debug('ajax request to get the html for adding a game', data);
+	}
+
+});
+
 $(function() {
-var superbar = new SS.Superbar('#superbar');
+var enterbets = new SS.Enterbets('#enterbets');
+var superbar = new SS.Superbar('#superbar', enterbets);
 });
 
 })(jQuery);

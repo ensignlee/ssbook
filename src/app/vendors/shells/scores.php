@@ -23,9 +23,20 @@ class ScoresShell extends Shell {
 		if (!empty($this->params['date']) && strtotime($this->params['date']) > 0) {
 			$date = $this->params['date'];
 		}
-	
-		
-		$scorer->score($date);
+
+		$all = empty($this->params['all']) ? null : $this->params['all'];
+		if (!empty($all)) {
+			// Lots
+			$date = empty($date) ? date('Y-m-d') : $date;
+			foreach (range(0, $all) as $add) {
+				$newdate = date('Y-m-d', strtotime("$date + $add days"));
+				$scorer->score($newdate);
+				sleep(5);
+			}
+		} else {
+			// Once
+			$scorer->score($date);
+		}
 			
 		return 0;
 	}

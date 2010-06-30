@@ -32,7 +32,7 @@ class Score extends AppModel {
 		foreach ($options as $key => $option) {
 			switch($key) {
 			case 'close_date': 
-				$days = 2;
+				$days = 14;
 				$closeafter = date('Y-m-d 23:59:59', strtotime("$option + $days days"));
 				$conds['game_date BETWEEN ? AND ?'] = array($option, $closeafter);
 				break;

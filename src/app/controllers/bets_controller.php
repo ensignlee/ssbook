@@ -18,11 +18,17 @@ class BetsController extends AppController {
 		case 'superbar':
 			$text = $params['text'];
 			$text = strtolower(" $text "); //give us some working room
+			$match = array();
+			if (preg_match('%((0?[1-9]|1[012])(:[0-5]\d){0,2}\s*([AP]M|[ap]m))%', $text, $match)) {
+				$text = str_replace($match[0], '', $text);
+			}
+
 			$options = array();
-			if (($pos = strpos($text, ' - ')) !== false) {
-				$strdate = strtotime(substr($text, $pos+2));
+			if (preg_match('@[0-9]+/[0-9]+/[0-9]+@', $text, $match)) {
+				$mstr = $match[0];
+				$strdate = strtotime($mstr);
 				if ($strdate > strtotime('2010-01-01')) {
-					$text = substr($text, 0, $pos);
+					$text = str_replace($mstr, '', $text);
 					$options['game_date'] = date('Y-m-d', $strdate);
 				}
 			}
