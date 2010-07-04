@@ -1,5 +1,5 @@
 #superbar {
-	width: 600px;
+	width: 500px;
 }
 .dropdown {
 	position: absolute;
@@ -12,4 +12,23 @@
 .dropdown li.hover {
 	background-color: grey;
 	cursor: pointer;
+}
+.bet {
+	border: 1px solid black;
+	padding: 3px;
+	margin: 4px;
+}
+.bet td {
+	padding: 4px;
+}
+.bet input {
+	width: 70px;
+}
+
+#rightsection {
+	margin: 0;
+	padding: 0;
+	margin-left: 300px;
+	padding-left: 5px;
+	border-left: 1px black solid;
 }

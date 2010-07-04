@@ -15,7 +15,10 @@ SS.Superbar = function(selector, Enterbets) {
 	this.divHeight = '300px';
 	this.lastVal = '';
 
+	this.lastRequest = null;
+
 	this.Enterbets = Enterbets;
+	this.doneLoadingBet = true;
 }
 
 $.extend(SS.Superbar.prototype, {
@@ -25,13 +28,15 @@ $.extend(SS.Superbar.prototype, {
 	},
 
 	onFocus : function(e) {
-		this.lastVal = null;
-		this.onKeyUp();
+		if (this.doneLoadingBet) {
+			this.lastVal = null;
+			this.onKeyUp();
+		}
 	},
 
 	onKeyUp : function(e) {
 		var val = this.getValue();
-		if (val != this.lastVal) {
+		if (val != this.lastVal && this.doneLoadingBet) {
 			this.request(val);
 			this.lastVal = val;
 		}
@@ -68,9 +73,12 @@ $.extend(SS.Superbar.prototype, {
 
 	selectCurrent : function () {
 		var hli = this.getHoverLi();
+		this.abort();
 
 		if (hli) {
-			this.jSelect.val($.trim(hli.text()));
+			var text = $.trim(hli.text());
+			this.jSelect.val(text);
+			this.lastVal = text;
 			var clazzez = hli.attr('class').split(' ');
 			var _this = this;
 
@@ -108,6 +116,9 @@ $.extend(SS.Superbar.prototype, {
 	},
 
 	response : function (data, textStatus) {
+		if (!data) {
+			return false;
+		}
 		if (textStatus != 'success') {
 			alert('Unable to read from server please try again');
 		}
@@ -148,7 +159,13 @@ $.extend(SS.Superbar.prototype, {
 		if (!scoreid) {
 			data['text'] = this.getValue();
 		}
+		this.doneLoadingBet = false;
+		this.Enterbets.done = $.proxy(this, 'enterbetsDone');
 		this.Enterbets.add(data);
+	},
+
+	enterbetsDone : function() {
+		this.doneLoadingBet = true;
 	},
 
 	createOrShowDiv : function(t, l, w) {
@@ -172,9 +189,18 @@ $.extend(SS.Superbar.prototype, {
 		}
 	},
 
+	abort : function() {
+		if (this.lastRequest) {
+			this.lastRequest.abort();
+		}
+		this.lastRequest = null;
+	},
+
 	request : function(val) {
+		this.abort();
+
 		if (val.length >= 2) {
-			$.getJSON(this.url, {text : val}, $.proxy(this.response, this));
+			this.lastRequest = $.getJSON(this.url, {text : val}, $.proxy(this.response, this));
 		} else {
 			this.hideDiv();
 		}
@@ -184,22 +210,141 @@ $.extend(SS.Superbar.prototype, {
 
 SS.Enterbets = function(selector) {
 	this.jSelect = $(selector);
+	this.jBets = null;
+	this.url = SS.Cake.base + '/bets/createbets';
+	this.ajaxUrl = SS.Cake.base + '/bets/ajax/getbet';
 }
 
+SS.Enterbets.TYPES = [
+	{name:'total',desc:"Total",show:'Total'},
+	{name:'spread',desc:"Spread",show:'Spread'}
+];
+
 $.extend(SS.Enterbets.prototype, {
+
+	render : function() {
+		this.jSelect.html("<form action='"+this.url+"' method='post'><div class='bets'><h1>Bets</h1></div><div class='record'><input type='submit' /></div>");
+		var _this = this;
+		this.jSelect.ready(function() {
+			_this.jBets = _this.jSelect.find('.bets');
+			_this.jSelect.find('form').submit($.proxy(_this.onSubmit, _this));
+		});
+	},
+
+	onSubmit : function () {
+		console.debug('currently submitting');
+	},
 
 	/**
          * Adding a bet with {scoreid, [text]}
          */
 	add : function (data) {
-		console.debug('ajax request to get the html for adding a game', data);
+		var _this = this;
+		$.getJSON(this.ajaxUrl, data, function(data) {
+			_this.done();
+			if (data) {
+				_this.show(data);
+			}
+		});
+	},
+
+	done : function() {},
+
+	/**
+	 * @param <string> iden Identifier "SS[scoreid]" "incremental"
+	 */
+	renderBet : function (home, visitor, datetime, type, iden) {
+		var h = '<td><select class="type" name="type['+iden+']">';
+		$.each(SS.Enterbets.TYPES, function (key, val) {
+			h += '<option value="'+val.name+'"';
+			if (val.name == type) {
+				h += ' selected="selected"';
+			}
+			h += '>'+val.desc+'</option>';
+		});
+		h += '</select></td>';
+
+		h += '<td><input type="text" class="spread" name="spread['+iden+']" /></td>';
+		h += '<td><input type="text" class="risk" name="risk['+iden+']" /></td>';
+		h += '<td><input type="text" class="odds" name="odds['+iden+']" /></td>';
+		h += '<td><input type="text" class="towin" name="towin['+iden+']" /></td>';
+		var ttl = '<tr><td>Type</td><td class="type_header">&nbsp;</td><td>Risk</td><td>Odds</td><td>To Win</td>';
+
+		var datestr = datetime.toString('M/d/yy h:mm tt');
+		var je = $('<div class="bet"><table><tr><td colspan="5">'+visitor+' @ '+home+' '+datestr+'</td></tr>'+ttl+'<tr>'+h+'</tr></table></div>');
+		return je;
+	},
+
+	spreadChange : function(bet, val) {
+		console.debug('spreadChange', bet, val);
+	},
+
+	riskChange : function(bet,val ) {
+		console.debug('riskChange', bet, val);
+	},
+
+	oddsChange : function(bet, val) {
+		console.debug('oddsChange', bet, val);
+	},
+	
+	typeChange : function(bet, type, data) {
+		$.each(SS.Enterbets.TYPES, function (key, val) {
+			if (val.name == type) {
+				bet.find('.type_header').text(val.show);
+				return false;
+			} 
+		});
+		// Set the other stuff
+		var odd = null;
+		console.debug(data);
+		$.each(data.odds, function (key, val) {
+			if (val.type == type) {
+				odd = val;
+				return false;
+			}
+		});
+		if (odd) {
+			console.debug('odd', odd);
+			switch(type) {
+			case 'spread':
+				bet.find('.spread').val(odd.spread_home);
+				bet.find('.odds').val(odd.odds_home);
+				break;
+			case 'total':
+				bet.find('.spread').val(odd.total);
+				bet.find('.odds').val(odd.odds_home);
+				break;
+			}
+		}
+	},
+
+	setupEvents : function(bet, data) {
+		var _this = this;
+		bet.find('.spread').change(function() { _this.spreadChange(bet, bet.find('.spread').val()); });
+		bet.find('.risk').change(function() { _this.riskChange(bet, bet.find('.risk').val()); });
+		bet.find('.odds').change(function() { _this.oddsChange(bet, bet.find('.odds').val()); });
+
+		var typeC = function() { _this.typeChange(bet, bet.find('.type').val(), data); };
+		bet.find('.type').change(typeC);
+		typeC();
+	},
+	
+	show : function (data) {
+		var iden = 'SS'+data.scoreid;
+		var bet = this.renderBet(data.home, data.visitor, new Date(data.game_date), data.type, iden);
+		var _this = this;
+		this.jBets.append(bet).ready(function() {
+			bet.find('.spread').focus();
+			_this.setupEvents(bet, data);
+		});
 	}
 
 });
 
 $(function() {
-var enterbets = new SS.Enterbets('#enterbets');
-var superbar = new SS.Superbar('#superbar', enterbets);
+	var enterbets = new SS.Enterbets('#enterbets');
+	enterbets.render();
+	var superbar = new SS.Superbar('#superbar', enterbets);
 });
 
 })(jQuery);

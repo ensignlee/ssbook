@@ -31,7 +31,9 @@
 		echo $this->Html->css('reset');
 		echo $this->Html->css('generic');
 
-		echo $this->Javascript->link('http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js');?>
+		echo $this->Javascript->link('http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js');
+		echo $this->Javascript->link('date');
+?>
 <script type='text/javascript'>
 var SS = {};
 SS.Cake = {
