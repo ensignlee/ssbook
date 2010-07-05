@@ -213,6 +213,7 @@ SS.Enterbets = function(selector) {
 	this.jBets = null;
 	this.url = SS.Cake.base + '/bets/createbets';
 	this.ajaxUrl = SS.Cake.base + '/bets/ajax/getbet';
+	this.iconurl = SS.Cake.base + '/img/icons/';
 	this.idenNumber = 0;
 }
 
@@ -234,6 +235,10 @@ $.extend(SS.Enterbets.prototype, {
 
 	onSubmit : function () {
 		//console.debug('currently submitting');
+		if (!this.validateAll()) {
+			alert('Unable to validate all');
+			return false;
+		}
 	},
 
 	/**
@@ -255,7 +260,7 @@ $.extend(SS.Enterbets.prototype, {
 	 * @param <string> iden Identifier "SS[scoreid]" "incremental"
 	 */
 	renderBet : function (home, visitor, datetime, type, iden) {
-		var h = '<td><select class="type" name="type['+iden+']">';
+		var h = '<td class="icon"><img src="'+this.iconurl+'wrong.png"/></td><td><select class="type" name="type['+iden+']">';
 		$.each(SS.Enterbets.TYPES, function (key, val) {
 			h += '<option value="'+val.name+'"';
 			if (val.name == type) {
@@ -270,15 +275,16 @@ $.extend(SS.Enterbets.prototype, {
 		h += '<td><input type="text" class="risk" name="risk['+iden+']" /></td>';
 		h += '<td><input type="text" class="odds" name="odds['+iden+']" /></td>';
 		h += '<td><input type="text" class="towin" name="towin['+iden+']" /></td>';
-		var ttl = '<tr><td colspan="2">Type</td><td class="type_header">&nbsp;</td><td>Risk</td><td>Odds</td><td>To Win</td>';
+		var ttl = '<tr><td>&nbsp;</td><td colspan="2">Type</td><td class="type_header">&nbsp;</td><td>Risk</td><td>Odds</td><td>To Win</td></tr>';
 
 		var datestr = datetime.toString('M/d/yy h:mm tt');
-		var je = $('<div class="bet"><table><tr><td colspan="6">'+visitor+' @ '+home+' '+datestr+'</td></tr>'+ttl+'<tr>'+h+'</tr></table></div>');
+		var je = $('<div class="bet"><table><tr><td>&nbsp;</td><td colspan="6">'+visitor+' @ '+home+' '+datestr+'</td></tr>'+ttl+'<tr>'+h+'</tr></table><div class="close"><img src="'+this.iconurl+'close.png" /></div></div>');
 		return je;
 	},
 
 	spreadChange : function(bet, val) {
 		//console.debug('spreadChange', bet, val);
+		this.validate(bet);
 	},
 
 	calcRisk : function(win, odds) {
@@ -313,6 +319,7 @@ $.extend(SS.Enterbets.prototype, {
 		} else {
 			this.towinChange(bet, val);
 		}
+		this.validate(bet);
 	},
 
 	riskChange : function(bet,val ) {
@@ -321,6 +328,7 @@ $.extend(SS.Enterbets.prototype, {
 		if (!(isNaN(risk) || isNaN(odds)) && risk > 0 && odds != 0) {
 			bet.find('.towin').val(this.calcWin(risk, odds));
 		}
+		this.validate(bet);
 	},
 	
 	towinChange : function(bet, val) {
@@ -329,6 +337,7 @@ $.extend(SS.Enterbets.prototype, {
 		if (!(isNaN(towin) || isNaN(odds)) && towin > 0 && odds != 0) {
 			bet.find('.risk').val(this.calcRisk(towin, odds));
 		}
+		this.validate(bet);
 	},
 	
 	typeChange : function(bet, type, data, iden) {
@@ -376,6 +385,8 @@ $.extend(SS.Enterbets.prototype, {
 			setodd(bet, odd, dir);
 		});
 	},
+
+	
 	
 	setOdd : function (bet, odd, type, dir) {
 		if (odd) {
@@ -401,6 +412,42 @@ $.extend(SS.Enterbets.prototype, {
 				break;
 			}
 		}
+		this.validate(bet);
+	},
+
+	validate : function(bet) {
+		var sels = ['.spread', '.risk', '.odds', '.towin'];
+		var success = true;
+		$.each(sels, function(key, val) {
+			var v = bet.find(val).val();
+			if (v == NaN || v == 0) {
+				success = false;
+				return false;
+			}
+		});
+		if (success) {
+			bet.find('.icon img').attr('src', this.iconurl+'check.png');
+			return true;
+		} else {
+			bet.find('.icon img').attr('src', this.iconurl+'wrong.png');
+			return false;
+		}
+	},
+
+	validateAll : function() {
+		var success = true;
+		var _this = this;
+		this.jBets.find('.bet').each(function (idx, bet) {
+			if (!_this.validate($(bet))) {
+				success = false;
+			}
+		});
+		return success;
+	},
+
+	closeBet : function(bet) {
+		//console.debug('close', bet);
+		bet.remove();
 	},
 
 	setupEvents : function(bet, data, iden) {
@@ -409,6 +456,7 @@ $.extend(SS.Enterbets.prototype, {
 		bet.find('.risk').keyup(function() { _this.riskChange(bet, bet.find('.risk').val()); });
 		bet.find('.odds').keyup(function() { _this.oddsChange(bet, bet.find('.odds').val()); });
 		bet.find('.towin').keyup(function() { _this.towinChange(bet, bet.find('.towin').val()); });
+		bet.find('.close img').click(function() { _this.closeBet(bet); });
 
 		var typeC = function() { _this.typeChange(bet, bet.find('.type').val(), data, iden); };
 		bet.find('.type').change(typeC);

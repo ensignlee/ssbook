@@ -17,6 +17,17 @@
 	border: 1px solid black;
 	padding: 3px;
 	margin: 4px;
+	position: relative;
+}
+.bet .close {
+	position: absolute;
+	top: 1px;
+	right: 1px;
+	cursor: pointer;
+}
+.bet .icon {
+	text-align: center;
+	vertical-align: bottom;
 }
 .bet td {
 	padding: 4px;
