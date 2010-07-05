@@ -64,6 +64,9 @@ h1.head {
 	cursor: pointer;
 	margin: 4px;
 }
+#accorselect li.withodds {
+	color: #333;
+}
 #accorselect li.hover {
 	color: gray;
 }

@@ -1,6 +1,6 @@
 <div id='leftsection'>
-	<input type='text' class='dateselect' name='startdate' value='<?=date('Y-m-d', strtotime('-2 days'))?>' /> -
-	<input type='text' class='dateselect' name='enddate' value='<?=date('Y-m-d')?>' />
+	Date: <input type='text' class='dateselect' name='startdate' value='<?=date('Y-m-d')?>' /> -
+	<input type='text' class='dateselect' name='enddate' value='<?=date('Y-m-d', strtotime('+1 day'))?>' />
 	<div id='accorselect'>&nbsp;</div>
 </div>
 <div id='rightsection'>

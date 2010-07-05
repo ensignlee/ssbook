@@ -485,12 +485,27 @@ SS.Accorselect = function(select, Enterbets, startdateselect, enddateselect) {
 }
 
 $.extend(SS.Accorselect.prototype, {
+	
+	setupDates : function() {
+		var _this = this;
+		this.jStartdate.change(function() {
+			_this.find();
+		});
+		this.jEnddate.change(function() {
+			_this.find();
+		});		
+	},
+
 	render : function(leagues) {
 		var h = '';
 		$.each(leagues, function(league, games) {
 			h += '<h1 class="head">'+league+'</h1><ul>';
 			$.each(games, function (key, game) {
-				h += '<li class="selectgame-'+game.scoreid+'">'+game.desc+'</li>';
+				var clazz = '';
+				if (game.odds) {
+					clazz = ' withodds';
+				}
+				h += '<li class="selectgame-'+game.scoreid+clazz+'">'+game.desc+'</li>';
 			});
 			h += '</ul>';
 		});
@@ -541,6 +556,7 @@ $(function() {
 	enterbets.render();
 	var superbar = new SS.Superbar('#superbar', enterbets);
 	var accorselect = new SS.Accorselect('#accorselect', enterbets, 'input[name=startdate]', 'input[name=enddate]');
+	accorselect.setupDates();
 	accorselect.find();	
 });
 

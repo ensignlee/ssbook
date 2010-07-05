@@ -109,12 +109,22 @@ class Score extends AppModel {
 	public function findScoresBetweenDates($startdate, $enddate) {
 		App::import('model', 'LeagueType');
 		$LeagueType = new LeagueType();
+		App::import('model', 'Odd');
+		$Odd = new Odd();
+
 		$cond = array(
 			'conditions' => array('game_date BETWEEN ? AND ?' => array($startdate, $enddate)),
-			'order' => array('game_date DESC')
+			'order' => array('game_date ASC')
 		);
 		$games = $this->find('all', $cond);
 		$out = array();
+		$scoreids = array();
+		foreach ($games as $game) {
+			$scoreids[] = $game['Score']['id'];
+		}
+		$odds = $Odd->find('list', array('conditions' => array('scoreid' => $scoreids), 'group' => 'scoreid', 'fields' => array('scoreid')));
+		$odds = array_flip($odds);
+
 		foreach ($games as $game) {
 			$game = $game['Score'];
 			$league = $LeagueType->getName($game['league']);
@@ -122,7 +132,7 @@ class Score extends AppModel {
 				$out[$league] = array();
 			}
 			$date = date('n/j/y g:i A', strtotime($game['game_date']));
-			$out[$league][] = array('desc' => "{$game['visitor']} @ {$game['home']} $date", 'scoreid' => $game['id']);
+			$out[$league][] = array('desc' => "{$game['visitor']} @ {$game['home']} $date", 'scoreid' => $game['id'], 'odds' => isset($odds[$game['id']]));
 		}
 		return $out;
 	}
