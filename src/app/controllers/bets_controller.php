@@ -94,6 +94,13 @@ class BetsController extends AppController {
 		$this->set('bets', $bets);
 	}
 
+	private function accorselect($params) {
+		$startdate = $params['startdate'];
+		$enddate = date('Y-m-d 23:59:59', strtotime($params['enddate']));
+		$leagues = $this->Score->findScoresBetweenDates($startdate, $enddate);
+		$this->set('leagues', $leagues);
+	}
+
 	public function ajax($action = '') {
 		$params = $this->params['url'];
 		$date = date('Y-m-d H:i:s'); //today for right now
@@ -104,6 +111,10 @@ class BetsController extends AppController {
 			break;
 		case 'getbet':
 			$this->getbet($params);
+			break;
+		case 'accorselect':
+			$this->accorselect($params);
+			break;
 		}
 		$this->render("ajax_$action");
 	}

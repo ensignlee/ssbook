@@ -25,10 +25,34 @@
 	width: 70px;
 }
 
+.dateselect {
+	width: 7em;
+}
+
 #rightsection {
 	margin: 0;
 	padding: 0;
-	margin-left: 300px;
+	margin-left: 340px;
 	padding-left: 5px;
 	border-left: 1px black solid;
+}
+#leftsection {
+	margin: 0;
+	padding: 0;
+	padding-left: 5px;
+	width: 320px;
+	float: left;
+}
+h1.head {
+	cursor: pointer;
+	background-color: #EEE;
+	padding: 2px !important;
+	padding-left: 4px !important;
+}
+#accorselect li {
+	cursor: pointer;
+	margin: 4px;
+}
+#accorselect li.hover {
+	color: gray;
 }

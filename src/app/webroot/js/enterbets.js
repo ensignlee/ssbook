@@ -428,10 +428,72 @@ $.extend(SS.Enterbets.prototype, {
 
 });
 
+SS.Accorselect = function(select, Enterbets, startdateselect, enddateselect) {
+	this.jSelect = $(select);
+	this.jStartdate = $(startdateselect);
+	this.jEnddate = $(enddateselect);
+	this.Enterbets = Enterbets;
+	this.url = SS.Cake.base + '/bets/ajax/accorselect';
+}
+
+$.extend(SS.Accorselect.prototype, {
+	render : function(leagues) {
+		var h = '';
+		$.each(leagues, function(league, games) {
+			h += '<h1 class="head">'+league+'</h1><ul>';
+			$.each(games, function (key, game) {
+				h += '<li class="selectgame-'+game.scoreid+'">'+game.desc+'</li>';
+			});
+			h += '</ul>';
+		});
+
+		var _this = this;
+		this.jSelect.html(h).ready(function(){
+			_this.jSelect.find('.head').click(function() {
+				$(this).next().toggle('fast');
+				return false;
+			}).next().hide();
+
+			_this.jSelect.find('li[class^=selectgame]').click(function() {
+				var clazz = $(this).attr('class').split('-');
+				var data = { scoreid : clazz[1] };
+				_this.Enterbets.add(data);
+				//$(this).parent().toggle('fast');
+				return false;
+			}).hover(function () { $(this).addClass('hover') }, function() { $(this).removeClass('hover') });
+		});
+	 },
+
+	getStartdate : function() {
+		return new Date(this.jStartdate.val());
+	},
+
+	getEnddate : function() {
+		return new Date(this.jEnddate.val());
+	},
+
+	find : function() {
+		this.findDates(this.getStartdate(), this.getEnddate());
+	},
+
+	findDates : function(startdate, enddate) {
+		var _this = this;
+		$.getJSON(this.url, {
+				startdate : startdate.toString('yyyy-MM-dd'),
+				enddate : enddate.toString('yyyy-MM-dd')
+			},
+			function (json) {
+				_this.render(json);
+			});
+	}
+});
+
 $(function() {
 	var enterbets = new SS.Enterbets('#enterbets');
 	enterbets.render();
 	var superbar = new SS.Superbar('#superbar', enterbets);
+	var accorselect = new SS.Accorselect('#accorselect', enterbets, 'input[name=startdate]', 'input[name=enddate]');
+	accorselect.find();	
 });
 
 })(jQuery);

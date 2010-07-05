@@ -2,6 +2,7 @@
 
 class LeagueType extends AppModel {
 	var $name = 'LeagueType';
+	private $_cacheMap = array();
 
 	public function contains($name) {
 		$out = $this->find('first', array('conditions' => array('name' => trim($name))));
@@ -11,6 +12,13 @@ class LeagueType extends AppModel {
 			return $out[$this->name]['id'];
 		}
 	}	
+
+	public function getName($id) {
+		if (empty($this->_cacheMap)) {
+			$this->_cacheMap = $this->find('list');
+		}
+		return isset($this->_cacheMap[$id]) ? $this->_cacheMap[$id] : '';
+	}
 
 	public function getOrSet($name) {
 		if (empty($name)) {

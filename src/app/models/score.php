@@ -105,4 +105,25 @@ class Score extends AppModel {
 		}
 		return false;
 	}
+	
+	public function findScoresBetweenDates($startdate, $enddate) {
+		App::import('model', 'LeagueType');
+		$LeagueType = new LeagueType();
+		$cond = array(
+			'conditions' => array('game_date BETWEEN ? AND ?' => array($startdate, $enddate)),
+			'order' => array('game_date DESC')
+		);
+		$games = $this->find('all', $cond);
+		$out = array();
+		foreach ($games as $game) {
+			$game = $game['Score'];
+			$league = $LeagueType->getName($game['league']);
+			if (!isset($out[$league])) {
+				$out[$league] = array();
+			}
+			$date = date('n/j/y g:i A', strtotime($game['game_date']));
+			$out[$league][] = array('desc' => "{$game['visitor']} @ {$game['home']} $date", 'scoreid' => $game['id']);
+		}
+		return $out;
+	}
 }
