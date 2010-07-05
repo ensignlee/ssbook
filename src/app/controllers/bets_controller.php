@@ -79,7 +79,7 @@ class BetsController extends AppController {
 
 	public function ajax($action = '') {
 		$params = $this->params['url'];
-		$date = date('Y-m-d'); //today for right now
+		$date = date('Y-m-d H:i:s'); //today for right now
 
 		switch ($action) {
 		case 'superbar':
