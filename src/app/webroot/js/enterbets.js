@@ -213,6 +213,7 @@ SS.Enterbets = function(selector) {
 	this.jBets = null;
 	this.url = SS.Cake.base + '/bets/createbets';
 	this.ajaxUrl = SS.Cake.base + '/bets/ajax/getbet';
+	this.idenNumber = 0;
 }
 
 SS.Enterbets.TYPES = [
@@ -232,7 +233,7 @@ $.extend(SS.Enterbets.prototype, {
 	},
 
 	onSubmit : function () {
-		console.debug('currently submitting');
+		//console.debug('currently submitting');
 	},
 
 	/**
@@ -269,7 +270,7 @@ $.extend(SS.Enterbets.prototype, {
 		h += '<td><input type="text" class="risk" name="risk['+iden+']" /></td>';
 		h += '<td><input type="text" class="odds" name="odds['+iden+']" /></td>';
 		h += '<td><input type="text" class="towin" name="towin['+iden+']" /></td>';
-		var ttl = '<tr><td>Type</td><td class="type_header" colspan="2">&nbsp;</td><td>Risk</td><td>Odds</td><td>To Win</td>';
+		var ttl = '<tr><td colspan="2">Type</td><td class="type_header">&nbsp;</td><td>Risk</td><td>Odds</td><td>To Win</td>';
 
 		var datestr = datetime.toString('M/d/yy h:mm tt');
 		var je = $('<div class="bet"><table><tr><td colspan="6">'+visitor+' @ '+home+' '+datestr+'</td></tr>'+ttl+'<tr>'+h+'</tr></table></div>');
@@ -277,18 +278,62 @@ $.extend(SS.Enterbets.prototype, {
 	},
 
 	spreadChange : function(bet, val) {
-		console.debug('spreadChange', bet, val);
+		//console.debug('spreadChange', bet, val);
 	},
 
-	riskChange : function(bet,val ) {
-		console.debug('riskChange', bet, val);
+	calcRisk : function(win, odds) {
+		if(odds == 0)
+			return;
+
+		if(odds > 0) {
+			return win*100/odds;
+		} else {
+			return win/-100*odds;
+		}
+	},
+	
+	calcWin : function (risk, odds) {
+		if(odds == 0)
+			return;
+
+		if(odds > 0) {
+			return risk*odds/100;
+		} else {
+			return risk/odds*-100;
+		}
 	},
 
 	oddsChange : function(bet, val) {
-		console.debug('oddsChange', bet, val);
+		var odds = parseInt(bet.find('.odds').val());
+		if (odds == 0 || odds == NaN) {
+			return;
+		}
+		if (odds > 0) {
+			this.riskChange(bet, val);
+		} else {
+			this.towinChange(bet, val);
+		}
+	},
+
+	riskChange : function(bet,val ) {
+		var risk = parseInt(bet.find('.risk').val());
+		var odds = parseInt(bet.find('.odds').val());
+		if (!(isNaN(risk) || isNaN(odds)) && risk > 0 && odds != 0) {
+			bet.find('.towin').val(this.calcWin(risk, odds));
+		}
 	},
 	
-	typeChange : function(bet, type, data) {
+	towinChange : function(bet, val) {
+		var towin = parseInt(bet.find('.towin').val());
+		var odds = parseInt(bet.find('.odds').val());
+		if (!(isNaN(towin) || isNaN(odds)) && towin > 0 && odds != 0) {
+			bet.find('.risk').val(this.calcRisk(towin, odds));
+		}
+	},
+	
+	typeChange : function(bet, type, data, iden) {
+		var _this = this;
+		var dir = bet.find('.direction select').val();
 		$.each(SS.Enterbets.TYPES, function (key, val) {
 			if (val.name == type) {
 				bet.find('.type_header').text(val.show);
@@ -297,46 +342,87 @@ $.extend(SS.Enterbets.prototype, {
 		});
 		// Set the other stuff
 		var odd = null;
-		console.debug(data);
 		$.each(data.odds, function (key, val) {
 			if (val.type == type) {
 				odd = val;
 				return false;
 			}
 		});
+		var h = '<select name="direction['+iden+']">';
+		var hsel = '';
+		var vsel = '';
+		if (!dir) {
+			dir = 'home';
+			if (type == 'total') {
+				dir = 'over';
+			}
+		}
+		if (dir == 'over' || dir == 'home') {
+			hsel = 'selected="selected"';
+		} else {
+			vsel = 'selected="selected"';
+		}
+		if (type == 'spread') {
+			h += '<option '+hsel+' value="home">Home</option><option '+vsel+' value="visitor">Visitor</option>';
+		} else {
+			h += '<option '+hsel+' value="over">Over</option><option '+vsel+' value="under">Under</option>';
+		}
+		h += '</select>';
+		var setodd = function() {
+			var newdir = bet.find('.direction select').val();
+			_this.setOdd(bet, odd, type, newdir);
+		}
+		bet.find('.direction').html(h).change(setodd).ready(function() {
+			setodd(bet, odd, dir);
+		});
+	},
+	
+	setOdd : function (bet, odd, type, dir) {
 		if (odd) {
-			console.debug('odd', odd);
+			//console.debug('odd', odd);
 			switch(type) {
 			case 'spread':
-				bet.find('.spread').val(odd.spread_home);
-				bet.find('.odds').val(odd.odds_home);
+				if (dir == 'home') {
+					bet.find('.spread').val(odd.spread_home);
+					bet.find('.odds').val(odd.odds_home);
+				} else {
+					bet.find('.spread').val(odd.spread_visitor);
+					bet.find('.odds').val(odd.odds_visitor);
+				}
 				break;
 			case 'total':
-				bet.find('.spread').val(odd.total);
-				bet.find('.odds').val(odd.odds_home);
+				if (dir == 'over') {
+					bet.find('.spread').val(odd.total);
+					bet.find('.odds').val(odd.odds_home);
+				} else {
+					bet.find('.spread').val(odd.total);
+					bet.find('.odds').val(odd.odds_visitor);
+				}
 				break;
 			}
 		}
 	},
 
-	setupEvents : function(bet, data) {
+	setupEvents : function(bet, data, iden) {
 		var _this = this;
-		bet.find('.spread').change(function() { _this.spreadChange(bet, bet.find('.spread').val()); });
-		bet.find('.risk').change(function() { _this.riskChange(bet, bet.find('.risk').val()); });
-		bet.find('.odds').change(function() { _this.oddsChange(bet, bet.find('.odds').val()); });
+		bet.find('.spread').keyup(function() { _this.spreadChange(bet, bet.find('.spread').val()); });
+		bet.find('.risk').keyup(function() { _this.riskChange(bet, bet.find('.risk').val()); });
+		bet.find('.odds').keyup(function() { _this.oddsChange(bet, bet.find('.odds').val()); });
+		bet.find('.towin').keyup(function() { _this.towinChange(bet, bet.find('.towin').val()); });
 
-		var typeC = function() { _this.typeChange(bet, bet.find('.type').val(), data); };
+		var typeC = function() { _this.typeChange(bet, bet.find('.type').val(), data, iden); };
 		bet.find('.type').change(typeC);
 		typeC();
 	},
 	
 	show : function (data) {
-		var iden = 'SS'+data.scoreid;
+		var num = this.idenNumber++;
+		var iden = 'SS'+data.scoreid+'_'+num;
 		var bet = this.renderBet(data.home, data.visitor, new Date(data.game_date), data.type, iden);
 		var _this = this;
 		this.jBets.append(bet).ready(function() {
 			bet.find('.spread').focus();
-			_this.setupEvents(bet, data);
+			_this.setupEvents(bet, data, iden);
 		});
 	}
 

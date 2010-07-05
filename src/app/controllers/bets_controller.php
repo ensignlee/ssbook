@@ -77,6 +77,23 @@ class BetsController extends AppController {
 		$this->set('bet', $bet);
 	}
 
+	public function createbets() {
+		$form = $this->params['form'];
+		$bets = array();
+		foreach (array_keys($form['type']) as $iden) {
+			list($dbkey, $num) = explode('_', $iden);
+			$bets[] = array(
+				'type' => $form['type'][$iden],
+				'direction' => $form['direction'][$iden],
+				'spread' => $form['spread'][$iden],
+				'risk' => $form['risk'][$iden],
+				'odds' => $form['odds'][$iden],
+				'key' => $dbkey
+			);
+		}
+		$this->set('bets', $bets);
+	}
+
 	public function ajax($action = '') {
 		$params = $this->params['url'];
 		$date = date('Y-m-d H:i:s'); //today for right now
