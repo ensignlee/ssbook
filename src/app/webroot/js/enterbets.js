@@ -547,11 +547,11 @@ $.extend(SS.Accorselect.prototype, {
 	 },
 
 	getStartdate : function() {
-		return new Date(this.jStartdate.val());
+		return new Date(this.jStartdate.val()+'T12:00:00');
 	},
 
 	getEnddate : function() {
-		return new Date(this.jEnddate.val());
+		return new Date(this.jEnddate.val()+'T12:00:00');
 	},
 
 	find : function() {
