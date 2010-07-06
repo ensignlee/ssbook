@@ -219,7 +219,11 @@ SS.Enterbets = function(selector) {
 
 SS.Enterbets.TYPES = [
 	{name:'total',desc:"Total",show:'Total'},
-	{name:'spread',desc:"Spread",show:'Spread'}
+	{name:'half_total',desc:"Half Total",show:'Total'},
+	{name:'spread',desc:"Spread",show:'Spread'},
+	{name:'half_spread',desc:"Half Spread",show:'Spread'},
+	{name:'moneyline',desc:"Money Line",show:'M/L'},
+	{name:'half_moneyline',desc:"Half Money Line",show:'M/L'}
 ];
 
 $.extend(SS.Enterbets.prototype, {
@@ -292,9 +296,9 @@ $.extend(SS.Enterbets.prototype, {
 			return;
 
 		if(odds > 0) {
-			return win*100/odds;
+			return Math.round(win*10000/odds)/100;
 		} else {
-			return win/-100*odds;
+			return Math.round(win/-1*odds)/100;
 		}
 	},
 	
@@ -303,9 +307,9 @@ $.extend(SS.Enterbets.prototype, {
 			return;
 
 		if(odds > 0) {
-			return risk*odds/100;
+			return Math.round(risk*odds)/100;
 		} else {
-			return risk/odds*-100;
+			return Math.round(risk/odds*-10000)/100;
 		}
 	},
 
@@ -371,7 +375,7 @@ $.extend(SS.Enterbets.prototype, {
 		} else {
 			vsel = 'selected="selected"';
 		}
-		if (type == 'spread') {
+		if (type == 'half_spread' || type == 'half_moneyline' || type == 'spread' || type == 'moneyline') {
 			h += '<option '+hsel+' value="home">Home</option><option '+vsel+' value="visitor">Visitor</option>';
 		} else {
 			h += '<option '+hsel+' value="over">Over</option><option '+vsel+' value="under">Under</option>';
@@ -382,6 +386,12 @@ $.extend(SS.Enterbets.prototype, {
 			_this.setOdd(bet, odd, type, newdir);
 		}
 		bet.find('.direction').html(h).change(setodd).ready(function() {
+			if (type == 'moneyline' || type == 'half_moneyline') {
+				bet.find('.spread').attr('disabled', 'disabled').val(0);
+			} else {
+				bet.find('.spread').attr('disabled', '');
+			}
+			
 			setodd(bet, odd, dir);
 		});
 	},
@@ -393,6 +403,9 @@ $.extend(SS.Enterbets.prototype, {
 			//console.debug('odd', odd);
 			switch(type) {
 			case 'spread':
+			case 'half_spread':
+			case 'moneyline':
+			case 'half_moneyline':
 				if (dir == 'home') {
 					bet.find('.spread').val(odd.spread_home);
 					bet.find('.odds').val(odd.odds_home);
@@ -402,6 +415,7 @@ $.extend(SS.Enterbets.prototype, {
 				}
 				break;
 			case 'total':
+			case 'half_total':
 				if (dir == 'over') {
 					bet.find('.spread').val(odd.total);
 					bet.find('.odds').val(odd.odds_home);
@@ -411,12 +425,16 @@ $.extend(SS.Enterbets.prototype, {
 				}
 				break;
 			}
+		} else {
+			bet.find('.spread').val('');
+			bet.find('.odds').val('');
 		}
+		this.oddsChange(bet, bet.find('.odd').val());
 		this.validate(bet);
 	},
 
 	validate : function(bet) {
-		var sels = ['.spread', '.risk', '.odds', '.towin'];
+		var sels = ['.risk', '.odds', '.towin'];
 		var success = true;
 		$.each(sels, function(key, val) {
 			var v = bet.find(val).val();

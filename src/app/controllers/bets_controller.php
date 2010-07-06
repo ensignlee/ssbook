@@ -65,7 +65,8 @@ class BetsController extends AppController {
 				'home' => $score['home'],
 				'visitor' => $score['visitor'],
 				'league' => $score['league'],
-				'game_date' => $score['game_date']
+				'game_date' => $score['game_date'],
+				'type' => 'spread'
 			);
 			$odds = $this->Odd->latest($params['scoreid']);
 			$bet['odds'] = array();
@@ -85,7 +86,7 @@ class BetsController extends AppController {
 			$bets[] = array(
 				'type' => $form['type'][$iden],
 				'direction' => $form['direction'][$iden],
-				'spread' => $form['spread'][$iden],
+				'spread' => (int)$form['spread'][$iden],
 				'risk' => $form['risk'][$iden],
 				'odds' => $form['odds'][$iden],
 				'key' => $dbkey

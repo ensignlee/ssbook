@@ -1,5 +1,5 @@
 #superbar {
-	width: 500px;
+	width: 550px;
 }
 .dropdown {
 	position: absolute;
@@ -59,6 +59,9 @@ h1.head {
 	background-color: #EEE;
 	padding: 2px !important;
 	padding-left: 4px !important;
+}
+#accorselect {
+	background-color: #FFE;
 }
 #accorselect li {
 	cursor: pointer;
