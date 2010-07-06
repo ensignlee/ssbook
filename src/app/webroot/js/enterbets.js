@@ -279,10 +279,11 @@ $.extend(SS.Enterbets.prototype, {
 		h += '<td><input type="text" class="risk" name="risk['+iden+']" /></td>';
 		h += '<td><input type="text" class="odds" name="odds['+iden+']" /></td>';
 		h += '<td><input type="text" class="towin" name="towin['+iden+']" /></td>';
-		var ttl = '<tr><td>&nbsp;</td><td colspan="2">Type</td><td class="type_header">&nbsp;</td><td>Risk</td><td>Odds</td><td>To Win</td></tr>';
+		h += '<td><input type="text" class="book" name="book['+iden+']" /></td>';
+		var ttl = '<tr><td>&nbsp;</td><td colspan="2">Type</td><td class="type_header">&nbsp;</td><td>Risk</td><td>Odds</td><td>To Win</td><td>Book</td></tr>';
 
 		var datestr = datetime.toString('M/d/yy h:mm tt');
-		var je = $('<div class="bet"><table><tr><td>&nbsp;</td><td colspan="6">'+visitor+' @ '+home+' '+datestr+'</td></tr>'+ttl+'<tr>'+h+'</tr></table><div class="close"><img src="'+this.iconurl+'close.png" /></div></div>');
+		var je = $('<div class="bet"><table><tr><td>&nbsp;</td><td colspan="7">'+visitor+' @ '+home+' '+datestr+'</td></tr>'+ttl+'<tr>'+h+'</tr></table><div class="close"><img src="'+this.iconurl+'close.png" /></div></div>');
 		return je;
 	},
 

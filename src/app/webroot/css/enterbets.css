@@ -1,5 +1,5 @@
 #superbar {
-	width: 550px;
+	width: 600px;
 }
 .dropdown {
 	position: absolute;
@@ -33,7 +33,10 @@
 	padding: 4px;
 }
 .bet input {
-	width: 70px;
+	width: 60px;
+}
+.bet .book {
+	width: 80px;
 }
 
 .dateselect {
