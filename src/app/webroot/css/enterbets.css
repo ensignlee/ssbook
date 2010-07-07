@@ -13,30 +13,30 @@
 	background-color: grey;
 	cursor: pointer;
 }
-.bet {
+.bet, .bet-parlay {
 	border: 1px solid black;
 	padding: 3px;
 	margin: 4px;
 	position: relative;
 }
-.bet .close {
+.bets .close {
 	position: absolute;
 	top: 1px;
 	right: 1px;
 	cursor: pointer;
 }
-.bet .icon {
+.bets .icon {
 	text-align: center;
 	vertical-align: bottom;
 }
-.bet td {
+.bets td {
 	padding: 4px;
 }
-.bet input {
+.bets input[type=text] {
 	width: 60px;
 }
-.bet .book {
-	width: 80px;
+.bets .book {
+	width: 80px !important;
 }
 
 .dateselect {

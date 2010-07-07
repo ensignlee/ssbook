@@ -80,19 +80,47 @@ class BetsController extends AppController {
 
 	public function createbets() {
 		$form = $this->params['form'];
+		$form = $form + array('parlay' => array(), 'direction' => array(), 'spread' => array());
 		$bets = array();
 		foreach (array_keys($form['type']) as $iden) {
 			list($dbkey, $num) = explode('_', $iden);
+			if (!isset($form['direction'][$iden])) {
+				$form['direction'][$iden] = null;
+			}
+			if (!isset($form['spread'][$iden])) {
+				$form['spread'][$iden] = null;
+			}
+			if (!isset($form['parlay'][$iden])) {
+				$form['parlay'][$iden] = null;
+			}
 			$bets[] = array(
 				'type' => $form['type'][$iden],
 				'direction' => $form['direction'][$iden],
-				'spread' => (int)$form['spread'][$iden],
+				'spread' => $form['spread'][$iden],
 				'risk' => $form['risk'][$iden],
 				'odds' => $form['odds'][$iden],
-				'key' => $dbkey
+				'key' => $dbkey,
+				'parlay' => $this->parseParlay($form['parlay'][$iden])
 			);
 		}
 		$this->set('bets', $bets);
+	}
+
+	private function parseParlay($parlays) {
+		if (empty($parlays)) {
+			return false;
+		}
+		$out = array();
+		foreach ($parlays as $key => $game) {
+			$gameinfo = explode(';', $game);
+			$i = array();
+			foreach ($gameinfo as $row) {
+				list($k, $v) = explode('=', $row);
+				$i[$k] = $v;
+			}
+			$out[$key] = $i;
+		}
+		return $out;
 	}
 
 	private function accorselect($params) {

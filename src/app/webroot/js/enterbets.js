@@ -4,6 +4,14 @@ if (typeof SS == 'undefined') {
 
 (function ($) {
 
+SS.calcWin = function(risk, odds) {
+	if(odds > 0) {
+		return risk*odds/100;
+	} else {
+		return risk/odds*-100;
+	}
+};
+
 SS.Superbar = function(selector, Enterbets) {
 	this.jSelect = $(selector);
 
@@ -19,7 +27,7 @@ SS.Superbar = function(selector, Enterbets) {
 
 	this.Enterbets = Enterbets;
 	this.doneLoadingBet = true;
-}
+};
 
 $.extend(SS.Superbar.prototype, {
 
@@ -229,12 +237,93 @@ SS.Enterbets.TYPES = [
 $.extend(SS.Enterbets.prototype, {
 
 	render : function() {
-		this.jSelect.html("<form action='"+this.url+"' method='post'><div class='bets'><h1>Bets</h1></div><div class='record'><input type='submit' /></div>");
+		this.jSelect.html("<form action='"+this.url+"' method='post'><div class='bets'>&nbsp;</div><div class='record'><input type='submit' value='Add Bets' /><button id='parlay' type='button'>Parlay</button></div>");
 		var _this = this;
 		this.jSelect.ready(function() {
 			_this.jBets = _this.jSelect.find('.bets');
 			_this.jSelect.find('form').submit($.proxy(_this.onSubmit, _this));
+			_this.jSelect.find('#parlay').click($.proxy(_this, 'onParlay'));
 		});
+	},
+
+	onParlay : function() {
+		var _this = this;
+		var parlaybets = this.jBets.find(':checked').parents('.bet');
+
+		var gamesinfo = [];
+		var success = !!parlaybets.length && parlaybets.length > 1;
+		parlaybets.each(function(key, bet) {
+			var info = _this.getBetInfo($(bet));
+			success = success && _this.betParlayValid(info);	
+			gamesinfo.push(info);
+		});
+
+		if (!success) {
+			alert('Unable to create parlay');
+			return false;
+		}
+
+		this.idenNumber++;
+		var iden = 'parlay_'+this.idenNumber;
+		var bet = this.renderParlay(gamesinfo, iden);
+		var calcedOdd = '', prevCalcedOdd = 100;
+		$.each(gamesinfo, function(key, val) {
+			if (val.odds == '') {
+				calcedOdd = '';
+				return false;
+			}
+			if (calcedOdd == '') {
+				calcedOdd = 0;
+			}
+			calcedOdd = SS.calcWin(prevCalcedOdd, val.odds);
+			calcedOdd += prevCalcedOdd;
+			prevCalcedOdd = calcedOdd;
+		});
+		calcedOdd -= 100;
+		if (calcedOdd < 100) {
+			calcedOdd = Math.round(-1000000/calcedOdd)/100;
+		} 
+
+		var _this = this;
+		this.jBets.prepend(bet).ready(function() {
+			bet.find('.risk').focus();
+			bet.find('.odds').val(calcedOdd);
+			bet.append(_this.buildBetInput(gamesinfo, iden));
+			_this.setupEvents(bet, gamesinfo, iden);
+			parlaybets.remove();
+		});
+		return false;
+	},
+
+	buildBetInput : function(parlaybets, iden) {
+		var h = '';
+		var _this = this;
+		$.each(parlaybets, function (key, val) {
+			h += '<input type="hidden" name="parlay['+iden+']['+val.iden+']" value="'+_this.betInfoToCSV(val)+'" />';
+		});
+		return $(h);
+	},
+
+	betInfoToCSV : function(betinfo) {
+console.debug(betinfo);
+		var ret = [];
+		$.each(betinfo, function(key, val) {
+			ret.push(key+'='+val);
+		});
+		return ret.join(';');
+	},
+
+	betParlayValid : function(info) {
+		switch(info.type) {
+		case 'moneyline':
+		case 'half_moneyline':
+		case 'spread':
+		case 'half_spread':
+		case 'total':
+		case 'half_total':
+			return info.spread != '';
+		}			
+		return false;
 	},
 
 	onSubmit : function () {
@@ -280,11 +369,95 @@ $.extend(SS.Enterbets.prototype, {
 		h += '<td><input type="text" class="odds" name="odds['+iden+']" /></td>';
 		h += '<td><input type="text" class="towin" name="towin['+iden+']" /></td>';
 		h += '<td><input type="text" class="book" name="book['+iden+']" /></td>';
-		var ttl = '<tr><td>&nbsp;</td><td colspan="2">Type</td><td class="type_header">&nbsp;</td><td>Risk</td><td>Odds</td><td>To Win</td><td>Book</td></tr>';
+		var ttl = '<tr><td><input type="checkbox" /></td><td colspan="2">Type</td><td class="type_header">&nbsp;</td><td>Risk</td><td>Odds</td><td>To Win</td><td>Book</td></tr>';
 
 		var datestr = datetime.toString('M/d/yy h:mm tt');
-		var je = $('<div class="bet"><table><tr><td>&nbsp;</td><td colspan="7">'+visitor+' @ '+home+' '+datestr+'</td></tr>'+ttl+'<tr>'+h+'</tr></table><div class="close"><img src="'+this.iconurl+'close.png" /></div></div>');
+		var je = $('<div class="bet"><table><tr><td>&nbsp;</td><td colspan="7" class="teamnames"><span class="teamnames_visitor">'+visitor+'</span> @ <span class="teamnames_home">'+home+'</span> <span class="teamnames_datestr">'+datestr+'</td></td></tr>'+ttl+'<tr>'+h+'</tr></table><div class="close"><img src="'+this.iconurl+'close.png" /></div></div>');
 		return je;
+	},
+
+	renderParlay : function (gamesinfo, iden) {
+		var title = this.titleText(gamesinfo);
+		var h = '<div class="bet-parlay"><table><tr><td>&nbsp;</td><td colspan="7">'+title+'</td></tr>';
+		h += '<tr><td>&nbsp;</td><td colspan="2">Type</td>';
+		h += '<td>Games</td><td>Risk</td><td>Odds</td><td>To Win</td><td>Book</td></tr>';
+		h += '<tr><td class="icon">&nbsp;</td><td>';
+		h += '<select name="type['+iden+']"><option value="parlay">Parlay</option></select>';
+		h += '</td><td>&nbsp;</td>';
+
+		h += '<td>'+gamesinfo.length+'</td>';
+		h += '<td><input type="text" class="risk" name="risk['+iden+']" /></td>';
+		h += '<td><input type="text" class="odds" name="odds['+iden+']" /></td>';
+		h += '<td><input type="text" class="towin" name="towin['+iden+']" /></td>';
+		h += '<td><input type="text" class="book" name="book['+iden+']" /></td>';
+		h += '</tr><td>&nbsp;</td><td colspan="7" class="gametext">';
+		h += this.gameText(gamesinfo);
+		h += '</td></tr></table>';
+		h += '<div class="close"><img src="'+this.iconurl+'close.png" /></div></div>';
+
+		return $(h);
+	},
+
+	titleText : function(gamesinfo) {
+		if (!gamesinfo || !gamesinfo.length) {
+			return '';
+		}
+		var t = [];
+		$.each(gamesinfo, function(key, val) {
+			t.push(val.teamnames);
+		});
+		return t.join(', ');
+	},
+
+	gameText : function(gamesinfo) {
+		if (!gamesinfo || !gamesinfo.length) {
+			return '';
+		}
+		var t = '';
+		var _this = this;
+		$.each(gamesinfo, function(key, val) {
+			t += '<div>'+_this.singleGameText(val)+'</div>';
+		});
+		return t;
+	},
+
+	singleGameText : function(game) {
+		var t = '';
+		var spread = game.spread;
+		switch(game.type) {
+		case 'moneyline':
+		case 'half_moneyline':
+			spread = 'M/L';			
+		case 'spread':
+		case 'half_spread':
+			if (game.direction == 'home') {
+				t += game.home;
+			} else {
+				t += game.visitor;
+			}
+			return t+ ' '+spread;
+		case 'total':
+		case 'half_total':
+			return game.visitor+' @ '+game.home+' '+game.type+' '+spread;
+		}
+		return '';
+	},
+
+	getBetInfo : function(bet) {
+		var info = {};
+		info['teamnames'] = bet.find('.teamnames').text();
+		info['home'] = bet.find('.teamnames_home').text();
+		info['visitor'] = bet.find('.teamnames_visitor').text();
+		info['datestr'] = bet.find('.teamnames_datestr').text();
+		info['spread'] = bet.find('.spread').val();
+		var iden = /[a-zA-Z]+[0-9_]+/.exec(bet.find('.risk').attr('name'));
+		info['iden'] = iden[0];
+		info['risk'] = bet.find('.risk').val();
+		info['odds'] = bet.find('.odds').val();
+		info['towin'] = bet.find('.book').val();
+		info['type'] = bet.find('.type').val();
+		info['direction'] = bet.find('.direction select').val();
+		return info;
 	},
 
 	spreadChange : function(bet, val) {
@@ -307,11 +480,7 @@ $.extend(SS.Enterbets.prototype, {
 		if(odds == 0)
 			return;
 
-		if(odds > 0) {
-			return Math.round(risk*odds)/100;
-		} else {
-			return Math.round(risk/odds*-10000)/100;
-		}
+		return Math.round(SS.calcWin(risk, odds)*100)/100;
 	},
 
 	oddsChange : function(bet, val) {
@@ -356,12 +525,17 @@ $.extend(SS.Enterbets.prototype, {
 		});
 		// Set the other stuff
 		var odd = null;
-		$.each(data.odds, function (key, val) {
-			if (val.type == type) {
-				odd = val;
-				return false;
-			}
-		});
+		if (data.odds !== undefined && data.odds.length) {
+			$.each(data.odds, function (key, val) {
+				if (val.type == type) {
+					odd = val;
+					return false;
+				}
+			});
+		}
+		if (!odd) {
+			return false;
+		}
 		var h = '<select name="direction['+iden+']">';
 		var hsel = '';
 		var vsel = '';
@@ -487,7 +661,7 @@ $.extend(SS.Enterbets.prototype, {
 		var iden = 'SS'+data.scoreid+'_'+num;
 		var bet = this.renderBet(data.home, data.visitor, new Date(data.game_date), data.type, iden);
 		var _this = this;
-		this.jBets.append(bet).ready(function() {
+		this.jBets.prepend(bet).ready(function() {
 			bet.find('.spread').focus();
 			_this.setupEvents(bet, data, iden);
 		});
