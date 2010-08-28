@@ -163,6 +163,10 @@ class Pinnacle extends Pinnacle_Log {
 		switch(strtolower($name)) {
 		case 'baseball mlb':
 			return "MLB";
+		case 'football nfl':
+			return 'NFL';
+		case 'football ncaa':
+			return 'NCAAF';
 		default:
 			return false;
 		}

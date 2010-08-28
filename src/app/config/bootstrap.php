@@ -56,7 +56,7 @@ function curl_file_get_contents($url, $post = null) {
 	curl_setopt($fp, CURLOPT_FAILONERROR, 1);
 	curl_setopt($fp, CURLOPT_FOLLOWLOCATION, 1);
 	curl_setopt($fp, CURLOPT_RETURNTRANSFER, 1);
-	curl_setopt($fp, CURLOPT_TIMEOUT, 15);
+	curl_setopt($fp, CURLOPT_TIMEOUT, 120);
 	curl_setopt($fp, CURLOPT_HTTPGET, true);
 	$result = curl_exec($fp);
 	curl_close($fp);
