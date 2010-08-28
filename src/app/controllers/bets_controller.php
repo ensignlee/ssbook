@@ -167,4 +167,9 @@ class BetsController extends AppController {
 		}
 		$this->render("ajax_$action");
 	}
+
+	public function view() {
+		$bets = $this->UserBet->getAll($this->Auth->user('id'));		
+		$this->set('bets', $bets);
+	}
 }
