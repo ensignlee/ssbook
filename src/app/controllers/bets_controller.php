@@ -100,10 +100,30 @@ class BetsController extends AppController {
 				'risk' => $form['risk'][$iden],
 				'odds' => $form['odds'][$iden],
 				'key' => $dbkey,
+				'scoreid' => str_replace('SS', '', $dbkey),
+				'book' => $form['book'][$iden],
+				'date_std' => $form['date_std'][$iden],
 				'parlay' => $this->parseParlay($form['parlay'][$iden])
 			);
 		}
-		$this->set('bets', $bets);
+		list($saveBets, $unsavedBets) = $this->saveBets($bets);
+		
+		$this->set('savedBets', $saveBets);
+		$this->set('unsavedBets', $unsavedBets);
+	}
+
+	private function saveBets($bets) {
+		$saved = $notSaved = array();
+		$userid = $this->Auth->user('id');
+		
+		foreach ($bets as $bet) {
+			if ($this->UserBet->create($userid, $bet)) {
+				$saved[] = $bet;
+			} else {
+				$notSaved[] = $bet;
+			}
+		}
+		return array($saved, $notSaved);
 	}
 
 	private function parseParlay($parlays) {
