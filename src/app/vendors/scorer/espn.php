@@ -23,8 +23,10 @@ class Espn extends Espn_Log {
 			throw new Exception('Unable to find Score model');
 		}
 		$this->types = array();
-		$this->types[] = new Espn_MLB();
-		$this->types[] = new Espn_NBA();
+		//$this->types[] = new Espn_MLB();
+		//$this->types[] = new Espn_NBA();
+		//$this->types[] = new Espn_NFL();
+		$this->types[] = new Espn_NCAAF();
 
 		$this->setSourceId();
 		$this->date = $this->shell->Score->getLastGameDate($this->sourceid);
@@ -48,6 +50,13 @@ class Espn extends Espn_Log {
 			return null;
 		}
 		return $tstr;
+	}
+
+	public static function addNull($left, $right) {
+		if (is_null($left) || is_null($right)) {
+			return null;
+		}
+		return $left + $right;
 	}
 
 	public function score($date = null) {
@@ -116,6 +125,88 @@ abstract class Espn_Scorer extends Espn_Log {
 		$lt = new LeagueType();
 		$this->league = $lt->getOrSet($this->leagueName);
 	} 
+
+	public function addDays() {
+		return 1;
+	}
+
+	protected static function createDate($str) {
+		$out = date('Y-m-d H:i:s', strtotime(str_replace('ET', 'EDT', $str)));
+		return $out;
+	}
+}
+
+class Espn_NCAAF extends Espn_NFL {
+
+	public $leagueName = 'NCAAF';
+	
+        public function getUrl($date) {
+                return sprintf('http://scores.espn.go.com/college-football/scoreboard?date=%s', date('Ymd', strtotime($date)));
+        }
+}
+
+class Espn_NFL extends Espn_Scorer {
+	
+	public $leagueName = 'NFL';
+
+	public function getUrl($date) {
+		return sprintf('http://scores.espn.go.com/nfl/scoreboard?date=%s', date('Ymd', strtotime($date)));
+	}
+	
+	public function addDays() {
+		return 6; // Only 6, just to be careful?
+	}
+
+	public function parseHtml($html) {
+		$doc = phpQuery::newDocument($html);
+		$out = array();
+
+		$scores = pq('.final-state');
+		foreach ($scores as $score) {
+			$row = $this->parseScore($score);
+			$out[] = $row;
+		}
+
+		$scores = pq('.preview');
+		foreach ($scores as $score) {
+			$row = $this->parseScore($score, true);
+			$out[] = $row;
+		}
+
+		return $out;
+	}
+
+	protected function parseScore($score, $preview = false) {
+		$row = array();
+		$dateStr = pq($score)->parents('.gameDay-Container')->prev()->text();
+		$away = pq(".visitor", $score);
+		$home = pq(".home", $score);
+		$row['visitor'] = pq('.team-name a', $away)->text();
+		$row['home'] = pq('.team-name a', $home)->text();
+
+		if (!$preview) {
+			$row['visitor_score_total'] = Espn::replaceNull(pq('.score .final', $away)->text());
+			$row['home_score_total'] = Espn::replaceNull(pq('.score .final', $home)->text());
+			$row['visitor_score_half'] = Espn::addNull(Espn::replaceNull(pq('li[id$=aScore1]', $away)->text()), Espn::replaceNull(pq('li[id$=aScore2]', $away)->text()));
+			$row['home_score_half'] = Espn::addNull(Espn::replaceNull(pq('li[id$=hScore1]', $home)->text()), Espn::replaceNull(pq('li[id$=hScore2]', $home)->text()));
+		}
+
+		$row['league'] = $this->league;
+		$status = Espn::replaceNull(pq(".game-status", $score)->text());
+		if ($status == "Final") {
+			$status = "";
+		}
+		$row['game_date'] = self::createDate("$dateStr $status");
+		
+		$id = pq($score)->attr('id');
+		if (preg_match('/[0-9]+/', $id, $m)) {
+			$row['source_gameid'] = $m[0];
+		} else {
+			throw new Exception('Unable to find source_gameid');
+		}
+		return $row;
+	}
+
 }
 
 class Espn_MLB extends Espn_Scorer {
@@ -171,14 +262,9 @@ class Espn_MLB extends Espn_Scorer {
 		}
 		return $row;
 	}
-
-	protected static function createDate($str) {
-		$out = date('Y-m-d H:i:s', strtotime(str_replace('ET', 'EDT', $str)));
-		return $out;
-	}
 }
 
-class ESPN_NBA extends Espn_MLB {
+class Espn_NBA extends Espn_MLB {
 	
 	public $leagueName = 'NBA';
 
