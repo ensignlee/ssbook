@@ -117,7 +117,7 @@ class BetsController extends AppController {
 		$userid = $this->Auth->user('id');
 		
 		foreach ($bets as $bet) {
-			if ($this->UserBet->create($userid, $bet)) {
+			if ($this->UserBet->persist($userid, $bet)) {
 				$saved[] = $bet;
 			} else {
 				$notSaved[] = $bet;

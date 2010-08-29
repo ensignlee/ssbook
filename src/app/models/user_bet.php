@@ -12,7 +12,8 @@ class UserBet extends AppModel {
 	/**
 	 * expects (type, direction, spread, risk, odds, scoreid, book, parlay, game_date)
 	 */
-	public function create($userid, &$bet) {
+	public function persist($userid, &$bet) {
+		$this->create();
 		$save = array(
 			'userid' => $userid,
 			'scoreid' => $bet['scoreid'],
@@ -23,7 +24,11 @@ class UserBet extends AppModel {
 			'odds' => $bet['odds'],
 			'risk' => $bet['risk']
 		);
-		return $this->save($save);
+		$success = $this->save($save);
+		if ($success) {
+			$bet['id'] = $this->id;
+		}
+		return $success;
 	}	
 
 	public function getAll($userid) {
