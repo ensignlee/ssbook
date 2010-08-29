@@ -45,9 +45,9 @@ class UserBet extends AppModel {
 		return $this->SourceType->getOrSet($name);
 	}
 
-	public function getAll($userid) {
+	public function getAll($userid, $parlayids = null) {
 		$bets = $this->find('all', array(
-			'conditions' => array('userid' => $userid)
+			'conditions' => array('userid' => $userid, 'parlayid' => $parlayids)
 		));
 
 		App::import('Model', 'LeagueType');
@@ -59,13 +59,22 @@ class UserBet extends AppModel {
 			$bet['Score']['league'] = $this->LeagueType->getName($bet['Score']['league']);
 			$bet['UserBet']['source'] = $this->SourceType->getName($bet['UserBet']['sourceid']);
 			$bet['UserBet']['bet'] = self::buildBet($bet['UserBet']);
+			if ($bet['UserBet']['type'] == 'parlay') {
+				$bet['UserBet']['Parlay'] = $this->getParlays($userid, $bet['UserBet']['id']);
+			}
 			$bet['UserBet']['winning'] = self::calcWinning($bet['Score'], $bet['UserBet']);
 		}
 		return $bets;
 	}
+	
+	public function getParlays($userid, $id) {
+		return $this->getAll($userid, $id);
+	}
 
 	public static function calcWinning($score, $bet) {
-		return "na";
+		App::import('Vendor', 'calculator/winning');
+		$w = new Winning($score, $bet);
+		return $w->process();
 	}
 
 	public static function buildBet($bet) {
