@@ -23,9 +23,9 @@ class Espn extends Espn_Log {
 			throw new Exception('Unable to find Score model');
 		}
 		$this->types = array();
-		//$this->types[] = new Espn_MLB();
-		//$this->types[] = new Espn_NBA();
-		//$this->types[] = new Espn_NFL();
+		$this->types[] = new Espn_MLB();
+		$this->types[] = new Espn_NBA();
+		$this->types[] = new Espn_NFL();
 		$this->types[] = new Espn_NCAAF();
 
 		$this->setSourceId();
