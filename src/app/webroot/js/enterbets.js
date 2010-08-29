@@ -305,7 +305,6 @@ $.extend(SS.Enterbets.prototype, {
 	},
 
 	betInfoToCSV : function(betinfo) {
-console.debug(betinfo);
 		var ret = [];
 		$.each(betinfo, function(key, val) {
 			ret.push(key+'='+val);
@@ -601,7 +600,7 @@ console.debug(betinfo);
 				}
 				break;
 			}
-		} else {
+		} else if (dir) {
 			bet.find('.spread').val('');
 			bet.find('.odds').val('');
 		}

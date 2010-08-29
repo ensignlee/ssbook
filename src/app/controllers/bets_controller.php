@@ -93,7 +93,7 @@ class BetsController extends AppController {
 			if (!isset($form['parlay'][$iden])) {
 				$form['parlay'][$iden] = null;
 			}
-			$bets[] = array(
+			$bet = array(
 				'type' => $form['type'][$iden],
 				'direction' => $form['direction'][$iden],
 				'spread' => $form['spread'][$iden],
@@ -102,9 +102,30 @@ class BetsController extends AppController {
 				'key' => $dbkey,
 				'scoreid' => str_replace('SS', '', $dbkey),
 				'book' => $form['book'][$iden],
-				'date_std' => $form['date_std'][$iden],
+				'date_std' => isset($form['date_std'][$iden]) ? $form['date_std'][$iden] : null,
 				'parlay' => $this->parseParlay($form['parlay'][$iden])
 			);
+			if ($bet['type'] == 'parlay') {
+				$date_std = 0;
+				foreach ($bet['parlay'] as $p) {
+					$date_std = max($date_std, strtotime($p['date_std']));
+				}
+				$bet['date_std'] = gmdate('Y-m-d H:i:s', $date_std);
+				$bet['scoreid'] = null;
+				$userid = $this->Auth->user('id');
+				$this->UserBet->persist($userid, $bet);
+				$saveParlays = array();
+				foreach ($bet['parlay'] as $iden => $p) {
+					list($dbkey, $num) = explode('_', $iden);
+					$p['parlayid'] = $bet['id'];
+					$p['scoreid'] = str_replace('SS', '', $dbkey);
+					$p['pt'] = 'parlay';
+					$saveParlays[] = $p;
+				}
+				$this->saveBets($saveParlays);
+			} else {
+				$bets[] = $bet;
+			}
 		}
 		list($saveBets, $unsavedBets) = $this->saveBets($bets);
 		

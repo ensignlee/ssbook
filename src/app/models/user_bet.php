@@ -22,7 +22,9 @@ class UserBet extends AppModel {
 			'direction' => $bet['direction'],
 			'spread' => $bet['spread'],
 			'odds' => $bet['odds'],
-			'risk' => $bet['risk']
+			'risk' => $bet['risk'],
+			'parlayid' => isset($bet['parlayid']) ? $bet['parlayid'] : null,
+			'pt' => isset($bet['pt']) ? $bet['pt'] : null
 		);
 		if (!empty($bet['book'])) {
 			$save['sourceid'] = $this->getSaveSource($bet['book']);
