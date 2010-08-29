@@ -24,12 +24,24 @@ class UserBet extends AppModel {
 			'odds' => $bet['odds'],
 			'risk' => $bet['risk']
 		);
+		if (!empty($bet['book'])) {
+			$save['sourceid'] = $this->getSaveSource($bet['book']);
+			$bet['sourceid'] = $save['sourceid'];
+		}
 		$success = $this->save($save);
 		if ($success) {
 			$bet['id'] = $this->id;
 		}
 		return $success;
 	}	
+
+	private function getSaveSource($name) {
+		if (empty($this->SourceType)) {
+			App::import('Model', 'SourceType');
+			$this->SourceType = new SourceType();
+		}
+		return $this->SourceType->getOrSet($name);
+	}
 
 	public function getAll($userid) {
 		$bets = $this->find('all', array(
@@ -38,9 +50,12 @@ class UserBet extends AppModel {
 
 		App::import('Model', 'LeagueType');
 		$this->LeagueType = new LeagueType();
+		App::import('Model', 'SourceType');
+		$this->SourceType = new SourceType();
 
 		foreach ($bets as &$bet) {
 			$bet['Score']['league'] = $this->LeagueType->getName($bet['Score']['league']);
+			$bet['UserBet']['source'] = $this->SourceType->getName($bet['UserBet']['sourceid']);
 			$bet['UserBet']['bet'] = self::buildBet($bet['UserBet']);
 			$bet['UserBet']['winning'] = self::calcWinning($bet['Score'], $bet['UserBet']);
 		}

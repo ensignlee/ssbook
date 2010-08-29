@@ -8,9 +8,11 @@
 	<th>Visitor</th>
 	<th>League</th>
 	<th>Bet Direction</th>
+	<th>Bet Type</th>
 	<th>Bet</th>
 	<th>Risk</th>
 	<th>Winnings</th>
+	<th>Book</th>
 </tr>
 
 <?php
@@ -25,9 +27,11 @@ foreach ($bets as $bet) :
 	<td><?= $score['visitor'] ?></td>
 	<td><?= $score['league'] ?></td>
 	<td><?= $bet['direction'] ?></td>
+	<td><?= $bet['type'] ?></td>
 	<td><?= $bet['bet'] ?></td>
 	<td><?= $bet['risk'] ?></td>
 	<td><?= $bet['winning'] ?></td>
+	<td><?= $bet['source'] ?></td>
 </tr>	
 
 <?php endforeach; // ($bets as $bet) : ?>
