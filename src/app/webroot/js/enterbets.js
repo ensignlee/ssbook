@@ -487,6 +487,8 @@ console.debug(betinfo);
 
 	oddsChange : function(bet, val) {
 		var odds = parseInt(bet.find('.odds').val());
+		var towin = parseInt(bet.find('.towin').val());
+
 		if (odds == 0 || odds == NaN) {
 			return;
 		}
@@ -498,7 +500,7 @@ console.debug(betinfo);
 		this.validate(bet);
 	},
 
-	riskChange : function(bet,val ) {
+	riskChange : function(bet, val) {
 		var risk = parseInt(bet.find('.risk').val());
 		var odds = parseInt(bet.find('.odds').val());
 		if (!(isNaN(risk) || isNaN(odds)) && risk > 0 && odds != 0) {
@@ -534,9 +536,6 @@ console.debug(betinfo);
 					return false;
 				}
 			});
-		}
-		if (!odd) {
-			return false;
 		}
 		var h = '<select name="direction['+iden+']">';
 		var hsel = '';
