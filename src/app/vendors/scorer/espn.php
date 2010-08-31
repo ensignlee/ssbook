@@ -84,6 +84,7 @@ class Espn extends Espn_Log {
 				}
 				if ($this->shell->Score->save($score)) {
 					$success++;
+					$this->log("Saving {$score['visitor']} @ {$score['home']}");
 				} else {
 					throw new Exception('Unable to save game'.json_encode(array($score, $this->shell->Score->validationErrors)));
 				}
