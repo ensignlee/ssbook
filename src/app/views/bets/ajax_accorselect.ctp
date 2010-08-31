@@ -1,2 +1,2 @@
 <?php
-echo json_encode($leagues);
+echo json_encode(array('startdate' => $startdate, 'enddate' => $enddate, 'leagues' => $leagues));

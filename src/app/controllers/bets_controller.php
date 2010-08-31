@@ -164,11 +164,28 @@ class BetsController extends AppController {
 		return $out;
 	}
 
-	private function accorselect($params) {
+	private function getStartEnd($params) {
 		$startdate = $params['startdate'];
-		$enddate = date('Y-m-d 23:59:59', strtotime($params['enddate']));
+		$enddate = $params['enddate'];
+		$rawStart = strtotime($startdate);
+		$rawEnd = strtotime($enddate);
+		if ($rawStart === false || $rawStart < strtotime('2008-01-01')) {
+			$startdate = date('Y-m-d');
+			$rawStart = strtotime($startdate);
+		}
+		if ($rawEnd === false || $rawEnd < $rawStart) {
+			$enddate = date('Y-m-d', $rawStart);
+		}
+		$enddate = date('Y-m-d 23:59:59', strtotime($enddate));
+		return array($startdate, $enddate);
+	}
+
+	private function accorselect($params) {
+		list($startdate, $enddate) = $this->getStartEnd($params);
 		$leagues = $this->Score->findScoresBetweenDates($startdate, $enddate);
 		$this->set('leagues', $leagues);
+		$this->set('startdate', date('Y-m-d', strtotime($startdate)));
+		$this->set('enddate', date('Y-m-d', strtotime($enddate)));
 	}
 
 	public function ajax($action = '') {

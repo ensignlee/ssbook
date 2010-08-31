@@ -689,8 +689,14 @@ $.extend(SS.Accorselect.prototype, {
 		});		
 	},
 
-	render : function(leagues) {
+	render : function(json) {
 		var h = '';
+		var leagues = json.leagues;
+		var startdate = json.startdate;
+		var enddate = json.enddate;
+		this.setStartdate(startdate);
+		this.setEnddate(enddate);
+
 		$.each(leagues, function(league, games) {
 			h += '<h1 class="head">'+league+'</h1><ul>';
 			$.each(games, function (key, game) {
@@ -720,12 +726,20 @@ $.extend(SS.Accorselect.prototype, {
 		});
 	 },
 
+	setStartdate : function(dt) {
+		this.jStartdate.val(dt);
+	},
+
+	setEnddate : function(dt) {
+		this.jEnddate.val(dt);
+	},
+
 	getStartdate : function() {
-		return new Date(this.jStartdate.val()+'T12:00:00');
+		return new Date(this.jStartdate.val());
 	},
 
 	getEnddate : function() {
-		return new Date(this.jEnddate.val()+'T12:00:00');
+		return new Date(this.jEnddate.val());
 	},
 
 	find : function() {
