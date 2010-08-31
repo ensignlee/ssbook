@@ -2,6 +2,11 @@
 
 class Score extends AppModel {
 	var $name = 'Score';
+	var $validate = array(
+		'home' => 'notEmpty',
+		'visitor' => 'notEmpty',
+		'game_date' => 'date'
+	);
 
 	public function setToRecord($field, $value) {
 		$out = $this->find('first', array('conditions' => array($field => $value)));
