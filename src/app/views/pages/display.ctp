@@ -3,3 +3,4 @@
 
 <div><?= $html->link('Enter Bets', '/bets/'); ?></div>
 <div><?= $html->link('View Bets', '/bets/view'); ?></div>
+<div><?= $html->link('Create User', '/users/create'); ?></div>

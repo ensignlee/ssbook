@@ -52,7 +52,11 @@ SS.Cake = {
 			<h1><?php echo $this->Html->link($this->Html->image('logo.png', array('alt' => 'logo')), 'http://www.sagestats.com/ss2', array('escape' => false)); ?></h1>
 		</div>
 		<div id="content">
-			<ul><li><?= $html->link('view', '/bets/view') ?></li><li><?= $html->link('enter', '/bets') ?></li></ul>
+			<ul>
+				<li><?= $html->link('View', '/bets/view') ?></li>
+				<li><?= $html->link('Enter', '/bets') ?></li>
+				<li><?= $html->link('Create', '/users/create') ?></li>
+			</ul>
 
 			<?php echo $this->Session->flash(); ?>
 
