@@ -485,8 +485,8 @@ $.extend(SS.Enterbets.prototype, {
 	},
 
 	oddsChange : function(bet, val) {
-		var odds = parseInt(bet.find('.odds').val());
-		var towin = parseInt(bet.find('.towin').val());
+		var odds = parseFloat(bet.find('.odds').val());
+		var towin = parseFloat(bet.find('.towin').val());
 
 		if (odds == 0 || odds == NaN) {
 			return;
@@ -500,8 +500,8 @@ $.extend(SS.Enterbets.prototype, {
 	},
 
 	riskChange : function(bet, val) {
-		var risk = parseInt(bet.find('.risk').val());
-		var odds = parseInt(bet.find('.odds').val());
+		var risk = parseFloat(bet.find('.risk').val());
+		var odds = parseFloat(bet.find('.odds').val());
 		if (!(isNaN(risk) || isNaN(odds)) && risk > 0 && odds != 0) {
 			bet.find('.towin').val(this.calcWin(risk, odds));
 		}
@@ -509,8 +509,8 @@ $.extend(SS.Enterbets.prototype, {
 	},
 	
 	towinChange : function(bet, val) {
-		var towin = parseInt(bet.find('.towin').val());
-		var odds = parseInt(bet.find('.odds').val());
+		var towin = parseFloat(bet.find('.towin').val());
+		var odds = parseFloat(bet.find('.odds').val());
 		if (!(isNaN(towin) || isNaN(odds)) && towin > 0 && odds != 0) {
 			bet.find('.risk').val(this.calcRisk(towin, odds));
 		}

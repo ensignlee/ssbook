@@ -5,7 +5,6 @@ class Score extends AppModel {
 	var $validate = array(
 		'home' => 'notEmpty',
 		'visitor' => 'notEmpty',
-		'game_date' => 'date'
 	);
 
 	public function setToRecord($field, $value) {
