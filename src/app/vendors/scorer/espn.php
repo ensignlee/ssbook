@@ -5,8 +5,10 @@ require('phpQuery.php');
 
 class Espn_Log extends Object {
 	public function log($str, $type = 'debug') {
-		$str = "ESPN: $str";
-		parent::log($str, $type);
+		parent::log('['.getmypid().'] '.$str, 'espn_'.date('Ymd'));
+		if ($type == 'error') {
+			echo $str; // Echo goes to email
+		}
 	}
 }
 
@@ -65,11 +67,15 @@ class Espn extends Espn_Log {
 		}
 
 		foreach ($this->types as $type) {
-			$this->loadType($type);
-			$this->parseType();
-			$success = $this->saveType();
-			$this->log("Saving $success game(s)");
-			sleep(1);
+			try {
+				$this->loadType($type);
+				$this->parseType();
+				$success = $this->saveType();
+				$this->log("Saving $success game(s)");
+				sleep(1);
+			} catch (Exception $e) {
+				$this->log($e->getMessage(), 'error');
+			}
 		}
 	}
 
@@ -86,7 +92,7 @@ class Espn extends Espn_Log {
 					$success++;
 					$this->log("Saving {$score['visitor']} @ {$score['home']}");
 				} else {
-					throw new Exception('Unable to save game'.json_encode(array($score, $this->shell->Score->validationErrors)));
+					$this->log('Unable to save game'.json_encode(array($score, $this->shell->Score->validationErrors)), 'error');
 				}
 			}
 		}

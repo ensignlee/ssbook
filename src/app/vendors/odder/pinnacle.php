@@ -2,8 +2,10 @@
 
 class Pinnacle_Log extends Object {
 	public function log($str, $type = 'debug') {
-		$str = "Pinnacle: $str";
-		parent::log($str, $type);
+		parent::log('['.getmypid().'] '.$str, 'pinnacle_'.date('Ymd'));
+		if ($type == 'error') {
+			echo $str;
+		}
 	}
 }
 
