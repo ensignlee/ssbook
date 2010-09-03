@@ -13,6 +13,7 @@
 	<th>Risk</th>
 	<th>Winnings</th>
 	<th>Book</th>
+	<th>Delete</th>
 </tr>
 
 <?php
@@ -32,7 +33,30 @@ foreach ($bets as $bet) :
 	<td><?= $bet['risk'] ?></td>
 	<td><?= $bet['winning'] ?></td>
 	<td><?= $bet['source'] ?></td>
+	<td><?= $html->link('X', '/bets/delete/'.$bet['id']) ?></td>
 </tr>	
+<?php
+if (!empty($bet['Parlay'])) {
+	foreach ($bet['Parlay'] as $parlay) {
+		$bet = $parlay['UserBet'];
+		$score = $parlay['Score'];
+?>
+<tr><td>-</td>
+	<td><?= $score['home'] ?></td>
+	<td><?= $score['visitor'] ?></td>
+	<td><?= $score['league'] ?></td>
+	<td><?= $bet['direction'] ?></td>
+	<td><?= $bet['type'] ?></td>
+	<td><?= $bet['bet'] ?></td>
+	<td>&nbsp;</td>
+	<td>&nbsp;</td>
+	<td><?= $bet['source'] ?></td>
+	<td>&nbsp;</td>
+</tr>
+<?php
+	}
+}
+?>
 
 <?php endforeach; // ($bets as $bet) : ?>
 

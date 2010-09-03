@@ -8,7 +8,19 @@ abstract class Winning_GameType {
 		$this->winning = $winning;
 	}
 
-	abstract public function process();
+	public function process() {
+		if (!$this->isGradeable()) {
+			return null;
+		}
+		return $this->processGame();
+	}
+
+	protected function isGradeable() {
+		$game = $this->winning->getGame();
+		return (!is_null($game[$this->homeScore]) && !is_null($game[$this->visitorScore]));
+	}
+	
+	abstract protected function processGame();
 
 	public static function calcWin($risk, $odds) {
 		if($odds > 0) {
@@ -20,10 +32,19 @@ abstract class Winning_GameType {
 
 	public static function getInstance($winning) {
 		$bet = $winning->getBet();
-echo "get instance";
 		switch ($bet['type']) {
+		case 'half_spread':
+			return new Winning_Spread($winning);
+		case 'half_total':
+			return new Winning_Total($winning);
+		case 'half_moneyline':
+			return new Winning_MoneyLine($winning);
 		case 'spread':
 			return new Winning_Spread($winning);
+		case 'total':
+			return new Winning_Total($winning);
+		case 'moneyline':
+			return new Winning_MoneyLine($winning);
 		case 'parlay':
 			return new Winning_Parlay($winning);
 		default:
@@ -34,7 +55,7 @@ echo "get instance";
 
 	public static function getMoney($winner, &$bet) {
 		if (is_null($winner)) {
-			return null;
+			return 0;
 		}
 		if ($winner) {
 			return Winning_GameType::calcWin($bet['risk'], $bet['odds']);
@@ -42,7 +63,11 @@ echo "get instance";
 			return -$bet['risk'];
 		}
 	}
+
+	protected $homeScore = 'home_score_total';
+	protected $visitorScore = 'visitor_score_total';
 }
+
 
 class Winning_Parlay extends Winning_GameType {
 	public function process() {
@@ -53,7 +78,6 @@ class Winning_Parlay extends Winning_GameType {
 		$win = true;
 		foreach ($bet['Parlay'] as $parlay) {
 			$w = new Winning($parlay['Score'], $parlay['UserBet']);
-echo "parlay";
 			$isWin = $w->isWin();
 			if (is_null($isWin)) {
 				$win = null;
@@ -64,25 +88,76 @@ echo "parlay";
 		}
 		return Winning_GameType::getMoney($win, $bet);
 	}
-			
+
+	protected function processGame() {
+		return $this->process();
+	}
+}
+
+class Winning_Total extends Winning_GameType {
+
+	protected function totalCovered($game, $over, $isOver) {
+		if (($game[$this->homeScore] + $game[$this->visitorScore]) == $over) {
+			return null;
+		}	
+		return $isOver == (($game[$this->homeScore] + $game[$this->visitorScore]) > $over);
+	}
+
+	protected function processGame() {
+		$game = $this->winning->getGame();
+		$bet = $this->winning->getBet();
+		$winner = $this->totalCovered($game, $bet['spread'], $bet['direction'] == 'over');
+		return Winning_GameType::getMoney($winner, $bet);
+	}
+}
+
+class Winning_MoneyLine extends Winning_GameType {
+
+	protected function moneyCovered($game, $isHome) {
+		if ($game[$this->homeScore] == $game[$this->visitorScore]) {
+			return null;
+		}
+		return $isHome == ($game[$this->homeScore] > $game[$this->visitorScore]);
+	}
+
+	protected function processGame() {
+		$game = $this->winning->getGame();
+		$bet = $this->winning->getBet();
+		$winner = $this->moneyCovered($game, $bet['direction'] == 'home');
+		return Winning_GameType::getMoney($winner, $bet);
+	}
 }
 
 class Winning_Spread extends Winning_GameType {
 
 	protected function spreadCovered($game, $spread) {
-		if (!is_null($game['home_score_total']) && !is_null($game['visitor_score_total'])) {
-var_dump($game, $spread);
-			return ($game['home_score_total'] + $spread) > $game['visitor_score_total'];
+		if (($game[$this->homeScore] + $spread) == $game[$this->visitorScore]) {
+			return null;
 		}
-		return null;
+		return ($game[$this->homeScore] + $spread) > $game[$this->visitorScore];
 	}
 
-	public function process() {
+	protected function processGame() {
 		$game = $this->winning->getGame();
 		$bet = $this->winning->getBet();
 		$winner = $this->spreadCovered($game, ($bet['direction'] == 'home') ? $bet['spread'] : -$bet['spread']);
 		return Winning_GameType::getMoney($winner, $bet);
 	}
+}
+
+class Winning_MoneyHalf extends Winning_MoneyLine {
+	protected $homeScore = 'home_score_total_half';
+	protected $visitorScore = 'visitor_score_total_half';
+}
+
+class Winning_TotalHalf extends Winning_Total {
+	protected $homeScore = 'home_score_total_half';
+	protected $visitorScore = 'visitor_score_total_half';
+}
+
+class Winning_SpreadHalf extends Winning_Spread {
+	protected $homeScore = 'home_score_total_half';
+	protected $visitorScore = 'visitor_score_total_half';
 }
 
 class Winning {
@@ -92,7 +167,6 @@ class Winning {
 	private $winnings;
 
 	public function __construct($game, $bet) {
-echo "create game";
 		$this->game = $game;
 		$this->bet = $bet;
 		$this->winnings = null;
@@ -113,7 +187,7 @@ echo "create game";
 		if (is_null($this->winnings)) {
 			return null;
 		}
-		return $this->winnings > 0;
+		return $this->winnings >= 0;
 	}
 	
 	public function process() {

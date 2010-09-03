@@ -81,10 +81,11 @@ class UserBet extends AppModel {
 		$ret = "";
 		switch ($bet['type']) {
 		case 'spread':
-		case 'halfspread':
+		case 'half_spread':
 		case 'total':
-		case 'halftotal':
+		case 'half_total':
 			$ret .= $bet['spread'];
+		case 'half_moneyline':
 		case 'moneyline':
 			$ret .= "({$bet['odds']})";
 		}

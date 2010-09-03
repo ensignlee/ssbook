@@ -42,6 +42,11 @@ body {
 	color: #CCC;
 }
 
+#flashMessage {
+	background-color: yellow;
+	padding: 4px;
+}
+
 /* Debugging */
 .cake-sql-log caption, .cake-sql-log {
 	background-color: #EEE;

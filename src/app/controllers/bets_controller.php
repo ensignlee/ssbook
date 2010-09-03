@@ -4,9 +4,22 @@ class BetsController extends AppController {
 	var $name = 'Bets';
 	var $uses = array('LeagueType', 'Odd', 'Score', 'SourceType', 'UserBet');
 	var $helpers = array('Html','Ajax','Javascript');
-	var $components = array('RequestHandler');
+	var $components = array('Auth', 'Session', 'RequestHandler');
 
 	public function index() {
+	}
+
+	public function delete($id = null) {
+		if (empty($id)) {
+			$this->Session->setFlash('Invalid id');
+		}
+		$this->UserBet->id = $id;
+		if ($this->UserBet->delete()) {
+			$this->Session->setFlash('Bet Removed');
+		} else {
+			$this->Session->setFlash('Unable to remove bet');
+		}
+		$this->redirect('/bets/view');
 	}
 
 	private function superbar($params, $date) {
