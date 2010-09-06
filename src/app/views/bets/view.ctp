@@ -14,6 +14,7 @@
 	<th>Winnings</th>
 	<th>Book</th>
 	<th>Delete</th>
+	<th>View</th>
 </tr>
 
 <?php
@@ -34,6 +35,7 @@ foreach ($bets as $bet) :
 	<td><?= $bet['winning'] ?></td>
 	<td><?= $bet['source'] ?></td>
 	<td><?= $html->link('X', '/bets/delete/'.$bet['id']) ?></td>
+	<td><?= $html->link('View', '/score/view/'.$score['id']) ?></td>
 </tr>	
 <?php
 if (!empty($bet['Parlay'])) {
@@ -52,6 +54,7 @@ if (!empty($bet['Parlay'])) {
 	<td>&nbsp;</td>
 	<td><?= $bet['source'] ?></td>
 	<td>&nbsp;</td>
+	<td><?= $html->link('View', '/score/view/'.$score['id']) ?></td>
 </tr>
 <?php
 	}

@@ -74,7 +74,7 @@ class Espn extends Espn_Log {
 				$this->log("Saving $success game(s)");
 				sleep(1);
 			} catch (Exception $e) {
-				$this->log($e->getMessage(), 'error');
+				$this->log($e->getMessage()."\n", 'error');
 			}
 		}
 	}
@@ -209,7 +209,7 @@ class Espn_NFL extends Espn_Scorer {
 		if (preg_match('/[0-9]+/', $id, $m)) {
 			$row['source_gameid'] = $m[0];
 		} else {
-			throw new Exception('Unable to find source_gameid');
+			throw new Exception('Unable to find source_gameid '.json_encode($row));
 		}
 		return $row;
 	}
@@ -229,7 +229,7 @@ class Espn_MLB extends Espn_Scorer {
 
 		$date = pq('.key-dates > h2')->text();
 		if (strpos($date, 'Scores for') === false) {
-			throw new Exception('Unable to find correct date');
+			throw new Exception("Unable to find correct date\n".$html);
 		}
 		$time = date('Y-m-d', strtotime(str_replace('Scores for', '', $date)));
 
@@ -265,7 +265,7 @@ class Espn_MLB extends Espn_Scorer {
 		if (preg_match('/[0-9]+/', $id, $m)) {
 			$row['source_gameid'] = $m[0];
 		} else {
-			throw new Exception('Unable to find source_gameid');
+			throw new Exception("Unable to find source_gameid ".json_encode($row));
 		}
 		return $row;
 	}
@@ -293,7 +293,7 @@ class Espn_NBA extends Espn_MLB {
 		foreach ($titles as $title) {
 			$id = pq($title)->attr('id');
 			if (!preg_match('/[0-9T]$/', $id, $m)) {
-				throw new Exception('Unable to find scores');
+				throw new Exception('Unable to find scores'.json_encode($score));
 			}
 			$cid = $m[0];
 			$periods[$cid] = pq($title)->text();
@@ -308,7 +308,7 @@ class Espn_NBA extends Espn_MLB {
 			}
 		}
 		if (empty($one) || empty($two)) {
-			throw new Exception('Unable to locate periods 1 and 2');
+			throw new Exception('Unable to locate periods 1 and 2'.json_encode($score));
 		}
 		$visitor = pq("td[id$=als{$one}]", $score)->text() + pq("td[id$=als{$two}]", $score)->text();
 		$home = pq("td[id$=hls{$one}]", $score)->text() + pq("td[id$=hls{$two}]", $score)->text();
