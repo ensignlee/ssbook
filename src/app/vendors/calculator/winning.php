@@ -141,6 +141,9 @@ class Winning_Spread extends Winning_GameType {
 		$game = $this->winning->getGame();
 		$bet = $this->winning->getBet();
 		$winner = $this->spreadCovered($game, ($bet['direction'] == 'home') ? $bet['spread'] : -$bet['spread']);
+		if (!is_null($winner) && $bet['direction'] == 'visitor') {
+			$winner = !$winner;
+		}
 		return Winning_GameType::getMoney($winner, $bet);
 	}
 }
