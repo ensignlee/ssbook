@@ -88,6 +88,18 @@ class Espn extends Espn_Log {
 				if (!empty($this->shell->Score->id)) {
 					unset($score['game_date']);
 				}
+					
+				if (isset($score['game_date'])) {
+					if (empty($score['game_date'])) {
+						$this->log('Game date cannot be empty '.json_encode($score), 'error');
+						continue;
+					}
+					$t = strtotime($score['game_date']);
+					if ($t == false || $t < strtotime('2000-01-01')) {
+						$this->log('Game time to small '.json_encode($score), 'error');
+						continue;
+					}
+				}
 				if ($this->shell->Score->save($score)) {
 					$success++;
 					$this->log("Saving {$score['visitor']} @ {$score['home']}");
@@ -118,6 +130,7 @@ class Espn extends Espn_Log {
 		$url = $this->cur->getUrl($this->date);
 		$this->log("Looking up $url");
 		$this->html = curl_file_get_contents($url);
+		file_put_contents('/tmp/'.date('Ymd').$type->leagueName, $this->html);
 	}
 }
 
@@ -148,7 +161,7 @@ class Espn_NCAAF extends Espn_NFL {
 	public $leagueName = 'NCAAF';
 	
         public function getUrl($date) {
-                return sprintf('http://scores.espn.go.com/college-football/scoreboard?date=%s', date('Ymd', strtotime($date)));
+                return sprintf('http://scores.espn.go.com/ncf/scoreboard?confId=80&date=%s', date('Ymd', strtotime($date)));
         }
 }
 
@@ -186,6 +199,9 @@ class Espn_NFL extends Espn_Scorer {
 	protected function parseScore($score, $preview = false) {
 		$row = array();
 		$dateStr = pq($score)->parents('.gameDay-Container')->prev()->text();
+		if (empty($dateStr)) {
+			$this->log('Unable to find dateStr '.json_encode($score), 'error');
+		}
 		$away = pq(".visitor", $score);
 		$home = pq(".home", $score);
 		$row['visitor'] = pq('.team-name a', $away)->text();
