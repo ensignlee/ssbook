@@ -550,8 +550,11 @@ $.extend(SS.Enterbets.prototype, {
 		} else {
 			vsel = 'selected="selected"';
 		}
+
+		var home = data.home;
+		var visitor = data.visitor;
 		if (type == 'half_spread' || type == 'half_moneyline' || type == 'spread' || type == 'moneyline') {
-			h += '<option '+hsel+' value="home">Home</option><option '+vsel+' value="visitor">Visitor</option>';
+			h += '<option '+hsel+' value="home">'+home+'</option><option '+vsel+' value="visitor">'+visitor+'</option>';
 		} else {
 			h += '<option '+hsel+' value="over">Over</option><option '+vsel+' value="under">Under</option>';
 		}
