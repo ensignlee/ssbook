@@ -582,27 +582,22 @@ $.extend(SS.Enterbets.prototype, {
 			case 'half_moneyline':
 				if (dir == 'home') {
 					bet.find('.spread').val(odd.spread_home);
-					bet.find('.odds').val(odd.odds_home);
 				} else {
 					bet.find('.spread').val(odd.spread_visitor);
-					bet.find('.odds').val(odd.odds_visitor);
 				}
 				break;
 			case 'total':
 			case 'half_total':
 				if (dir == 'over') {
 					bet.find('.spread').val(odd.total);
-					bet.find('.odds').val(odd.odds_home);
 				} else {
 					bet.find('.spread').val(odd.total);
-					bet.find('.odds').val(odd.odds_visitor);
 				}
 				break;
 			}
-		} else if (dir) {
-			bet.find('.spread').val('');
-			bet.find('.odds').val('');
 		}
+		bet.find('.odds').val('-110');
+
 		this.oddsChange(bet, bet.find('.odd').val());
 		this.validate(bet);
 	},
