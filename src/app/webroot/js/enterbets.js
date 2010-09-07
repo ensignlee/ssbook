@@ -491,11 +491,7 @@ $.extend(SS.Enterbets.prototype, {
 		if (odds == 0 || odds == NaN) {
 			return;
 		}
-		if (odds > 0) {
-			this.riskChange(bet, val);
-		} else {
-			this.towinChange(bet, val);
-		}
+		this.riskChange(bet, val);
 		this.validate(bet);
 	},
 
