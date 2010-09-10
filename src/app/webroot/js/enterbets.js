@@ -240,10 +240,13 @@ SS.Enterbets = function(selector) {
 SS.Enterbets.TYPES = [
 	{name:'total',desc:"Total",show:'Total'},
 	{name:'half_total',desc:"Half Total",show:'Total'},
+	{name:'second_total',desc:"Second Total",show:'Total'},
 	{name:'spread',desc:"Spread",show:'Spread'},
 	{name:'half_spread',desc:"Half Spread",show:'Spread'},
+	{name:'second_spread',desc:"Second Spread",show:'Spread'},
 	{name:'moneyline',desc:"Money Line",show:'M/L'},
-	{name:'half_moneyline',desc:"Half Money Line",show:'M/L'}
+	{name:'half_moneyline',desc:"Half Money Line",show:'M/L'},
+	{name:'second_moneyline',desc:"Second Money Line",show:'M/L'}
 ];
 
 $.extend(SS.Enterbets.prototype, {
@@ -328,10 +331,13 @@ $.extend(SS.Enterbets.prototype, {
 		switch(info.type) {
 		case 'moneyline':
 		case 'half_moneyline':
+		case 'second_moneyline':
 		case 'spread':
 		case 'half_spread':
+		case 'second_spread':
 		case 'total':
 		case 'half_total':
+		case 'second_total':
 			return info.spread != '';
 		}			
 		return false;
@@ -439,9 +445,11 @@ $.extend(SS.Enterbets.prototype, {
 		switch(game.type) {
 		case 'moneyline':
 		case 'half_moneyline':
+		case 'second_moneyline':
 			spread = 'M/L';			
 		case 'spread':
 		case 'half_spread':
+		case 'second_spread':
 			if (game.direction == 'home') {
 				t += game.home;
 			} else {
@@ -450,6 +458,7 @@ $.extend(SS.Enterbets.prototype, {
 			return t+ ' '+spread;
 		case 'total':
 		case 'half_total':
+		case 'second_total':
 			return game.visitor+' @ '+game.home+' '+game.type+' '+spread;
 		}
 		return '';
@@ -586,27 +595,41 @@ $.extend(SS.Enterbets.prototype, {
 		if (odd) {
 			//console.debug('odd', odd);
 			switch(type) {
-			case 'spread':
-			case 'half_spread':
 			case 'moneyline':
 			case 'half_moneyline':
+			case 'second_moneyline':
+				bet.find('.spread').val('0');
+				if (dir == 'home') {
+					bet.find('.odds').val(odd.odds_home);
+				} else {
+					bet.find('.odds').val(odd.odds_visitor);
+				}
+				break;
+			case 'spread':
+			case 'half_spread':
+			case 'second_spread':
 				if (dir == 'home') {
 					bet.find('.spread').val(odd.spread_home);
 				} else {
 					bet.find('.spread').val(odd.spread_visitor);
 				}
+				bet.find('.odds').val('-110');
 				break;
 			case 'total':
 			case 'half_total':
+			case 'second_total':
 				if (dir == 'over') {
 					bet.find('.spread').val(odd.total);
 				} else {
 					bet.find('.spread').val(odd.total);
 				}
+				bet.find('.odds').val('-110');
 				break;
 			}
+		} else {
+			bet.find('.spread').val('');
+			bet.find('.odds').val('-110');
 		}
-		bet.find('.odds').val('-110');
 
 		this.oddsChange(bet, bet.find('.odd').val());
 		this.validate(bet);

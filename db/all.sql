@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: localhost
--- Generation Time: Sep 09, 2010 at 08:31 PM
+-- Generation Time: Sep 09, 2010 at 09:36 PM
 -- Server version: 5.0.45
 -- PHP Version: 5.2.4
 
@@ -112,7 +112,7 @@ CREATE TABLE `user_bets` (
   `userid` mediumint(8) unsigned NOT NULL,
   `scoreid` int(10) unsigned default NULL,
   `game_date` datetime NOT NULL,
-  `type` enum('moneyline','half_moneyline','spread','half_spread','total','half_total','other','parlay') NOT NULL,
+  `type` enum('moneyline','half_moneyline','second_moneyline','spread','half_spread','second_spread','total','half_total','second_total','other','parlay') NOT NULL,
   `direction` enum('home','visitor','over','under') default NULL,
   `spread` float default NULL,
   `odds` smallint(6) default NULL,
