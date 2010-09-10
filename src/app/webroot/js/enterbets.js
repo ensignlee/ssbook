@@ -31,6 +31,10 @@ SS.Superbar = function(selector, Enterbets) {
 
 $.extend(SS.Superbar.prototype, {
 
+	focus : function() {
+		this.jSelect.focus();
+	},
+
 	getValue : function() {
 		return this.jSelect.val();
 	},
@@ -104,6 +108,10 @@ $.extend(SS.Superbar.prototype, {
 	},
 
 	goUp : function() {
+		if (this['dropdownDiv'] === undefined) {
+			return false;
+		}
+
 		var hli = this.getHoverLi();		
 		if (hli) {
 			hli.removeClass('hover');
@@ -114,6 +122,10 @@ $.extend(SS.Superbar.prototype, {
 	},
 	
 	goDown : function() {
+		if (this['dropdownDiv'] === undefined) {
+			return false;
+		}
+
 		var hli = this.getHoverLi();		
 		if (hli) {
 			hli.removeClass('hover');
@@ -569,8 +581,6 @@ $.extend(SS.Enterbets.prototype, {
 			setodd(bet, odd, dir);
 		});
 	},
-
-	
 	
 	setOdd : function (bet, odd, type, dir) {
 		if (odd) {
@@ -759,6 +769,8 @@ $(function() {
 	var accorselect = new SS.Accorselect('#accorselect', enterbets, 'input[name=startdate]', 'input[name=enddate]');
 	accorselect.setupDates();
 	accorselect.find();	
+
+	superbar.focus();
 });
 
 })(jQuery);
