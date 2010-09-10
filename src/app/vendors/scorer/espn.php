@@ -184,13 +184,17 @@ class Espn_NFL extends Espn_Scorer {
 		$scores = pq('.final-state');
 		foreach ($scores as $score) {
 			$row = $this->parseScore($score);
-			$out[] = $row;
+			if (!empty($row)) {
+				$out[] = $row;
+			}
 		}
 
 		$scores = pq('.preview');
 		foreach ($scores as $score) {
 			$row = $this->parseScore($score, true);
-			$out[] = $row;
+			if (!empty($row)) {
+				$out[] = $row;
+			}
 		}
 
 		return $out;
@@ -218,6 +222,10 @@ class Espn_NFL extends Espn_Scorer {
 		$status = Espn::replaceNull(pq(".game-status", $score)->text());
 		if ($status == "Final") {
 			$status = "";
+		}
+		if ($status == "TBD") {
+			$this->log("Game is still TBD {$row['visitor']} @ {$row['home']}");
+			return false;
 		}
 		$row['game_date'] = self::createDate("$dateStr $status");
 		
