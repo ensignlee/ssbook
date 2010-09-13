@@ -238,15 +238,15 @@ SS.Enterbets = function(selector) {
 }
 
 SS.Enterbets.TYPES = [
-	{name:'total',desc:"Total",show:'Total'},
-	{name:'half_total',desc:"Half Total",show:'Total'},
-	{name:'second_total',desc:"Second Total",show:'Total'},
 	{name:'spread',desc:"Spread",show:'Spread'},
-	{name:'half_spread',desc:"Half Spread",show:'Spread'},
-	{name:'second_spread',desc:"Second Spread",show:'Spread'},
-	{name:'moneyline',desc:"Money Line",show:'M/L'},
-	{name:'half_moneyline',desc:"Half Money Line",show:'M/L'},
-	{name:'second_moneyline',desc:"Second Money Line",show:'M/L'}
+	{name:'total',desc:"Total",show:'Total'},
+	{name:'moneyline',desc:"Moneyline",show:'M/L'},
+	{name:'half_spread',desc:"1st Half Spread",show:'Spread'},
+	{name:'half_total',desc:"1st Half Total",show:'Total'},
+	{name:'half_moneyline',desc:"1st Half Moneyline",show:'M/L'},
+	{name:'second_spread',desc:"2nd Half Spread",show:'Spread'},
+	{name:'second_total',desc:"2nd Half Total",show:'Total'},
+	{name:'second_moneyline',desc:"2nd Half Moneyline",show:'M/L'}
 ];
 
 $.extend(SS.Enterbets.prototype, {
