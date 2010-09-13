@@ -556,13 +556,7 @@ $.extend(SS.Enterbets.prototype, {
 		var h = '<select name="direction['+iden+']">';
 		var hsel = '';
 		var vsel = '';
-		if (!dir) {
-			dir = 'home';
-			if (type == 'total') {
-				dir = 'over';
-			}
-		}
-		if (dir == 'over' || dir == 'home') {
+		if (!dir || dir == 'over' || dir == 'home') {
 			hsel = 'selected="selected"';
 		} else {
 			vsel = 'selected="selected"';
@@ -570,7 +564,7 @@ $.extend(SS.Enterbets.prototype, {
 
 		var home = data.home;
 		var visitor = data.visitor;
-		if (type == 'half_spread' || type == 'half_moneyline' || type == 'spread' || type == 'moneyline') {
+		if (type == 'half_spread' || type == 'half_moneyline' || type == 'spread' || type == 'moneyline' || type == 'second_spread' || type == 'second_moneyline') {
 			h += '<option '+hsel+' value="home">'+home+'</option><option '+vsel+' value="visitor">'+visitor+'</option>';
 		} else {
 			h += '<option '+hsel+' value="over">Over</option><option '+vsel+' value="under">Under</option>';
