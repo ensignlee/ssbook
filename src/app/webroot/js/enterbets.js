@@ -683,7 +683,7 @@ $.extend(SS.Enterbets.prototype, {
 		var bet = this.renderBet(data.home, data.visitor, new Date(data.game_date), data.type, iden);
 		var _this = this;
 		this.jBets.prepend(bet).ready(function() {
-			bet.find('.spread').focus();
+			bet.find('.type').focus();
 			_this.setupEvents(bet, data, iden);
 		});
 	}
