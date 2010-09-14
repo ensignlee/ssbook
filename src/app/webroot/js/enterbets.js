@@ -240,13 +240,13 @@ SS.Enterbets = function(selector) {
 SS.Enterbets.TYPES = [
 	{name:'spread',desc:"Spread",show:'Spread'},
 	{name:'total',desc:"Total",show:'Total'},
-	{name:'moneyline',desc:"Moneyline",show:'M/L'},
+	{name:'moneyline',desc:"Moneyline",show:''},
 	{name:'half_spread',desc:"1st Half Spread",show:'Spread'},
 	{name:'half_total',desc:"1st Half Total",show:'Total'},
-	{name:'half_moneyline',desc:"1st Half Moneyline",show:'M/L'},
+	{name:'half_moneyline',desc:"1st Half Moneyline",show:''},
 	{name:'second_spread',desc:"2nd Half Spread",show:'Spread'},
 	{name:'second_total',desc:"2nd Half Total",show:'Total'},
-	{name:'second_moneyline',desc:"2nd Half Moneyline",show:'M/L'}
+	{name:'second_moneyline',desc:"2nd Half Moneyline",show:''}
 ];
 
 $.extend(SS.Enterbets.prototype, {
@@ -575,10 +575,10 @@ $.extend(SS.Enterbets.prototype, {
 			_this.setOdd(bet, odd, type, newdir);
 		}
 		bet.find('.direction').html(h).change(setodd).ready(function() {
-			if (type == 'moneyline' || type == 'half_moneyline') {
-				bet.find('.spread').attr('disabled', 'disabled').val(0);
+			if (type == 'moneyline' || type == 'half_moneyline' || type == 'second_moneyline') {
+				bet.find('.spread').hide();
 			} else {
-				bet.find('.spread').attr('disabled', '');
+				bet.find('.spread').show();
 			}
 			
 			setodd(bet, odd, dir);
