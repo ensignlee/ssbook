@@ -172,7 +172,7 @@ class Winning_MoneyHalf extends Winning_MoneyLine {
 
 class Winning_TotalHalf extends Winning_Total {
 	protected $homeScore = 'home_score_half';
-	protected $visitorScore = 'visitor_score_total_half';
+	protected $visitorScore = 'visitor_score_half';
 }
 
 class Winning_SpreadHalf extends Winning_Spread {
