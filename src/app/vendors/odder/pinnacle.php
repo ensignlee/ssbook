@@ -78,10 +78,12 @@ class Pinnacle extends Pinnacle_Log {
 		$this->log("Last game = {$this->lastGame}");
 
 		$out = array();
-		foreach ($sxml->events->event as $event) {
-			$event = $this->parseEvent($event);
-			if (!empty($event) && !empty($event['types'])) {
-				$out[] = $event;
+		if (is_array($sxml->events->event)) {
+			foreach ($sxml->events->event as $event) {
+				$event = $this->parseEvent($event);
+				if (!empty($event) && !empty($event['types'])) {
+					$out[] = $event;
+				}
 			}
 		}
 
