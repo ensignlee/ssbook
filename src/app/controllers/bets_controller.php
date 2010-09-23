@@ -70,6 +70,7 @@ class BetsController extends AppController {
 	}
 
 	private function getbet($params) {
+		//$this->Score->query("SET time_zone = 'US/Central';");
 		if (!empty($params['scoreid'])) {
 			$score = $this->Score->findById($params['scoreid']);
 			$score = $score['Score'];

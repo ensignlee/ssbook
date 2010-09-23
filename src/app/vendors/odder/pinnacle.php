@@ -25,20 +25,24 @@ class Pinnacle extends Pinnacle_Log {
 	}
 
 	public function match() {
-		$this->xml = $this->readXml();
-		$games = $this->getGameInfo();
-		$this->matches = array();
-		foreach ($games as $game) {
-			$match = $this->findGameMatch($game);
-			if ($match !== false) {
-				$this->matches[] = $match;
-			} else {
-				$this->log("Unable to find match for ".json_encode($game));
+		try {
+			$this->xml = $this->readXml();
+			$games = $this->getGameInfo();
+			$this->matches = array();
+			foreach ($games as $game) {
+				$match = $this->findGameMatch($game);
+				if ($match !== false) {
+					$this->matches[] = $match;
+				} else {
+					$this->log("Unable to find match for ".json_encode($game));
+				}
 			}
+			$success = $this->saveMatches();
+			$this->log("Finished creating $success odd(s)");
+			Cache::write('pinnacle_lastGame', $this->lastGame);
+		} catch (Exception $e) {
+			$this->log('Unable to read odds'.$e->getMessage(), 'error');
 		}
-		$success = $this->saveMatches();
-		$this->log("Finished creating $success odd(s)");
-		Cache::write('pinnacle_lastGame', $this->lastGame);
 	}
 	
 	private function saveMatches() {
