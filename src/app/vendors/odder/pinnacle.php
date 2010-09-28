@@ -82,13 +82,19 @@ class Pinnacle extends Pinnacle_Log {
 		$this->log("Last game = {$this->lastGame}");
 
 		$out = array();
-		if (is_array($sxml->events->event)) {
-			foreach ($sxml->events->event as $event) {
-				$event = $this->parseEvent($event);
-				if (!empty($event) && !empty($event['types'])) {
-					$out[] = $event;
-				}
+		$skipped = 0;
+		$this->log("Found potentially ".count($sxml->events->event)." events");
+		foreach ($sxml->events->event as $event) {
+			$event = $this->parseEvent($event);
+			if (!empty($event) && !empty($event['types'])) {
+				$out[] = $event;
+			} else {
+				$skipped++;
 			}
+		}
+
+		if ($skipped > 0) {
+			$this->log("Skipped $skipped events");
 		}
 
 		return $out;
@@ -192,6 +198,7 @@ class Pinnacle extends Pinnacle_Log {
 		$url = $this->getUrl();
 		$this->log("Fetching $url");
 		$xml = curl_file_get_contents($url);
+		file_put_contents('/tmp/'.date('Ymd').'pinnacle', $xml);
 		return $xml;
 	}
 }
