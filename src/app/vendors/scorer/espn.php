@@ -305,9 +305,13 @@ class Espn_NBA extends Espn_MLB {
 	
 	protected function parseScore($score, $gametime) {
 		$row = parent::parseScore($score, $gametime);
-		list($visitor, $home) = $this->getHalf($score);
-		$row['visitor_score_half'] = $visitor;
-		$row['home_score_half'] = $home;
+		try {
+			list($visitor, $home) = $this->getHalf($score);
+			$row['visitor_score_half'] = $visitor;
+			$row['home_score_half'] = $home;
+		} catch (Exception $e) {
+			$this->log('Could not find score'.$e->getMessage());
+		}
 		return $row;
 	}
 
