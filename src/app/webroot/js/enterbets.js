@@ -252,7 +252,7 @@ SS.Enterbets.TYPES = [
 $.extend(SS.Enterbets.prototype, {
 
 	render : function() {
-		this.jSelect.html("<form action='"+this.url+"' method='post'><div class='bets'>&nbsp;</div><div class='record'><input type='submit' value='Add Bets' /><button id='parlay' type='button'>Parlay</button></div>");
+		this.jSelect.html("<form action='"+this.url+"' method='post'><div class='bets'>&nbsp;</div><div class='record'><input type='submit' value='Add Bets' /><button id='parlay' type='button'>Parlay/Teaser</button></div>");
 		var _this = this;
 		this.jSelect.ready(function() {
 			_this.jBets = _this.jSelect.find('.bets');
@@ -400,7 +400,7 @@ $.extend(SS.Enterbets.prototype, {
 		h += '<tr><td>&nbsp;</td><td colspan="2">Type</td>';
 		h += '<td>Games</td><td>Risk</td><td>Odds</td><td>To Win</td><td>Book</td></tr>';
 		h += '<tr><td class="icon">&nbsp;</td><td>';
-		h += '<select name="type['+iden+']"><option value="parlay">Parlay</option></select>';
+		h += '<select name="type['+iden+']"><option value="parlay">Parlay/Teaser</option></select>';
 		h += '</td><td>&nbsp;</td>';
 
 		h += '<td>'+gamesinfo.length+'</td>';
