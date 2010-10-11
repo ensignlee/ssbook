@@ -274,7 +274,7 @@ $.extend(SS.Enterbets.prototype, {
 		});
 
 		if (!success) {
-			alert('Unable to create parlay');
+			alert('All Bets in Parlay must have a value for spread/total');
 			return false;
 		}
 
