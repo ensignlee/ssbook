@@ -119,7 +119,7 @@ class BetsController extends AppController {
 				'date_std' => isset($form['date_std'][$iden]) ? $form['date_std'][$iden] : null,
 				'parlay' => $this->parseParlay($form['parlay'][$iden])
 			);
-			if ($bet['type'] == 'parlay') {
+			if ($bet['type'] == 'parlay' || $bet['type'] == 'teaser') {
 				$date_std = 0;
 				foreach ($bet['parlay'] as $p) {
 					$date_std = max($date_std, strtotime($p['date_std']));
@@ -133,7 +133,7 @@ class BetsController extends AppController {
 					list($dbkey, $num) = explode('_', $iden);
 					$p['parlayid'] = $bet['id'];
 					$p['scoreid'] = str_replace('SS', '', $dbkey);
-					$p['pt'] = 'parlay';
+					$p['pt'] = $bet['type'];
 					$saveParlays[] = $p;
 				}
 				$this->saveBets($saveParlays);

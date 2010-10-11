@@ -59,7 +59,7 @@ class UserBet extends AppModel {
 			$bet['Score']['league'] = $this->LeagueType->getName($bet['Score']['league']);
 			$bet['UserBet']['source'] = $this->SourceType->getName($bet['UserBet']['sourceid']);
 			$bet['UserBet']['bet'] = self::buildBet($bet['UserBet']);
-			if ($bet['UserBet']['type'] == 'parlay') {
+			if ($bet['UserBet']['type'] == 'parlay' || $bet['UserBet']['type'] == 'teaser') {
 				$bet['UserBet']['Parlay'] = $this->getParlays($userid, $bet['UserBet']['id']);
 			}
 			$bet['UserBet']['winning'] = self::calcWinning($bet['Score'], $bet['UserBet']);

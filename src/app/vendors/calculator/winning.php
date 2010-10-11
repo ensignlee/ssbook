@@ -52,6 +52,7 @@ abstract class Winning_GameType {
 		case 'moneyline':
 			return new Winning_MoneyLine($winning);
 		case 'parlay':
+		case 'teaser':
 			return new Winning_Parlay($winning);
 		default:
 			throw new Exception("Unable to find type for {$bet['type']}");

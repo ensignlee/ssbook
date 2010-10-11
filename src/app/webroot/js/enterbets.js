@@ -400,7 +400,7 @@ $.extend(SS.Enterbets.prototype, {
 		h += '<tr><td>&nbsp;</td><td colspan="2">Type</td>';
 		h += '<td>Games</td><td>Risk</td><td>Odds</td><td>To Win</td><td>Book</td></tr>';
 		h += '<tr><td class="icon">&nbsp;</td><td>';
-		h += '<select name="type['+iden+']"><option value="parlay">Parlay/Teaser</option></select>';
+		h += '<select name="type['+iden+']"><option value="parlay">Parlay</option><option value="teaser">Teaser</option></select>';
 		h += '</td><td>&nbsp;</td>';
 
 		h += '<td>'+gamesinfo.length+'</td>';
