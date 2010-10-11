@@ -89,7 +89,7 @@ $.extend(SS.Superbar.prototype, {
 
 		if (hli) {
 			var text = $.trim(hli.text());
-			this.jSelect.val(text);
+			this.jSelect.val('');
 			this.lastVal = text;
 			var clazzez = hli.attr('class').split(' ');
 			var _this = this;
@@ -695,7 +695,6 @@ $.extend(SS.Enterbets.prototype, {
 		var bet = this.renderBet(data.home, data.visitor, new Date(data.game_date), data.type, iden);
 		var _this = this;
 		this.jBets.prepend(bet).ready(function() {
-			bet.find('.type').focus();
 			_this.setupEvents(bet, data, iden);
 		});
 	}
