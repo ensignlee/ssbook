@@ -4,6 +4,7 @@
 	<div id='accorselect'>&nbsp;</div>
 </div>
 <div id='rightsection'>
+	<?= $session->flash() ?>
 	<input type='text' name='superbar' id='superbar' />
 	<div id='enterbets'></div>
 </div>

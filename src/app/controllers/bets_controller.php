@@ -145,6 +145,13 @@ class BetsController extends AppController {
 		
 		$this->set('savedBets', $saveBets);
 		$this->set('unsavedBets', $unsavedBets);
+		
+		// Flash redirect
+		App::import('Helper', 'Html');
+		$html = new HtmlHelper();
+		$link = $html->link('View your bets', '/bets/view');
+		$this->Session->setFlash("Bet(s) entered successfully. $link");
+		$this->redirect('/bets/');
 	}
 
 	private function saveBets($bets) {
