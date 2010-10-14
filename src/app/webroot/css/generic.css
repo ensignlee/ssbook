@@ -1,50 +1,119 @@
-/*
-Colors-
-bg: #3366CC
-1: #FFD82B
-2: #FF872B
-*/
+h1 {
+	color: #495D5C;
+	font-size: 22px;
+	font-weight: normal;
+	margin: 0px 0px 5px 0px;
+	padding: 0px 0px 5px 0px;
+	border-bottom: solid 1px #333;
+}
+p {
+	margin: 7px 0;
+}
+	
+/** CSS LAYOUT **/
 body {
-	font-family: 'Arial';
-	background-color: #36c;
-	margin: 0;
+	background-image: url('../img/bg.jpg');
+	background-repeat: repeat-x;
+	background-position: center top;
+	/*background-color: #3a82e6;*/
 	width: 1000px;
-}
-#container {
-	padding-top: 1em;
-	padding-left: 1em;
-}
-#header {
-	padding: 10px;
-}
-#content {
-	border: 1px solid #CCC;
-	border-bottom: none;
-	background-color: #FFF;
-	padding: .5em;
-}
-#content h1 {
-	font-size: 1.1em;
-	padding: 10px 0;
+	margin: 0 auto;
+	/*color: #555555;*/
+	font-family: Verdana, Geneva, sans-serif;
+	font-size: 12px;
 }
 #footer {
-	border: 1px solid #CCC;
-	border-top: none;
+	background: url('../img/footer_bg.png') no-repeat center top;
+	width: 1000px;
+	height: 60px;
 	text-align: center;
-	color: #CCC;
-	background-color: #FFF;
-	font-size: .6em;
-	padding-top: 2em;
-	padding-bottom: 5px;
+	font-size: .9em;
+	padding-top: 15px;
+	padding-bottom: 8px;
+	color: #d1e5ff
+}
+#footer .sep {
+	margin: 0;
+}
+#footer {
+	text-align: center;
+}
+#copy {
+	margin-top: 5px;
+	clear: both;
+}
+#navbar ul {
+	margin: 13px 0 0 20px;
 }
 #footer a {
+	color: #d1e5ff;
 	text-decoration: none;
-	color: #CCC;
+}
+#footer a:hover {
+	text-decoration: underline;
+}
+#navbar a {
+	color: white;
+}
+#navbar .nav ul li {
+	margin: 0 25px;
+	display: inline;
+}
+#footer .nav ul li {
+	margin: 0 5px;
+	display: inline;
+}
+#footer .nav ul li a ,
+#navbar .nav ul li a {
+	text-decoration: none;
+	color: white;
+}
+#footer .nav ul li a:hover,
+#navbar .nav ul li a:hover {
+	text-decoration: underline;
+}
+#navbar {
+	background: url('../img/nav_bg.jpg') no-repeat left top;
+	width: 1000px;
+	height: 50px;
+	color: #FFFFFF;
+	font-weight: bold;
+}
+#navbar ul {
+	margin: 13px 0 0 20px;
+	float: left; /*Cover the lis*/
+}
+#navbar ul li {
+	margin: 0 20px;
+	float: left;
+}
+#navbar ul li a {
+	color: white;
+	text-decoration: none;
+}
+#navbar ul li a:hover {
+	text-decoration: underline;
+}
+#header {
+	height: 64px;
+	padding-top: 10px;
+}
+#banner {
+	background-color: #959FA4;
 }
 
+#container {
+	/* Nothing */
+}
+#content {
+	background-color: #FFF;
+	padding: 20px 15px;
+}
+
+
 #flashMessage {
-	background-color: yellow;
-	padding: 4px;
+	background-color: #FFF7D7;/*yellow from google*/
+	padding: 6px;
 }
 
 /* Debugging */
