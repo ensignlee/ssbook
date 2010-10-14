@@ -49,7 +49,7 @@ SS.Cake = {
 <body>
 	<div id="container">
 		<div id="header">
-			<h1><?php echo $this->Html->link($this->Html->image('logo.png', array('alt' => 'logo')), 'http://www.sagestats.com/ss2', array('escape' => false)); ?></h1>
+			<h1><?php echo $this->Html->link($this->Html->image('logo.png', array('alt' => 'logo')), '/', array('escape' => false)); ?></h1>
 		</div>
 		<div id="content">
 			<ul>

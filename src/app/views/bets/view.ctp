@@ -18,14 +18,19 @@
 </tr>
 
 <?php
+$startSS = strtotime('1990-01-01');
 foreach ($bets as $bet) :
 	$score = $bet['Score'];
 	$bet = $bet['UserBet'];
-	$game_date = $bet['game_date'];
+	$game_date = strtotime($bet['game_date']);
+	if ($game_date < $startSS) {
+		$game_date = strtotime($score['game_date']);
+	}
+	
 ?>
 
 <tr>
-	<td><?= date("m/d/y", strtotime($game_date)) ?></td>
+	<td><?= date("m/d/y", $game_date) ?></td>
 	<td><?= $score['home'] ?></td>
 	<td><?= $score['visitor'] ?></td>
 	<td><?= $score['league'] ?></td>
