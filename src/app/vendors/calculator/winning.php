@@ -99,11 +99,12 @@ class Winning_Parlay extends Winning_GameType {
 		$win = true;
 		foreach ($bet['Parlay'] as $parlay) {
 			$w = new Winning($parlay['Score'], $parlay['UserBet']);
-			$isWin = $w->isWin();
+			$isWin = $w->process();
 			if (is_null($isWin)) {
 				$win = null;
 				break;
 			} else {
+				$isWin = $isWin > 0;
 				$win = $win && $isWin;
 			}
 		}
