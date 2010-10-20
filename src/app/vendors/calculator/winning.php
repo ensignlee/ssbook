@@ -17,6 +17,10 @@ abstract class Winning_GameType {
 
 	protected function isGradeable() {
 		$game = $this->getGame();
+		//TODO : Is Parlay gradeable?
+		if (is_null($game)) {
+			return true;
+		}
 		return (!is_null($game['home_score_total']) && !is_null($game['visitor_score_total']));
 	}
 	
@@ -91,7 +95,7 @@ abstract class Winning_GameType {
 
 
 class Winning_Parlay extends Winning_GameType {
-	public function process() {
+	public function allParlays() {
 		$bet = $this->winning->getBet();
 		if (!is_array($bet['Parlay'])) {
 			throw new Exception("Malformed Parlay");
@@ -112,7 +116,7 @@ class Winning_Parlay extends Winning_GameType {
 	}
 
 	protected function processGame() {
-		return $this->process();
+		return $this->allParlays();
 	}
 }
 
