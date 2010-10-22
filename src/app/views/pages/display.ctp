@@ -1,22 +1,28 @@
-<h1>Welcome to SS2</h1>
-<p> 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam eget felis purus, ut pharetra enim. Nam eleifend mi eu nunc convallis tempus. Nam pulvinar ornare adipiscing. Quisque eu nisl a felis condimentum volutpat. Pellentesque pretium sapien sed sapien rutrum ornare. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam nec metus velit. Aliquam a mi vitae tortor pharetra venenatis id ac quam. Phasellus vestibulum aliquet placerat. Maecenas ultricies bibendum dolor eget aliquet. Donec sed elit nibh. Nullam euismod elementum aliquam. Quisque dignissim rutrum neque vitae malesuada. Aenean faucibus nulla sed nibh luctus commodo. Quisque tempor facilisis orci, non adipiscing quam cursus quis. Suspendisse ut leo rutrum elit pellentesque tincidunt sed non enim. Nullam at rutrum nisi.
-</p> 
-<p> 
-Nulla facilisi. Etiam dolor lacus, facilisis vitae consectetur faucibus, ullamcorper at risus. In massa odio, dictum quis tincidunt quis, varius et tellus. Nunc id neque nibh, posuere luctus quam. Praesent sem arcu, porttitor vitae posuere id, posuere sit amet augue. Mauris dictum odio at eros tristique ornare. Curabitur condimentum pulvinar libero volutpat lacinia. Vestibulum risus libero, hendrerit non sagittis et, ultricies eget orci. Nullam id interdum augue. Nullam justo metus, viverra eu sagittis vel, vestibulum id enim. Nulla vel ipsum id nunc cursus aliquam eget in arcu. Suspendisse porta augue eu nisi malesuada imperdiet. Proin nisi eros, suscipit quis volutpat ut, gravida vitae risus. Nullam pulvinar tellus ullamcorper nisl accumsan quis vestibulum libero facilisis. Vestibulum imperdiet lectus et dui mattis malesuada. Suspendisse interdum, tortor non lobortis pharetra, neque justo sollicitudin nunc, et viverra dui metus a quam. Suspendisse mattis venenatis fermentum.
-</p> 
-<p> 
-Nullam eget elit dolor, a laoreet elit. Ut adipiscing, dui imperdiet eleifend tempus, ante nisi venenatis erat, nec feugiat eros odio ac sapien. Curabitur sodales ipsum eget orci scelerisque nec auctor leo elementum. Pellentesque ac nulla dui, in posuere purus. Mauris tempor venenatis leo. Nullam venenatis, velit vel tincidunt imperdiet, ligula nisl convallis elit, eu rutrum risus turpis iaculis sem. Quisque pulvinar sollicitudin tellus a dictum. Pellentesque eleifend elit eu nisi viverra vestibulum. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos.
-</p> 
-<p> 
-Aenean eget libero justo. Integer erat dui, ultricies ut tempus sit amet, fermentum a sapien. Praesent lacinia venenatis purus, vel aliquet lacus pharetra nec. Sed sollicitudin, est eget vehicula ullamcorper, odio felis sodales lacus, a fermentum nunc tellus et magna. Vestibulum porta mauris enim, nec hendrerit velit. Donec tellus quam, auctor sit amet dignissim vel, tristique et lacus. Nullam mattis, nulla in porttitor ultricies, ipsum augue posuere augue, eu adipiscing sem risus ac odio. Quisque ultrices pretium nisi vel lacinia. Vivamus nec erat eget eros vehicula semper eu sed sem. Quisque nibh dui, convallis non lobortis eget, auctor sed ipsum. In vel dui ipsum, vel dignissim nibh. Aenean vel lorem ut arcu aliquam semper. Nullam non tellus quis purus sodales luctus. Sed sapien ante, faucibus in aliquam at, consectetur quis libero. Sed vel libero nec lacus tristique convallis.
-</p> 
-<p> 
-Pellentesque pharetra, ligula in malesuada ultrices, felis ipsum congue ante, quis semper arcu massa ac lectus. Nunc eu odio at tellus cursus molestie. Nulla sit amet molestie purus. Praesent vehicula tristique sapien, sit amet hendrerit leo consectetur vitae. Phasellus cursus aliquet dolor, id laoreet odio dignissim id. Sed hendrerit aliquet lacus, ut cursus orci fringilla eu. Fusce ut enim quam, sed commodo est. Nunc tristique aliquet eros, eget blandit tellus volutpat venenatis. Cras vehicula varius malesuada. Vivamus nunc velit, placerat ac bibendum placerat, pulvinar ullamcorper risus. Aenean faucibus est a enim porttitor a porta tortor adipiscing. Morbi auctor tempus metus id pellentesque. Suspendisse tortor tortor, faucibus vel cursus quis, cursus nec nisl.
+<h1>SharpBetTracker</h1>
+
+<p>Are you a sports bettor looking for ways to win more money? SharpBetTracker can help you do just that.</p>
+<p>SharpBetTracker is a free and convenient way to easily track and analyze your bets, saving you time and maximizing your earnings.</p>
+<h2>How can SharpBetTracker help you?</h2>
+<p>SharpBetTracker will help you analyze your bets, showing you your strengths and weaknesses. You can improve on your weaknesses and focus on your strengths, making your betting even stronger and increasing your profit!
 </p>
-
-<div><?=$user['first_name']?> <?=$user['last_name']?> please take some time to look around</div>
-
-<div><?= $html->link('Enter Bets', '/bets/'); ?></div>
-<div><?= $html->link('View Bets', '/bets/view'); ?></div>
-<div><?= $html->link('Create User', '/users/create'); ?></div>
+<h2>Why use SharpBetTracker?</h2>
+<p>SharpBetTracker makes your life easier. How? By doing things for you, things like:</p>
+<ul>
+<li>Breaking down your bets to show you which bets you are best at and which ones you are ... not so good at. Ever wondered if betting away favorites really is a money burner like a lot of people say? Check for yourself! Maybe you'll find that you're smart enough to choose away favorites that WIN.</li>
+<li>Grading your wagers for you. Have you ever had so many wagers going in a day that it took a ton of work to figure out if you were up or down at the end of the day? Or have you ever had a crummy day and just not wanted to even look at your records, much less enter in your losses? Well, we've got you covered - we'll grade your games for you, show you your record for the day, and how much you're up. You'll spend less time record-keeping and more time winning.</li>
+<li>Giving you detailed analysis on your portfolio, like
+<ul>
+<li>What-if analysis: Want to see how your portfolio would look like if you had flat bet everything instead of varying your wager amounts? Our what-if analysis tool will allow you to do just that, showing you the best way to deal with your bankroll to help you earn more.</li>
+<li>Rollover calculators: Ever lost track of how much rollover you have left at a sportsbook? We'll keep track of that for you, so that way you know when that bonus money you received is yours. Plus, this way you don't have to worry about a sportsbook "rounding up" your rollover.</li>
+</ul></li>
+<li>Helping you through losing streaks - when you can look back on your records and history in the middle of a losing streak, it makes those inevitable losing streaks much more bearable. When you can see how well you've done in the past, it'll help you resist chasing your losses or making those long-shot parlays that end up costing you more money.</li>
+<li>Increasing your credibility - When you can back up your plays with solid statistics about your record, your credibility will increase 100-fold. We even provide attractive ways to show a mini-version of your customized statistics page along with your bets, to make your forum posts stand out from everybody else's, instantly increasing people's respect for you.</li>
+</ul>
+<h2>Is SharpBetTracker easy to use?</h2>
+<p>Yes. Do you know how to use google? Then you know how to use SharpBetTracker.
+Finding games is amazingly easy with our search bar tool. All you have to do is start entering in the name of the team you want to bet on and voila, select it from the dropdown.</p>
+<p>And entering in bets is as easy as entering them at the sportsbook you placed your bets at. Just type in how much you wagered, what your odds were, and we’ll take care of the rest!
+Easy peasy lemon squeezy.</p>
+<h2>How much does SharpBetTracker cost?</h2>
+<p>$0. Nada. Zilch. We're sportsbettors ourselves here at SharpBetTracker and we put this together because we were tired of having to fiddle with complicated excel sheets to figure out information we wanted to know about our portfolios. We wanted a bet tracker that could do everything we wanted, so we started programming one. It started off simple, and has grown based on suggestions and ideas from other handicappers like you.</p>
+<p>So what're you waiting for? Sign up, get started, and start winning more!</p>

@@ -9,7 +9,11 @@ h1 {
 p {
 	margin: 7px 0;
 }
-	
+#content ul {
+	list-style-type: circle;
+	padding: .5em 1.5em;
+}
+
 /** CSS LAYOUT **/
 body {
 	background-image: url('../img/bg.jpg');
