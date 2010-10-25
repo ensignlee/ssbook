@@ -29,6 +29,7 @@ class Espn extends Espn_Log {
 		$this->types[] = new Espn_NBA();
 		$this->types[] = new Espn_NFL();
 		$this->types[] = new Espn_NCAAF();
+		$this->types[] = new Espn_NHL();
 
 		$this->setSourceId();
 		$this->date = $this->shell->Score->getLastGameDate($this->sourceid);
@@ -151,7 +152,11 @@ abstract class Espn_Scorer extends Espn_Log {
 	}
 
 	protected static function createDate($str) {
-		$out = date('Y-m-d H:i:s', strtotime(str_replace('ET', 'EDT', $str)));
+		$strtime = strtotime(str_replace('ET', 'EDT', $str));
+		if ($strtime === false) {
+			return false;
+		}
+		$out = date('Y-m-d H:i:s', $strtime);
 		return $out;
 	}
 }
@@ -240,8 +245,18 @@ class Espn_NFL extends Espn_Scorer {
 
 }
 
+class Espn_NHL extends Espn_MLB {
+	public $leagueName = 'NHL';
+	protected $statusLine = 'statusLine2Left';
+
+	public function getUrl($date) {
+		return sprintf('http://scores.espn.go.com/nhl/scoreboard?date=%s', date('Ymd', strtotime($date)));
+	}
+}
+
 class Espn_MLB extends Espn_Scorer {
-	
+
+	protected $statusLine = 'statusLine2';
 	public $leagueName = 'MLB';
 
 	public function getUrl($date) {
@@ -282,8 +297,12 @@ class Espn_MLB extends Espn_Scorer {
 		$row['visitor_score_total'] = Espn::replaceNull(pq('.team-score', $away)->text());
 		$row['home_score_total'] = Espn::replaceNull(pq('.team-score', $home)->text());
 		$row['league'] = $this->league;
-		$status = Espn::replaceNull(pq("span[id$='statusLine2']", $score)->text());
-		$row['game_date'] = self::createDate("$gametime $status");
+		$status = Espn::replaceNull(pq("span[id$='{$this->statusLine}']", $score)->text());
+		$parsedtime = self::createDate("$gametime $status");
+		if ($parsedtime === false) {
+			$parsedtime = self::createDate("$gametime");
+		}
+		$row['game_date'] = $parsedtime;
 		
 		$id = pq($score)->attr('id');
 		if (preg_match('/[0-9]+/', $id, $m)) {
