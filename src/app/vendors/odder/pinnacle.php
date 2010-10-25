@@ -181,6 +181,8 @@ class Pinnacle extends Pinnacle_Log {
 			return 'NFL';
 		case 'football ncaa':
 			return 'NCAAF';
+		case 'hockey nhl reg time':
+			return 'NHL';
 		default:
 			return false;
 		}
