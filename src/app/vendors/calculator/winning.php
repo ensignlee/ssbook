@@ -18,7 +18,7 @@ abstract class Winning_GameType {
 	protected function isGradeable() {
 		$game = $this->getGame();
 		//TODO : Is Parlay gradeable?
-		if (is_null($game)) {
+		if (is_null($game) || is_null($game['id'])) {
 			return true;
 		}
 		return (!is_null($game['home_score_total']) && !is_null($game['visitor_score_total']));
@@ -100,8 +100,9 @@ class Winning_Parlay extends Winning_GameType {
 		if (!is_array($bet['Parlay'])) {
 			throw new Exception("Malformed Parlay");
 		}
-		$win = true;
+		$win = true;                
 		foreach ($bet['Parlay'] as $parlay) {
+			$parlay['UserBet']['risk'] = 100; //Simulate a bet on this game
 			$w = new Winning($parlay['Score'], $parlay['UserBet']);
 			$isWin = $w->process();
 			if (is_null($isWin)) {
