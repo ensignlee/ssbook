@@ -692,7 +692,7 @@ $.extend(SS.Enterbets.prototype, {
 	show : function (data) {
 		var num = this.idenNumber++;
 		var iden = 'SS'+data.scoreid+'_'+num;
-		var bet = this.renderBet(data.home, data.visitor, new Date(data.game_date), data.type, iden);
+		var bet = this.renderBet(data.home, data.visitor, Date.parse(data.game_date), data.type, iden);
 		var _this = this;
 		this.jBets.prepend(bet).ready(function() {
 			_this.setupEvents(bet, data, iden);
@@ -767,11 +767,11 @@ $.extend(SS.Accorselect.prototype, {
 	},
 
 	getStartdate : function() {
-		return new Date(this.jStartdate.val());
+		return Date.parse(this.jStartdate.val());
 	},
 
 	getEnddate : function() {
-		return new Date(this.jEnddate.val());
+		return Date.parse(this.jEnddate.val());
 	},
 
 	find : function() {
