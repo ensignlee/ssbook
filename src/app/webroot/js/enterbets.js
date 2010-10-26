@@ -12,7 +12,7 @@ SS.calcWin = function(risk, odds) {
 	}
 };
 
-SS.Superbar = function(selector, Enterbets) {
+SS.Superbar = function(selector, Enterbets, Accorselect) {
 	this.jSelect = $(selector);
 
 	this.jSelect.keydown($.proxy(this.onKeyPress, this));
@@ -26,6 +26,7 @@ SS.Superbar = function(selector, Enterbets) {
 	this.lastRequest = null;
 
 	this.Enterbets = Enterbets;
+	this.Accorselect = Accorselect;
 	this.doneLoadingBet = true;
 };
 
@@ -167,7 +168,7 @@ $.extend(SS.Superbar.prototype, {
 		html += '</ul>';
 		this.dropdownDiv.html(html).find('li')
 			.click($.proxy(this.selectCurrent, this))
-			.hover(function() { $(this).addClass('hover') }, function() { $(this).removeClass('hover') });
+			.hover(function() {$(this).addClass('hover')}, function() {$(this).removeClass('hover')});
 	},
 
 	gameClick : function (scoreid) {
@@ -175,7 +176,7 @@ $.extend(SS.Superbar.prototype, {
 	},
 
 	createGame : function (scoreid) {
-		var data = { scoreid : scoreid };
+		var data = {scoreid : scoreid};
 		if (!scoreid) {
 			data['text'] = this.getValue();
 		}
@@ -220,7 +221,11 @@ $.extend(SS.Superbar.prototype, {
 		this.abort();
 
 		if (val.length >= 2) {
-			this.lastRequest = $.getJSON(this.url, {text : val}, $.proxy(this.response, this));
+			this.lastRequest = $.getJSON(this.url, {
+				text : val,
+				startdate: this.Accorselect.getStartdate().toString('yyyy-MM-dd'),
+				enddate: this.Accorselect.getEnddate().toString('yyyy-MM-dd')
+			}, $.proxy(this.response, this));
 		} else {
 			this.hideDiv();
 		}
@@ -678,13 +683,13 @@ $.extend(SS.Enterbets.prototype, {
 
 	setupEvents : function(bet, data, iden) {
 		var _this = this;
-		bet.find('.spread').keyup(function() { _this.spreadChange(bet, bet.find('.spread').val()); });
-		bet.find('.risk').keyup(function() { _this.riskChange(bet, bet.find('.risk').val()); });
-		bet.find('.odds').keyup(function() { _this.oddsChange(bet, bet.find('.odds').val()); });
-		bet.find('.towin').keyup(function() { _this.towinChange(bet, bet.find('.towin').val()); });
-		bet.find('.close img').click(function() { _this.closeBet(bet); });
+		bet.find('.spread').keyup(function() {_this.spreadChange(bet, bet.find('.spread').val());});
+		bet.find('.risk').keyup(function() {_this.riskChange(bet, bet.find('.risk').val());});
+		bet.find('.odds').keyup(function() {_this.oddsChange(bet, bet.find('.odds').val());});
+		bet.find('.towin').keyup(function() {_this.towinChange(bet, bet.find('.towin').val());});
+		bet.find('.close img').click(function() {_this.closeBet(bet);});
 
-		var typeC = function() { _this.typeChange(bet, bet.find('.type').val(), data, iden); };
+		var typeC = function() {_this.typeChange(bet, bet.find('.type').val(), data, iden);};
 		bet.find('.type').change(typeC);
 		typeC();
 	},
@@ -750,11 +755,11 @@ $.extend(SS.Accorselect.prototype, {
 
 			_this.jSelect.find('li[class^=selectgame]').click(function() {
 				var clazz = $(this).attr('class').split('-');
-				var data = { scoreid : clazz[1] };
+				var data = {scoreid : clazz[1]};
 				_this.Enterbets.add(data);
 				//$(this).parent().toggle('fast');
 				return false;
-			}).hover(function () { $(this).addClass('hover') }, function() { $(this).removeClass('hover') });
+			}).hover(function () {$(this).addClass('hover')}, function() {$(this).removeClass('hover')});
 		});
 	 },
 
@@ -792,11 +797,11 @@ $.extend(SS.Accorselect.prototype, {
 
 $(function() {
 	var enterbets = new SS.Enterbets('#enterbets');
-	enterbets.render();
-	var superbar = new SS.Superbar('#superbar', enterbets);
+	enterbets.render();	
 	var accorselect = new SS.Accorselect('#accorselect', enterbets, 'input[name=startdate]', 'input[name=enddate]');
+	var superbar = new SS.Superbar('#superbar', enterbets, accorselect);
 	accorselect.setupDates();
-	accorselect.find();	
+	accorselect.find();
 
 	superbar.focus();
 });

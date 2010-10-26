@@ -41,8 +41,12 @@ class Score extends AppModel {
 				$conds['game_date BETWEEN ? AND ?'] = array($option, $closeafter);
 				break;
 			case 'game_date':
-				$enddate = date('Y-m-d 23:59:59', strtotime($option));
-				$conds['game_date BETWEEN ? AND ?'] = array($option, $enddate);
+				if (count($option) == 2) {					
+					$conds['game_date BETWEEN ? AND ?'] = $option;
+				} else {					
+					$enddate = date('Y-m-d 23:59:59', strtotime($option));
+					$conds['game_date BETWEEN ? AND ?'] = array($option, $enddate);
+				}
 				break;
 			case 'name':
 				$conds['or'] = array('home LIKE' => "%$option%", 'visitor LIKE' => "%$option%");
@@ -59,7 +63,7 @@ class Score extends AppModel {
 			default:
 				throw new Exception("$option is not supported");
 			}
-		}
+		}		
 
 		$resAfter = $this->find('all', array('conditions' => $conds, 'order' => 'game_date ASC'));
 		$out = array();

@@ -39,6 +39,12 @@ class BetsController extends AppController {
 				$options['game_date'] = date('Y-m-d', $strdate);
 			}
 		}
+		if (!empty($params['startdate']) && !empty($params['enddate'])) {
+			$options['game_date'] = array(
+			    date('Y-m-d 00:00:00', strtotime($params['startdate'])),
+			    date('Y-m-d 23:59:59', strtotime($params['enddate']))
+			);
+		}
 		if (!isset($options['game_date'])) {
 			$options['close_date'] = $date;
 		}
@@ -63,7 +69,7 @@ class BetsController extends AppController {
 			} else {
 				$options['name'] = $text;
 			}
-		}
+		}		
 			
 		$scores = $this->Score->matchOption($options);
 		$this->set('scores', $scores);
