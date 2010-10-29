@@ -307,8 +307,93 @@ class BetsController extends AppController {
 		return array($earnedData);
 	}
 
+	private function fixCond($cond) {
+		$ret = array();
+		$possibleTypes = $this->getBetTypes();
+		$possibleDirections = $this->getBetDirections();
+		foreach ($cond as $key => $val) {
+			if ($val !== false) {
+				switch ($key) {
+				case 'league':
+					$vals = (array)$val;
+					$set = array();
+					foreach ($vals as &$val) {
+						$val = $this->LeagueType->contains($val);
+						if ($val !== false) {
+							$set[] = $val;
+						}
+					}
+					if (!empty($set)) {
+						$ret[$key] = $set;
+					}
+					break;
+				case 'type':
+					$vals = (array)$val;
+					$set = array();
+					foreach ($vals as &$val) {
+						if (isset($possibleTypes[$val])) {
+							$set[] = $val;
+						}
+					}
+					if (!empty($set)) {
+						$ret[$key] = $set;
+					}
+					break;
+				case 'direction':
+					$vals = (array)$val;
+					$set = array();
+					foreach ($vals as &$val) {
+						if (isset($possibleDirections[$val])) {
+							$set[] = $val;
+						}
+					}
+					if (!empty($set)) {
+						$ret[$key] = $set;
+					}
+					break;
+				default:
+					$ret[$key] = $val;
+				}
+			}
+		}
+		return $ret;
+	}
+
+	private function getBetTypes() {
+		return array_combine(
+			$this->UserBet->possibleTypes(),
+			array_map(array('Inflector', 'humanize'), $this->UserBet->possibleTypes())
+		);
+	}
+
+	private function getBetDirections() {
+		return array_combine(
+			$this->UserBet->possibleDirections(),
+			array_map(array('Inflector', 'humanize'), $this->UserBet->possibleDirections())
+		);
+	}
+
 	public function view() {
-		$bets = $this->UserBet->getAll($this->Auth->user('id'));
+
+		$leagues = array_values($this->LeagueType->getList());
+		$possibleLeagues = array_combine($leagues, $leagues);
+		$this->set('possibleLeagues', $possibleLeagues);
+
+		$possibleTypes = $this->getBetTypes();
+		$this->set('possibleTypes', $possibleTypes);
+
+		$possibleDirections = $this->getBetDirections();
+		$this->set('possibleDirections', $possibleDirections);
+		
+		$cond = array(
+		    'league' => $this->urlGetVar('league'),
+		    'type' => $this->urlGetVar('type'),
+		    'direction' => $this->urlGetVar('direction')
+		);
+		$this->set('cond', $cond);
+		$cond = $this->fixCond($cond);
+
+		$bets = $this->UserBet->getAll($this->Auth->user('id'), null, $cond);
 		$record = $this->winLossTie($bets);
 		$this->set('record', $record);
 		$allStats = $this->allStats($bets);

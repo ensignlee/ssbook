@@ -9,6 +9,31 @@ class UserBet extends AppModel {
 		)
 	);
 
+	public function possibleTypes() {
+		return array(
+		    'moneyline',
+		    'half_moneyline',
+		    'second_moneyline',
+		    'spread',
+		    'half_spread',
+		    'second_spread',
+		    'total',
+		    'half_total',
+		    'second_total',
+		    'parlay',
+		    'teaser'
+		);
+	}
+
+	public function possibleDirections() {
+		return array(
+		    'home',
+		    'visitor',
+		    'over',
+		    'under'
+		);
+	}
+
 	/**
 	 * expects (type, direction, spread, risk, odds, scoreid, book, parlay, game_date)
 	 */
@@ -45,9 +70,11 @@ class UserBet extends AppModel {
 		return $this->SourceType->getOrSet($name);
 	}
 
-	public function getAll($userid, $parlayids = null) {
+	public function getAll($userid, $parlayids = null, $cond = array()) {
+
+		$cond = array_merge($cond, array('userid' => $userid, 'parlayid' => $parlayids));
 		$bets = $this->find('all', array(
-			'conditions' => array('userid' => $userid, 'parlayid' => $parlayids)
+			'conditions' => $cond
 		));
 
 		App::import('Model', 'LeagueType');

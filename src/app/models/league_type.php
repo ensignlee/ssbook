@@ -20,6 +20,13 @@ class LeagueType extends AppModel {
 		return isset($this->_cacheMap[$id]) ? $this->_cacheMap[$id] : '';
 	}
 
+	public function getList() {
+		if (empty($this->_cacheMap)) {
+			$this->_cacheMap = $this->find('list');
+		}
+		return $this->_cacheMap;
+	}
+
 	public function getOrSet($name) {
 		if (empty($name)) {
 			return null;

@@ -110,3 +110,24 @@ function safe_div($left, $right) {
 	return $left / $right;
 }
 }
+
+if(!function_exists('array_lookup')) {
+/**
+ * Caution, do not use inside a large array
+ */
+function array_lookup($key, &$arr, $default = false) {
+	if (array_key_exists($key, $arr)) {
+		return $arr[$key];
+	}
+	return $default;
+}
+}
+
+if(!function_exists('numberSafeEmpty')) {
+function numberSafeEmpty($str) {
+	if (ctype_digit($str) && (int)$str === 0) {
+		return false;
+	}
+	return empty($str);
+}
+}
