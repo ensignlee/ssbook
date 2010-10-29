@@ -98,3 +98,15 @@ function mb_trim($string, $charlist='\\\\s', $ltrim=true, $rtrim=true) {
 	return preg_replace("/$pattern_middle/usSD", '', $string); 
 } 
 }
+
+if(!function_exists('safe_div')) {
+function safe_div($left, $right) {
+	if (is_null($left) || is_null($right)) {
+		return null;
+	}
+	if ($right == 0) {
+		return 0;
+	}
+	return $left / $right;
+}
+}

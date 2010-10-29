@@ -233,8 +233,88 @@ class BetsController extends AppController {
 		$this->render("ajax_$action");
 	}
 
+	private function winLossTie(&$bets) {
+		$record = array(
+		    'win' => 0,
+		    'loss' => 0,
+		    'tie' => 0,
+		    'dollarsWon' => 0
+		);
+		foreach ($bets as $bet) {
+			$winning = $bet['UserBet']['winning'];
+			if (!is_null($winning)) {
+				if ($winning == 0) {
+					$record['tie']++;
+				} else if ($winning > 0) {
+					$record['win']++;
+				} else {
+					$record['loss']++;
+				}
+				$record['dollarsWon'] += $winning;
+			}
+		}
+		$record['winningPercentage'] = safe_div($record['win'], ($record['win']+$record['loss']+$record['tie']));
+		return $record;
+	}
+
+	private function allStats(&$bets) {
+		$allStats = array(
+		    'earned' => 0,
+		    'num' => 0,
+		    'bet' => 0,
+		    'odds' => 0,
+		    'breakEven' => 0
+		);
+		foreach ($bets as $bet) {
+			$winning = $bet['UserBet']['winning'];
+			if (!is_null($winning)) {
+				$allStats['num']++;
+				$allStats['earned'] += $winning;
+				$allStats['bet'] += $bet['UserBet']['risk'];
+
+				$odds = $bet['UserBet']['odds'];
+				if ($odds > 0) {
+					$allStats['breakEven'] = 1/($odds/100+1);
+					$allStats['odds'] += ($odds-100);
+				} else {
+					$allStats['breakEven'] = 1-1/($odds/(-100)+1);
+					$allStats['odds'] += ($odds+100);
+				}
+			}
+		}
+		$odds = safe_div($allStats['odds'], $allStats['num']);
+		$allStats['avgOdds'] = ($odds > 0) ? $odds + 100 : $odds - 100;
+		$allStats['breakEven'] = safe_div($allStats['breakEven'], $allStats['num'])*100;
+		$allStats['avgEarned'] = safe_div($allStats['earned'], $allStats['num']);
+		$allStats['avgBet'] = safe_div($allStats['bet'], $allStats['num']);
+		$allStats['roi'] = safe_div($allStats['avgEarned'], $allStats['avgBet']);
+
+		return $allStats;
+	}
+
+	private function graphData(&$bets) {
+		$earnedData = array();
+		$earned = 0;
+		$i = 0;
+		foreach ($bets as $bet) {
+			$winning = $bet['UserBet']['winning'];
+			if (!is_null($winning)) {
+				$earned += $winning;
+			}
+			$earnedData[] = array($i, $earned);
+			$i++;
+		}
+		return array($earnedData);
+	}
+
 	public function view() {
-		$bets = $this->UserBet->getAll($this->Auth->user('id'));		
+		$bets = $this->UserBet->getAll($this->Auth->user('id'));
+		$record = $this->winLossTie($bets);
+		$this->set('record', $record);
+		$allStats = $this->allStats($bets);
+		$this->set('allStats', $allStats);
+		$this->set('graphData', $this->graphData($bets));
+
 		$this->set('bets', $bets);
 	}
 }

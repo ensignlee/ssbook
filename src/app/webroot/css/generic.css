@@ -9,6 +9,19 @@ h1 {
 p {
 	margin: 7px 0;
 }
+table .number {
+	text-align: right;
+}
+table.cell-centered th, table.cell-centered td {
+	text-align: center;
+}
+table.cell-left th, table.cell-left td {
+	text-align: left;
+}
+table.spaced-table th, table.spaced-table td {
+	padding: 4px;
+}
+
 #content ul {
 	list-style-type: circle;
 	padding: .5em 1.5em;
