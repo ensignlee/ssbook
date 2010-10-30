@@ -131,3 +131,5 @@ function numberSafeEmpty($str) {
 	return empty($str);
 }
 }
+
+setlocale(LC_MONETARY, 'en_US');

@@ -48,6 +48,7 @@ $(function () {
 <div id="betTable">
 	<table>
 	<tr>
+		<th>&nbsp;</th>
 		<th>Date</th>
 		<th>League</th>
 		<th>Bet On</th>
@@ -62,22 +63,25 @@ $(function () {
 		<th>Delete</th>
 	</tr>
 
-	<?php	
+	<?php
+	$i = 0;
 	foreach ($bets as $bet) :
+		$i++;
 	?>
 	<tr>
-		<td><?= date("m/d/y", strtotime($bet['date'])) ?></td>
+		<td><?= $i ?></td>
+		<td class="date"><?= date("n/j/y", strtotime($bet['date'])) ?></td>
 		<td><?= $bet['league'] ?></td>
 		<td><?= $bet['beton'] ?></td>
 		<td><?= $bet['type'] ?></td>
-		<td><?= $bet['line'] ?></td>
+		<td class="number"><?= $bet['line'] ?></td>
 		<td><?= $bet['home'] ?></td>
 		<td><?= $bet['visitor'] ?></td>
-		<td><?= $bet['risk'] ?></td>
-		<td><?= $bet['odds'] ?></td>
-		<td><?= $bet['winning'] ?></td>
+		<td class="number"><?= money_format('%n', $bet['risk']) ?></td>
+		<td class="number"><?= $bet['odds'] ?></td>
+		<td class="number"><?= money_format('%(n', $bet['winning']) ?></td>
 		<td><?= $bet['book'] ?></td>
-		<td><?= $html->link('X', '/bets/delete/'.$bet['betid']) ?></td>
+		<td style="text-align: center"><?= $html->link('X', '/bets/delete/'.$bet['betid']) ?></td>
 	</tr>
 	<?php endforeach;// ($bets as $bet) : ?>
 	</table>

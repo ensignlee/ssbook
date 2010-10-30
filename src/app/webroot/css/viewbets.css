@@ -9,3 +9,15 @@
 .context-menu-item.item-checked .context-menu-item-inner {
 	background-image: url(../img/icons/check.png) !important;
 }
+
+#betTable table td {
+	border: 1px solid grey;
+}
+
+/* The hover style has a border so needs to be 1px less */
+table div.context-menu .context-menu-item .context-menu-item-inner {
+	padding: 1px 16px 1px 35px;
+}
+table div.context-menu .context-menu-item-hover .context-menu-item-inner {
+	padding: 0px 16px 0px 35px;
+}

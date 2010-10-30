@@ -12,6 +12,9 @@ p {
 table .number {
 	text-align: right;
 }
+table .date {
+	text-align: center;
+}
 table.cell-centered th, table.cell-centered td {
 	text-align: center;
 }
