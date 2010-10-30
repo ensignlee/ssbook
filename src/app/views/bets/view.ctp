@@ -1,12 +1,18 @@
 <?php
 $html->css('viewbets', 'stylesheet', array('inline' => false));
+$html->css('jquery.contextmenu', 'stylesheet', array('inline' => false));
 
 echo $javascript->link('jquery.flot.min.js');
+echo $javascript->link('jquery.contextmenu.js');
+echo $javascript->link('filtermenu.js');
 ?>
 <script type="text/javascript">
 $(function () {
 	var data = <?= json_encode($graphData) ?>;
 	$.plot($("#graph"), data);
+
+	var m = new SS.FilterMenu('#filter_date');
+	m.init(['One','Two','Three']);
 });
 </script>
 <div id="graph">Graph of Data</div>
@@ -34,46 +40,10 @@ $(function () {
 	</table>
 </div>
 
-<div id="betFilter">
-	<form method="get" action="">
-		<label for="league">League</label>
-		<select name="league[]" id="league" multiple size="3">
-			<?php foreach ($possibleLeagues as $leagueKey => $league) {
-				echo "<option ";
-				if (!empty($league) && is_array($cond['league']) && in_array($leagueKey, $cond['league'])) {
-					 echo "selected='selected'";
-				}
-				echo " value='$leagueKey'>$league</option>";
-			} ?>
-		</select>
-		<label for="type">Type</label>
-		<select name="type[]" id="type" multiple size="3">
-			<?php foreach ($possibleTypes as $typeKey => $type) {
-				echo "<option ";
-				if (!empty($type) && is_array($cond['type']) && in_array($typeKey, $cond['type'])) {
-					 echo "selected='selected'";
-				}
-				echo " value='$typeKey'>$type</option>";
-			} ?>
-		</select>
-		<label for="direction">Direction</label>
-		<select name="direction[]" id="direction" multiple size="3">
-			<?php foreach ($possibleDirections as $directionKey => $direction) {
-				echo "<option ";
-				if (!empty($direction) && is_array($cond['direction']) && in_array($directionKey, $cond['direction'])) {
-					 echo "selected='selected'";
-				}
-				echo " value='$directionKey'>$direction</option>";
-			} ?>
-		</select>
-		<input type="submit" value="Filter" />
-	</form>
-</div>
-
 <div id="betTable">
 	<table>
 	<tr>
-		<th>Date</th>
+		<th>Date <span id="filter_date">\/</span></th>
 		<th>Home</th>
 		<th>Visitor</th>
 		<th>League</th>

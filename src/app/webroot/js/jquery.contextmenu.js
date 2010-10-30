@@ -46,8 +46,8 @@
 				
 		showTransition:'show',
 		hideTransition:'hide',
-		showSpeed:null,
-		hideSpeed:null,
+		showSpeed: 0, //cameron: needs to be 0 to have a callback
+		hideSpeed: 0, //cameron: same
 		showCallback:null,
 		hideCallback:null,
 		
