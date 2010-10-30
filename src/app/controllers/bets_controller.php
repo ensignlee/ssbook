@@ -241,7 +241,7 @@ class BetsController extends AppController {
 		    'dollarsWon' => 0
 		);
 		foreach ($bets as $bet) {
-			$winning = $bet['UserBet']['winning'];
+			$winning = $bet['winning'];
 			if (!is_null($winning)) {
 				if ($winning == 0) {
 					$record['tie']++;
@@ -266,13 +266,13 @@ class BetsController extends AppController {
 		    'breakEven' => 0
 		);
 		foreach ($bets as $bet) {
-			$winning = $bet['UserBet']['winning'];
+			$winning = $bet['winning'];
 			if (!is_null($winning)) {
 				$allStats['num']++;
 				$allStats['earned'] += $winning;
-				$allStats['bet'] += $bet['UserBet']['risk'];
+				$allStats['bet'] += $bet['risk'];
 
-				$odds = $bet['UserBet']['odds'];
+				$odds = $bet['odds'];
 				if ($odds > 0) {
 					$allStats['breakEven'] = 1/($odds/100+1);
 					$allStats['odds'] += ($odds-100);
@@ -297,7 +297,7 @@ class BetsController extends AppController {
 		$earned = 0;
 		$i = 0;
 		foreach ($bets as $bet) {
-			$winning = $bet['UserBet']['winning'];
+			$winning = $bet['winning'];
 			if (!is_null($winning)) {
 				$earned += $winning;
 			}
@@ -392,10 +392,8 @@ class BetsController extends AppController {
 				if (!isset($distincts[$key])) {
 					$distincts[$key] = array();
 				}
-				if (!empty($bet['UserBet'][$key])) {
-					$distincts[$key][$bet['UserBet'][$key]] = true;
-				} else if (!empty($bet['Score'][$key])) {
-					$distincts[$key][$bet['Score'][$key]] = true;
+				if (!empty($bet[$key])) {
+					$distincts[$key][$bet[$key]] = true;
 				}
 			}
 		}
@@ -415,6 +413,59 @@ class BetsController extends AppController {
 		return $ret;
 	}
 
+	private function reformatBets(&$bets) {
+		$ret = array();
+		foreach ($bets as $bet) {
+			$ret[] = $this->reformatBet($bet);
+		}
+		return $ret;
+	}
+
+	private function getBetOn($userBet, $score) {
+		switch ($userBet['type']) {
+		case 'moneyline':
+		case 'half_moneyline':
+		case 'second_moneyline':
+		case 'spread':
+		case 'half_spread':
+		case 'second_spread':
+			return ($userBet['direction'] == 'home') ? $score['home'] : $score['visitor'];
+		case 'total':
+		case 'half_total':
+		case 'second_total':
+			return $userBet['direction'];
+		case 'parlay':		
+			return 'Parlay';
+		case 'teaser':
+			return 'Teaser';
+		}
+	}
+
+	private function reformatBet($bet) {
+		$userBet = $bet['UserBet'];
+		$score = $bet['Score'];
+
+		$userBetGameDate = strtotime($userBet['game_date']);
+		$scoreGameDate = strtotime($score['game_date']);
+
+		$fields = array(
+		    'betid' => $userBet['id'],
+		    'scoreid' => $score['id'],
+		    'date' => date('Y-m-d', max($userBetGameDate, $scoreGameDate)),
+		    'league' => $score['league'],
+		    'beton' => $this->getBetOn($userBet, $score),
+		    'type' => $userBet['type'],
+		    'line' => $userBet['spread'],
+		    'home' => $score['home'],
+		    'visitor' => $score['visitor'],
+		    'risk' => $userBet['risk'],
+		    'odds' => $userBet['odds'],
+		    'winning' => $userBet['winning'],
+		    'book' => $userBet['source']
+		);
+		return $fields;
+	}
+
 	public function view() {
 		
 		$cond = array(
@@ -428,6 +479,7 @@ class BetsController extends AppController {
 		$this->set('condAsMap', $this->getCondAsMap($cond));
 
 		$bets = $this->UserBet->getAll($this->Auth->user('id'), null, $sqlcond);
+		$bets = $this->reformatBets($bets);
 		$filters = $this->setFilters($bets, array('home'));
 		$this->set('filters', $filters);
 

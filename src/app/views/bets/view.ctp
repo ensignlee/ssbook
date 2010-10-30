@@ -49,44 +49,36 @@ $(function () {
 	<table>
 	<tr>
 		<th>Date</th>
+		<th>League</th>
+		<th>Bet On</th>
+		<th>Bet Type</th>
+		<th>Line</th>
 		<th>Home  <span class="clickable extra-click" id="filter_home_team"><img src="<?= $html->url('/img/icons/green_arrow_down.gif') ?>" /></span></th>
 		<th>Visitor</th>
-		<th>League</th>
-		<th>Bet Direction</th>
-		<th>Bet Type</th>
-		<th>Bet</th>
 		<th>Risk</th>
+		<th>Odds</th>
 		<th>Winnings</th>
 		<th>Book</th>
 		<th>Delete</th>
 	</tr>
 
-	<?php
-	$startSS = strtotime('1990-01-01');
+	<?php	
 	foreach ($bets as $bet) :
-		$score = $bet['Score'];
-		$bet = $bet['UserBet'];
-		$game_date = strtotime($bet['game_date']);
-		if ($game_date < $startSS) {
-			$game_date = strtotime($score['game_date']);
-		}
-
 	?>
-
 	<tr>
-		<td><?= date("m/d/y", $game_date) ?></td>
-		<td><?= $score['home'] ?></td>
-		<td><?= $score['visitor'] ?></td>
-		<td><?= $score['league'] ?></td>
-		<td><?= $bet['direction'] ?></td>
+		<td><?= date("m/d/y", strtotime($bet['date'])) ?></td>
+		<td><?= $bet['league'] ?></td>
+		<td><?= $bet['beton'] ?></td>
 		<td><?= $bet['type'] ?></td>
-		<td><?= $bet['bet'] ?></td>
+		<td><?= $bet['line'] ?></td>
+		<td><?= $bet['home'] ?></td>
+		<td><?= $bet['visitor'] ?></td>
 		<td><?= $bet['risk'] ?></td>
+		<td><?= $bet['odds'] ?></td>
 		<td><?= $bet['winning'] ?></td>
-		<td><?= $bet['source'] ?></td>
-		<td><?= $html->link('X', '/bets/delete/'.$bet['id']) ?></td>
+		<td><?= $bet['book'] ?></td>
+		<td><?= $html->link('X', '/bets/delete/'.$bet['betid']) ?></td>
 	</tr>
 	<?php endforeach;// ($bets as $bet) : ?>
-
 	</table>
 </div>
