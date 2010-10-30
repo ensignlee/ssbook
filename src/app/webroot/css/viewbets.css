@@ -6,8 +6,6 @@
 	height: 400px;
 }
 
-
-
-.context-menu-item .context-menu-item-inner.item-checked {
+.context-menu-item.item-checked .context-menu-item-inner {
 	background-image: url(../img/icons/check.png) !important;
 }

@@ -309,18 +309,21 @@ class BetsController extends AppController {
 
 	private function fixCond($cond) {
 		$ret = array();
+		$fixedCond = array();
 		$possibleTypes = $this->getBetTypes();
 		$possibleDirections = $this->getBetDirections();
 		foreach ($cond as $key => $val) {
 			if ($val !== false) {
 				switch ($key) {
 				case 'league':
-					$vals = (array)$val;
+					$vals = explode(',', $val);
 					$set = array();
 					foreach ($vals as &$val) {
-						$val = $this->LeagueType->contains($val);
-						if ($val !== false) {
-							$set[] = $val;
+						$sqlval = $this->LeagueType->contains($val);
+						$fixedCond[$key] = array();
+						if ($sqlval !== false) {
+							$fixedCond[$key][] = $val;
+							$set[] = $sqlval;
 						}
 					}
 					if (!empty($set)) {
@@ -328,10 +331,12 @@ class BetsController extends AppController {
 					}
 					break;
 				case 'type':
-					$vals = (array)$val;
+					$vals = explode(',', $val);
 					$set = array();
+					$fixedCond[$key] = array();
 					foreach ($vals as &$val) {
 						if (isset($possibleTypes[$val])) {
+							$fixedCond[$key][] = $val;
 							$set[] = $val;
 						}
 					}
@@ -340,10 +345,12 @@ class BetsController extends AppController {
 					}
 					break;
 				case 'direction':
-					$vals = (array)$val;
+					$vals = explode(',', $val);
 					$set = array();
+					$fixedCond[$key] = array();
 					foreach ($vals as &$val) {
 						if (isset($possibleDirections[$val])) {
+							$fixedCond[$key][] = $val;
 							$set[] = $val;
 						}
 					}
@@ -352,11 +359,15 @@ class BetsController extends AppController {
 					}
 					break;
 				default:
-					$ret[$key] = $val;
+					$vals = explode(',', $val);					
+					if (!empty($vals)) {
+						$fixedCond[$key] = $vals;
+						$ret[$key] = $vals;
+					}
 				}
 			}
 		}
-		return $ret;
+		return array($ret, $fixedCond);
 	}
 
 	private function getBetTypes() {
@@ -373,27 +384,53 @@ class BetsController extends AppController {
 		);
 	}
 
+	private function setFilters(&$bets, $distinct) {
+		$ret = array();
+		$distincts = array();
+		foreach ($bets as $bet) {
+			foreach ($distinct as $key) {
+				if (!isset($distincts[$key])) {
+					$distincts[$key] = array();
+				}
+				if (!empty($bet['UserBet'][$key])) {
+					$distincts[$key][$bet['UserBet'][$key]] = true;
+				} else if (!empty($bet['Score'][$key])) {
+					$distincts[$key][$bet['Score'][$key]] = true;
+				}
+			}
+		}
+		foreach ($distinct as $key) {
+			if (isset($distincts[$key])) {
+				$ret[$key] = array_keys($distincts[$key]);
+			}
+		}
+		return $ret;
+	}
+
+	private function getCondAsMap($cond) {
+		$ret = array();
+		foreach ($cond as $key => $rows) {
+			$ret[$key] = array_combine(array_values($rows), array_fill(0, count($rows), true));
+		}
+		return $ret;
+	}
+
 	public function view() {
-
-		$leagues = array_values($this->LeagueType->getList());
-		$possibleLeagues = array_combine($leagues, $leagues);
-		$this->set('possibleLeagues', $possibleLeagues);
-
-		$possibleTypes = $this->getBetTypes();
-		$this->set('possibleTypes', $possibleTypes);
-
-		$possibleDirections = $this->getBetDirections();
-		$this->set('possibleDirections', $possibleDirections);
 		
 		$cond = array(
-		    'league' => $this->urlGetVar('league'),
+		    'home' => $this->urlGetVar('home')
+		    /*'league' => $this->urlGetVar('league'),
 		    'type' => $this->urlGetVar('type'),
-		    'direction' => $this->urlGetVar('direction')
-		);
+		    'direction' => $this->urlGetVar('direction')*/
+		);		
+		list($sqlcond, $cond) = $this->fixCond($cond);
 		$this->set('cond', $cond);
-		$cond = $this->fixCond($cond);
+		$this->set('condAsMap', $this->getCondAsMap($cond));
 
-		$bets = $this->UserBet->getAll($this->Auth->user('id'), null, $cond);
+		$bets = $this->UserBet->getAll($this->Auth->user('id'), null, $sqlcond);
+		$filters = $this->setFilters($bets, array('home'));
+		$this->set('filters', $filters);
+
 		$record = $this->winLossTie($bets);
 		$this->set('record', $record);
 		$allStats = $this->allStats($bets);

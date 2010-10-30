@@ -50,6 +50,7 @@
 		hideSpeed: 0, //cameron: same
 		showCallback:null,
 		hideCallback:null,
+		bindAction: 'contextmenu',
 		
 		className:'context-menu',
 		itemClassName:'context-menu-item',
@@ -93,9 +94,9 @@
 			// Create the shadow object if shadow is enabled
 			if (cmenu.shadow) {
 				cmenu.createShadow(cmenu); // Extracted to method for extensibility
-				if (cmenu.shadowOffset) { cmenu.shadowOffsetX = cmenu.shadowOffsetY = cmenu.shadowOffset; }
+				if (cmenu.shadowOffset) {cmenu.shadowOffsetX = cmenu.shadowOffsetY = cmenu.shadowOffset;}
 			}
-			$('body').bind('contextmenu',function(){cmenu.hide();}); // If right-clicked somewhere else in the document, hide this menu
+			$('body').bind(cmenu.bindAction,function(){cmenu.hide();}); // If right-clicked somewhere else in the document, hide this menu
 			return cmenu;
 		},
 		
@@ -108,7 +109,7 @@
 		createMenu: function(menu,cmenu) {
 			var className = cmenu.className;
 			$.each(cmenu.theme.split(","),function(i,n){className+=' '+cmenu.themePrefix+n});
-			var $t = $('<table cellspacing=0 cellpadding=0></table>').click(function(){cmenu.hide(); return false;}); // We wrap a table around it so width can be flexible
+			var $t = $('<table cellspacing=0 cellpadding=0></table>').click(function(){cmenu.hide();return false;}); // We wrap a table around it so width can be flexible
 			var $tr = $('<tr></tr>');
 			var $td = $('<td></td>');
 			var $div = $('<div class="'+className+'"></div>');
@@ -137,7 +138,10 @@
 		// Create an individual menu item
 		createMenuItem: function(label,obj) {
 			var cmenu = this;
-			if (typeof obj=="function") { obj={onclick:obj}; } // If passed a simple function, turn it into a property of an object
+			 // If passed a simple function, turn it into a property of an object
+			if (typeof obj=="function") {
+				obj={onclick:obj};
+			}
 			// Default properties, extended in case properties are passed
 			var o = $.extend({
 				onclick:function() { },
@@ -155,11 +159,17 @@
 							// If the item is disabled, don't do anything when it is clicked
 							.click(function(e){if(cmenu.isItemDisabled(this)){return false;}else{return o.onclick.call(cmenu.target,this,cmenu,e)}})
 							// Change the class of the item when hovered over
-							.hover( function(){ o.hoverItem.call(this,(cmenu.isItemDisabled(this))?cmenu.disabledItemHoverClassName:o.hoverClassName); }
-									,function(){ o.hoverItemOut.call(this,(cmenu.isItemDisabled(this))?cmenu.disabledItemHoverClassName:o.hoverClassName); }
+							.hover( function(){o.hoverItem.call(this,(cmenu.isItemDisabled(this))?cmenu.disabledItemHoverClassName:o.hoverClassName);}
+									,function(){o.hoverItemOut.call(this,(cmenu.isItemDisabled(this))?cmenu.disabledItemHoverClassName:o.hoverClassName);}
 							);
 			var $idiv = $('<div class="'+cmenu.innerDivClassName+'" style="'+iconStyle+'">'+label+'</div>');
 			$div.append($idiv);
+			// cameron: adding data to the object
+			if (o['data']) {
+				$.each(o['data'], function(key, val) {
+					$div.data(key, val);
+				});
+			}
 			return $div;
 		},
 		
@@ -169,15 +179,15 @@
 		},
 		
 		// Determine if an individual item is currently disabled. This is called each time the item is hovered or clicked because the disabled status may change at any time
-		isItemDisabled: function(item) { return $(item).is('.'+this.disabledItemClassName); },
+		isItemDisabled: function(item) {return $(item).is('.'+this.disabledItemClassName);},
 		
 		// Functions to fire on hover. Extracted to methods for extensibility
-		hoverItem: function(c) { $(this).addClass(c); },
-		hoverItemOut: function(c) { $(this).removeClass(c); },
+		hoverItem: function(c) {$(this).addClass(c);},
+		hoverItemOut: function(c) {$(this).removeClass(c);},
 		
 		// Create the shadow object
 		createShadow: function(cmenu) {
-			cmenu.shadowObj = $('<div class="'+cmenu.shadowClass+'"></div>').css( {display:'none',position:"absolute", zIndex:9998, opacity:cmenu.shadowOpacity, backgroundColor:cmenu.shadowColor } );
+			cmenu.shadowObj = $('<div class="'+cmenu.shadowClass+'"></div>').css( {display:'none',position:"absolute", zIndex:9998, opacity:cmenu.shadowOpacity, backgroundColor:cmenu.shadowColor} );
 			$(cmenu.appendTo).append(cmenu.shadowObj);
 		},
 		
@@ -196,7 +206,7 @@
 		
 		// A hook to call before the menu is shown, in case special processing needs to be done.
 		// Return false to cancel the default show operation
-		beforeShow: function() { return true; },
+		beforeShow: function() {return true;},
 		
 		// Show the context menu
 		show: function(t,e) {
@@ -205,13 +215,13 @@
 			if (cmenu.beforeShow()!==false) {
 				// If the menu content is a function, call it to populate the menu each time it is displayed
 				if (cmenu.menuFunction) {
-					if (cmenu.menu) { $(cmenu.menu).remove(); }
+					if (cmenu.menu) {$(cmenu.menu).remove();}
 					cmenu.menu = cmenu.createMenu(cmenu.menuFunction(cmenu,t),cmenu);
 					cmenu.menu.css({display:'none'});
 					$(cmenu.appendTo).append(cmenu.menu);
 				}
 				var $c = cmenu.menu;
-				x+=cmenu.offsetX; y+=cmenu.offsetY;
+				x+=cmenu.offsetX;y+=cmenu.offsetY;
 				var pos = cmenu.getPosition(x,y,cmenu,e); // Extracted to method for extensibility
 				cmenu.showShadow(pos.x,pos.y,e);
 				// Resize the iframe if needed
@@ -235,11 +245,11 @@
 				var $w = $(window);
 				var wh = $w.height();
 				var ww = $w.width();
-				if (dir=="down" && (y+h-$w.scrollTop() > wh)) { dir = "up"; }
+				if (dir=="down" && (y+h-$w.scrollTop() > wh)) {dir = "up";}
 				var maxRight = x+w-$w.scrollLeft();
-				if (maxRight > ww) { x -= (maxRight-ww); }
+				if (maxRight > ww) {x -= (maxRight-ww);}
 			}
-			if (dir=="up") { y -= h; }
+			if (dir=="up") {y -= h;}
 			return {'x':x,'y':y};
 		},
 		
@@ -247,9 +257,9 @@
 		hide: function() {
 			var cmenu=this;
 			if (cmenu.shown) {
-				if (cmenu.iframe) { $(cmenu.iframe).hide(); }
-				if (cmenu.menu) { cmenu.menu[cmenu.hideTransition](cmenu.hideSpeed,((cmenu.hideCallback)?function(){cmenu.hideCallback.call(cmenu);}:null)); }
-				if (cmenu.shadow) { cmenu.shadowObj[cmenu.hideTransition](cmenu.hideSpeed); }
+				if (cmenu.iframe) {$(cmenu.iframe).hide();}
+				if (cmenu.menu) {cmenu.menu[cmenu.hideTransition](cmenu.hideSpeed,((cmenu.hideCallback)?function(){cmenu.hideCallback.call(cmenu);}:null));}
+				if (cmenu.shadow) {cmenu.shadowObj[cmenu.hideTransition](cmenu.hideSpeed);}
 			}
 			cmenu.shown = false;
 		}
@@ -257,9 +267,14 @@
 	
 	// This actually adds the .contextMenu() function to the jQuery namespace
 	$.fn.contextMenu = function(menu,options) {
+		var bindAction = 'contextmenu';
+		if (options['bindAction']) {
+			bindAction = options['bindAction'];
+		}
+		
 		var cmenu = $.contextMenu.create(menu,options);
 		return this.each(function(){
-			$(this).bind('contextmenu',function(e){cmenu.show(this,e);return false;});
+			$(this).bind(bindAction,function(e){cmenu.show(this,e);return false;});
 		});
 	};
 })(jQuery);

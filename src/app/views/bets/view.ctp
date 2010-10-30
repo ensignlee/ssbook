@@ -11,10 +11,15 @@ $(function () {
 	var data = <?= json_encode($graphData) ?>;
 	$.plot($("#graph"), data);
 
-	var m = new SS.FilterMenu('#filter_date');
-	m.init(['One','Two','Three']);
+	var m = new SS.FilterMenu('home', '#hiddenForm', '#filter_home_team');
+	m.init(<?= json_encode($filters['home']) ?>, <?= json_encode(isset($condAsMap['home']) ? $condAsMap['home'] : '') ?>);
 });
 </script>
+<form id="hiddenForm" method="get" action="">
+	<?php foreach ($condAsMap as $key => $rows) {
+		echo "<input type='hidden' name='$key' value=\"".htmlentities(implode(',', array_keys($rows)))."\" />";
+	} ?>
+</form>
 <div id="graph">Graph of Data</div>
 <div id="record">
 	<table class="spaced-table cell-centered">
@@ -43,8 +48,8 @@ $(function () {
 <div id="betTable">
 	<table>
 	<tr>
-		<th>Date <span id="filter_date">\/</span></th>
-		<th>Home</th>
+		<th>Date</th>
+		<th>Home  <span class="clickable extra-click" id="filter_home_team"><img src="<?= $html->url('/img/icons/green_arrow_down.gif') ?>" /></span></th>
 		<th>Visitor</th>
 		<th>League</th>
 		<th>Bet Direction</th>

@@ -21,6 +21,12 @@ table.cell-left th, table.cell-left td {
 table.spaced-table th, table.spaced-table td {
 	padding: 4px;
 }
+.clickable {
+	cursor: pointer;
+}
+.extra-click {
+	padding: 2px;
+}
 
 #content ul {
 	list-style-type: circle;
