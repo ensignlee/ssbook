@@ -11,8 +11,11 @@ $(function () {
 	var data = <?= json_encode($graphData) ?>;
 	$.plot($("#graph"), data);
 
-	var m = new SS.FilterMenu('home', '#hiddenForm', '#filter_home_team');
-	m.init(<?= json_encode($filters['home']) ?>, <?= json_encode(isset($condAsMap['home']) ? $condAsMap['home'] : '') ?>);
+	<?php foreach (array_keys($filters) as $key) : ?>
+	var m = new SS.FilterMenu('<?= $key ?>', '#hiddenForm', '#filter_<?= $key ?>');
+	<?php $list = $filters[$key]; sort($list); ?>
+	m.init(<?= json_encode($list) ?>, <?= json_encode(isset($condAsMap[$key]) ? $condAsMap[$key] : '') ?>);
+	<?php endforeach;// (array_keys($filters) as $key) : ?>
 });
 </script>
 <form id="hiddenForm" method="get" action="">
@@ -50,12 +53,12 @@ $(function () {
 	<tr>
 		<th>&nbsp;</th>
 		<th>Date</th>
-		<th>League</th>
-		<th>Bet On</th>
-		<th>Bet Type</th>
+		<th>League <span class="clickable extra-click" id="filter_league"><img src="<?= $html->url('/img/icons/green_arrow_down.gif') ?>" /></span></th>
+		<th>Bet On <span class="clickable extra-click" id="filter_beton"><img src="<?= $html->url('/img/icons/green_arrow_down.gif') ?>" /></span></th>
+		<th>Bet Type <span class="clickable extra-click" id="filter_type"><img src="<?= $html->url('/img/icons/green_arrow_down.gif') ?>" /></span></th>
 		<th>Line</th>
-		<th>Home  <span class="clickable extra-click" id="filter_home_team"><img src="<?= $html->url('/img/icons/green_arrow_down.gif') ?>" /></span></th>
-		<th>Visitor</th>
+		<th>Home <span class="clickable extra-click" id="filter_home"><img src="<?= $html->url('/img/icons/green_arrow_down.gif') ?>" /></span></th>
+		<th>Visitor <span class="clickable extra-click" id="filter_visitor"><img src="<?= $html->url('/img/icons/green_arrow_down.gif') ?>" /></span></th>
 		<th>Risk</th>
 		<th>Odds</th>
 		<th>Winnings</th>

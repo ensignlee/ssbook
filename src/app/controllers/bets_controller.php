@@ -311,7 +311,6 @@ class BetsController extends AppController {
 		$ret = array();
 		$fixedCond = array();
 		$possibleTypes = $this->getBetTypes();
-		$possibleDirections = $this->getBetDirections();
 		foreach ($cond as $key => $val) {
 			if ($val !== false) {
 				switch ($key) {
@@ -344,18 +343,10 @@ class BetsController extends AppController {
 						$ret[$key] = $set;
 					}
 					break;
-				case 'direction':
+				case 'beton':
 					$vals = explode(',', $val);
-					$set = array();
-					$fixedCond[$key] = array();
-					foreach ($vals as &$val) {
-						if (isset($possibleDirections[$val])) {
-							$fixedCond[$key][] = $val;
-							$set[] = $val;
-						}
-					}
-					if (!empty($set)) {
-						$ret[$key] = $set;
+					if (!empty($vals)) {
+						$fixedCond[$key] = $vals;
 					}
 					break;
 				default:
@@ -374,13 +365,6 @@ class BetsController extends AppController {
 		return array_combine(
 			$this->UserBet->possibleTypes(),
 			array_map(array('Inflector', 'humanize'), $this->UserBet->possibleTypes())
-		);
-	}
-
-	private function getBetDirections() {
-		return array_combine(
-			$this->UserBet->possibleDirections(),
-			array_map(array('Inflector', 'humanize'), $this->UserBet->possibleDirections())
 		);
 	}
 
@@ -455,7 +439,7 @@ class BetsController extends AppController {
 		    'league' => $score['league'],
 		    'beton' => $this->getBetOn($userBet, $score),
 		    'type' => $userBet['type'],
-		    'line' => $userBet['spread'],
+		    'line' => (float)$userBet['spread'],
 		    'home' => $score['home'],
 		    'visitor' => $score['visitor'],
 		    'risk' => $userBet['risk'],
@@ -466,13 +450,47 @@ class BetsController extends AppController {
 		return $fields;
 	}
 
+	private function isMatchingBet($bet, $cond, $keys) {
+		foreach ($keys as $key) {
+			if (isset($cond[$key])) {
+				foreach ($cond[$key] as $match) {
+					if ($match == $bet[$key]) {
+						return true;
+					}
+				}
+			}
+		}
+		return false;
+	}
+
+	private function filterNonSql(&$bets, $cond, $keys) {
+		$ret = array();
+		$i = 0;
+		foreach ($keys as $key) {
+			if (isset($cond[$key])) {
+				$i++;
+			}
+		}
+		// No non sql filters
+		if ($i <= 0) {
+			return $bets;
+		}
+		foreach ($bets as $bet) {
+			if ($this->isMatchingBet($bet, $cond, $keys)) {
+				$ret[] = $bet;
+			}
+		}
+		return $ret;
+	}
+
 	public function view() {
 		
 		$cond = array(
-		    'home' => $this->urlGetVar('home')
-		    /*'league' => $this->urlGetVar('league'),
+		    'home' => $this->urlGetVar('home'),
+		    'visitor' => $this->urlGetVar('visitor'),
 		    'type' => $this->urlGetVar('type'),
-		    'direction' => $this->urlGetVar('direction')*/
+		    'league' => $this->urlGetVar('league'),
+		    'beton' => $this->urlGetVar('beton')
 		);		
 		list($sqlcond, $cond) = $this->fixCond($cond);
 		$this->set('cond', $cond);
@@ -480,7 +498,9 @@ class BetsController extends AppController {
 
 		$bets = $this->UserBet->getAll($this->Auth->user('id'), null, $sqlcond);
 		$bets = $this->reformatBets($bets);
-		$filters = $this->setFilters($bets, array('home'));
+		$bets = $this->filterNonSql($bets, $cond, array('beton'));
+		
+		$filters = $this->setFilters($bets, array('home', 'visitor', 'type', 'league', 'beton'));
 		$this->set('filters', $filters);
 
 		$record = $this->winLossTie($bets);
