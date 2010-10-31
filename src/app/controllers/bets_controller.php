@@ -274,17 +274,17 @@ class BetsController extends AppController {
 
 				$odds = $bet['odds'];
 				if ($odds > 0) {
-					$allStats['breakEven'] = 1/($odds/100+1);
+					$allStats['breakEven'] += 1/(($odds/100)+1);
 					$allStats['odds'] += ($odds-100);
 				} else {
-					$allStats['breakEven'] = 1-1/($odds/(-100)+1);
+					$allStats['breakEven'] += 1/($odds/(-100)+1);
 					$allStats['odds'] += ($odds+100);
 				}
 			}
 		}
 		$odds = safe_div($allStats['odds'], $allStats['num']);
 		$allStats['avgOdds'] = ($odds > 0) ? $odds + 100 : $odds - 100;
-		$allStats['breakEven'] = safe_div($allStats['breakEven'], $allStats['num'])*100;
+		$allStats['breakEven'] = safe_div($allStats['breakEven'], $allStats['num']);
 		$allStats['avgEarned'] = safe_div($allStats['earned'], $allStats['num']);
 		$allStats['avgBet'] = safe_div($allStats['bet'], $allStats['num']);
 		$allStats['roi'] = safe_div($allStats['avgEarned'], $allStats['avgBet']);
