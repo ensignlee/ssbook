@@ -54,7 +54,8 @@ $.extend(SS.FilterMenu.prototype, {
 			hideCallback: function() {
 				self.onHide(this);
 			},
-			bindAction: 'click'
+			bindAction: 'click',
+			constrainToScreen: false
 		});
 		this.formSerial = $(this.hiddenForm).serialize();
 	},
