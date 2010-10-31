@@ -15,7 +15,7 @@ $.extend(SS.FilterMenu.prototype, {
 
 	init: function(filters, filtersSelected) {
 		var self = this;
-		/*var menu = [
+		var menu = [
 			{'Sort A-Z': {
 				onclick: function(menuItem, menu) {
 					self.sortDir = 'asc';
@@ -29,8 +29,7 @@ $.extend(SS.FilterMenu.prototype, {
 				},
 				icon: SS.Cake.base+'/img/icons/sort-descend.png'}},
 			$.contextMenu.separator
-		];*/
-		var menu = [];
+		];
 		$.each(filters, function(key, val) {
 			var obj = {};
 			obj[val] = {
@@ -77,11 +76,11 @@ $.extend(SS.FilterMenu.prototype, {
 				filters.push(data);
 			}
 		});		
-		/*
+		
 		if (this.sortDir) {
 			$(this.hiddenForm).find('[name=sort]').val(this.name+','+this.sortDir);
 		}
-		*/
+		
 	       var f = $(this.hiddenForm);
 	       var inputs = f.find('[name='+this.name+']');
 	       var filtString = filters.join(',');

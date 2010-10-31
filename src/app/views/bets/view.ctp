@@ -22,6 +22,7 @@ $(function () {
 	<?php foreach ($condAsMap as $key => $rows) {
 		echo "<input type='hidden' name='$key' value=\"".htmlentities(implode(',', array_keys($rows)))."\" />";
 	} ?>
+	<input type="hidden" name="sort" value="<?= "$sortKey,$sortDir" ?>" />
 </form>
 <div id="graph">Graph of Data</div>
 <div id="record">

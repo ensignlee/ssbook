@@ -512,9 +512,20 @@ class BetsController extends AppController {
 		$this->set('cond', $cond);
 		$this->set('condAsMap', $this->getCondAsMap($cond));
 
+		$sort = $this->urlGetVar('sort', 'date,desc');
+		if (strpos($sort, ',') !== false) {
+			list($this->sortKey, $this->sortDir) = explode(',', $sort);
+		} else {
+			$this->sortKey = $sort;
+			$this->sortDir = 'desc';
+		}
+		$this->set('sortKey', $this->sortKey);
+		$this->set('sortDir', $this->sortDir);
+
 		$bets = $this->UserBet->getAll($this->Auth->user('id'), null, $sqlcond);
 		$bets = $this->reformatBets($bets);
 		$bets = $this->filterNonSql($bets, $cond, array('beton'));
+		usort($bets, array($this, '_sort_bets'));
 		
 		$filters = $this->setFilters($bets, array('home', 'visitor', 'type', 'league', 'beton', 'book'));
 		$this->set('filters', $filters);
@@ -526,5 +537,19 @@ class BetsController extends AppController {
 		$this->set('graphData', $this->graphData($bets));
 
 		$this->set('bets', $bets);
+	}
+
+	private function _sort_bets($left, $right) {
+		$left = $left[$this->sortKey];
+		$right = $right[$this->sortKey];
+		$asc = $this->sortDir == 'asc';
+		if ($left == $right) {
+			return 0;
+		}
+		if ($left > $right) {
+			return $asc ? 1 : -1;
+		} else {
+			return $asc ? -1 : 1;
+		}
 	}
 }
