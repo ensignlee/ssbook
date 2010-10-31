@@ -156,6 +156,54 @@ class Pinnacle extends Pinnacle_Log {
 					);
 				}
 			}
+
+			if (strtolower($p->period_description) == '2nd half') {
+				if (isset($p->total)) {
+					$types['half_total'] = array(
+						'odds_home' => "{$p->total->over_adjust}",
+						'odds_visitor' => "{$p->total->under_adjust}",
+						'total' => "{$p->total->total_points}"
+					);
+				}
+				if (isset($p->spread)) {
+					$types['half_spread'] = array(
+						'odds_home' => "{$p->spread->spread_adjust_home}",
+						'spread_home' => "{$p->spread->spread_home}",
+						'odds_visitor' => "{$p->spread->spread_adjust_visiting}",
+						'spread_visitor' => "{$p->spread->spread_visiting}"
+					);
+				}
+				if (isset($p->moneyline)) {
+					$types['half_moneyline'] = array(
+						'odds_visitor' => "{$p->moneyline->moneyline_visiting}",
+						'odds_home' => "{$p->moneyline->moneyline_home}"
+					);
+				}
+			}
+
+			if (strtolower($p->period_description) == '2nd half') {
+				if (isset($p->total)) {
+					$types['second_total'] = array(
+						'odds_home' => "{$p->total->over_adjust}",
+						'odds_visitor' => "{$p->total->under_adjust}",
+						'total' => "{$p->total->total_points}"
+					);
+				}
+				if (isset($p->spread)) {
+					$types['second_spread'] = array(
+						'odds_home' => "{$p->spread->spread_adjust_home}",
+						'spread_home' => "{$p->spread->spread_home}",
+						'odds_visitor' => "{$p->spread->spread_adjust_visiting}",
+						'spread_visitor' => "{$p->spread->spread_visiting}"
+					);
+				}
+				if (isset($p->moneyline)) {
+					$types['second_moneyline'] = array(
+						'odds_visitor' => "{$p->moneyline->moneyline_visiting}",
+						'odds_home' => "{$p->moneyline->moneyline_home}"
+					);
+				}
+			}
 		}
 		return array('game' => $game, 'types' => $types);
 	}
