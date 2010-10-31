@@ -80,16 +80,33 @@ class Espn extends Espn_Log {
 		}
 	}
 
+	/**
+	 * Potentially this should be set before we actually change the names
+	 * to something more human readible. This way we can match games
+	 * that are the same name from ESPN itself
+	 * TODO: Look into making sure this does not collide?
+	 * @param <type> $score
+	 * @return string
+	 */
+	private function createSourceGameId($score) {
+		if (empty($score['home']) || empty($score['visitor']) || 
+			empty($score['league']) || empty($score['game_date'])) {
+			new Exception("Unable to create id from score".json_encode($score));
+		}
+		$home = strtolower($score['home']);
+		$visitor = strtolower($score['visitor']);
+		$league = strtolower($score['league']);
+		$date = date('Ymd', strtotime($score['game_date']));
+
+		$id = $date.$league.md5($home.$visitor);
+		return $id;
+	}
+
 	public function saveType() {
 		$success = 0;
 		if (!empty($this->scores)) {
 			foreach ($this->scores as $score) {
-				$score['sourceid'] = $this->sourceid;
-				$this->shell->Score->setToRecord('source_gameid', $score['source_gameid']);
-				if (!empty($this->shell->Score->id)) {
-					unset($score['game_date']);
-				}
-					
+
 				if (isset($score['game_date'])) {
 					if (empty($score['game_date'])) {
 						$this->log('Game date cannot be empty '.json_encode($score), 'error');
@@ -101,6 +118,23 @@ class Espn extends Espn_Log {
 						continue;
 					}
 				}
+
+				$score['sourceid'] = $this->sourceid;
+				if (!isset($score['source_gameid'])) {
+					// ESPNs id cannot be trusted
+					$score['source_gameid'] = $this->createSourceGameId($score);
+				}
+				$this->shell->Score->setToRecord('source_gameid', $score['source_gameid']);
+
+				// Only remove the game_date if it already exists
+				if (!empty($this->shell->Score->id)) {
+					unset($score['game_date']);
+					$league = $this->shell->Score->read('league');
+					if (empty($league) || $league['Score']['league'] != $score['league']) {
+						$this->log("Score league does not match".json_encode($score), 'error');
+					}
+				}
+				
 				if ($this->shell->Score->save($score)) {
 					$success++;
 					$this->log("Saving {$score['visitor']} @ {$score['home']}");
@@ -225,7 +259,7 @@ class Espn_NFL extends Espn_Scorer {
 
 		$row['league'] = $this->league;
 		$status = Espn::replaceNull(pq(".game-status", $score)->text());
-		if ($status == "Final") {
+		if ($status == "Final" || $status == "Final/OT") {
 			$status = "";
 		}
 		if ($status == "TBD") {
@@ -234,12 +268,6 @@ class Espn_NFL extends Espn_Scorer {
 		}
 		$row['game_date'] = self::createDate("$dateStr $status");
 		
-		$id = pq($score)->attr('id');
-		if (preg_match('/[0-9]+/', $id, $m)) {
-			$row['source_gameid'] = $m[0];
-		} else {
-			throw new Exception('Unable to find source_gameid '.json_encode($row));
-		}
 		return $row;
 	}
 
@@ -304,12 +332,6 @@ class Espn_MLB extends Espn_Scorer {
 		}
 		$row['game_date'] = $parsedtime;
 		
-		$id = pq($score)->attr('id');
-		if (preg_match('/[0-9]+/', $id, $m)) {
-			$row['source_gameid'] = $m[0];
-		} else {
-			throw new Exception("Unable to find source_gameid ".json_encode($row));
-		}
 		return $row;
 	}
 }
