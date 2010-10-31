@@ -62,7 +62,7 @@ $(function () {
 		<th>Risk</th>
 		<th>Odds</th>
 		<th>Winnings</th>
-		<th>Book</th>
+		<th>Book <span class="clickable extra-click" id="filter_book"><img src="<?= $html->url('/img/icons/green_arrow_down.gif') ?>" /></span></th>
 		<th>Delete</th>
 	</tr>
 

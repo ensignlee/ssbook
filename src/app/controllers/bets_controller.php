@@ -329,6 +329,21 @@ class BetsController extends AppController {
 						$ret[$key] = $set;
 					}
 					break;
+				case 'book':
+					$vals = explode(',', $val);
+					$set = array();
+					foreach ($vals as &$val) {
+						$sqlval = $this->SourceType->contains($val);
+						$fixedCond[$key] = array();
+						if ($sqlval !== false) {
+							$fixedCond[$key][] = $val;
+							$set[] = $sqlval;
+						}
+					}
+					if (!empty($set)) {
+						$ret['UserBet.sourceid'] = $set;
+					}
+					break;
 				case 'type':
 					$vals = explode(',', $val);
 					$set = array();
@@ -490,7 +505,8 @@ class BetsController extends AppController {
 		    'visitor' => $this->urlGetVar('visitor'),
 		    'type' => $this->urlGetVar('type'),
 		    'league' => $this->urlGetVar('league'),
-		    'beton' => $this->urlGetVar('beton')
+		    'beton' => $this->urlGetVar('beton'),
+		    'book' => $this->urlGetVar('book')
 		);		
 		list($sqlcond, $cond) = $this->fixCond($cond);
 		$this->set('cond', $cond);
@@ -500,7 +516,7 @@ class BetsController extends AppController {
 		$bets = $this->reformatBets($bets);
 		$bets = $this->filterNonSql($bets, $cond, array('beton'));
 		
-		$filters = $this->setFilters($bets, array('home', 'visitor', 'type', 'league', 'beton'));
+		$filters = $this->setFilters($bets, array('home', 'visitor', 'type', 'league', 'beton', 'book'));
 		$this->set('filters', $filters);
 
 		$record = $this->winLossTie($bets);
