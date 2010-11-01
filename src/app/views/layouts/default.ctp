@@ -3,7 +3,7 @@
 <head>
 	<?php echo $this->Html->charset(); ?>
 	<title>
-		<?php __('SharpBetTracker'); ?> : 
+		<?php __('Sharp Bet Tracker'); ?> : 
 		<?php echo $title_for_layout; ?>
 	</title>
 	<?php
