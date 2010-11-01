@@ -317,9 +317,9 @@ class BetsController extends AppController {
 				case 'league':
 					$vals = explode(',', $val);
 					$set = array();
+					$fixedCond[$key] = array();
 					foreach ($vals as &$val) {
 						$sqlval = $this->LeagueType->contains($val);
-						$fixedCond[$key] = array();
 						if ($sqlval !== false) {
 							$fixedCond[$key][] = $val;
 							$set[] = $sqlval;
@@ -332,9 +332,9 @@ class BetsController extends AppController {
 				case 'book':
 					$vals = explode(',', $val);
 					$set = array();
+					$fixedCond[$key] = array();
 					foreach ($vals as &$val) {
 						$sqlval = $this->SourceType->contains($val);
-						$fixedCond[$key] = array();
 						if ($sqlval !== false) {
 							$fixedCond[$key][] = $val;
 							$set[] = $sqlval;

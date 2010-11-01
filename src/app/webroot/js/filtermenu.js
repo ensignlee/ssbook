@@ -91,7 +91,6 @@ $.extend(SS.FilterMenu.prototype, {
 	       f.ready(function() {
 		       var inp = f.find('[name='+self.name+']');
 		       inp.val(filtString).ready(function() {
-			       console.info(f.serialize(), self.formSerial);
 			       if (f.serialize() != self.formSerial) {
 				       f.submit();
 			       }
