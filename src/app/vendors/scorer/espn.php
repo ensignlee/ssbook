@@ -95,7 +95,7 @@ class Espn extends Espn_Log {
 		}
 		$home = strtolower($score['home']);
 		$visitor = strtolower($score['visitor']);
-		$league = strtolower($score['league']);
+		$league = $score['league'];
 		$date = date('Ymd', strtotime($score['game_date']));
 
 		$id = $date.$league.md5($home.$visitor);
