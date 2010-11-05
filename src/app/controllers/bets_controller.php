@@ -307,9 +307,16 @@ class BetsController extends AppController {
 		$earnedData = array();
 		$earned = 0;
 		$i = 0;
+		usort($bets, array($this, '_sortDate'));
+		$lastDate = 0;
 		foreach ($bets as $bet) {
 			$winning = $bet['winning'];
 			$date = strtotime($bet['date'])*1000;
+			if (($date - $lastDate) < 2*60*60*1000) {
+				$date = $lastDate + 2*60*60*1000;
+			}
+			$lastDate = $date;
+
 			if (!is_null($winning)) {
 				$earned += $winning;
 			}
@@ -317,6 +324,16 @@ class BetsController extends AppController {
 			$i++;
 		}
 		return array($earnedData);
+	}
+	
+	private function _sortDate($betl, $betr) {
+		$l = strtotime($betl['date']);
+		$r = strtotime($betr['date']);
+		if ($l == $r) {
+			return 0;
+		} else {
+			return $l > $r ? 1 : -1;
+		}
 	}
 
 	private function fixCond($cond) {
