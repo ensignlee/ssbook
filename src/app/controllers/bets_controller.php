@@ -303,7 +303,7 @@ class BetsController extends AppController {
 		return $allStats;
 	}
 
-	private function graphData(&$bets) {
+	private function graphData($bets) {
 		$earnedData = array();
 		$earned = 0;
 		$i = 0;
