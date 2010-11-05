@@ -211,8 +211,8 @@ class BetsController extends AppController {
 		list($startdate, $enddate) = $this->getStartEnd($params);
 		$leagues = $this->Score->findScoresBetweenDates($startdate, $enddate);
 		$this->set('leagues', $leagues);
-		$this->set('startdate', date('Y-m-d', strtotime($startdate)));
-		$this->set('enddate', date('Y-m-d', strtotime($enddate)));
+		$this->set('startdate', date('n/j/Y', strtotime($startdate)));
+		$this->set('enddate', date('n/j/Y', strtotime($enddate)));
 	}
 
 	public function ajax($action = '') {
