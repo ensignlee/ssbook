@@ -5,12 +5,20 @@ $html->css('jquery.contextmenu', 'stylesheet', array('inline' => false));
 echo $javascript->link('jquery.flot.min.js');
 echo $javascript->link('jquery.contextmenu.js');
 echo $javascript->link('filtermenu.js');
+echo $javascript->link('generic.js');
 ?>
 <script type="text/javascript">
 $(function () {
-	var data = <?= json_encode($graphData) ?>;
-	$.plot($("#graph"), data, {
-		xaxis: { mode: "time" }
+	var dollarsWon = <?= json_encode($graphData[0]) ?>;
+	$.plot($("#graph"), [{
+			label: "Dollars Won",
+			color: 'rgb(62,118,182)',
+			data: dollarsWon
+		}],{
+			xaxis: { mode: "time"},
+			yaxis: { tickFormatter: function(val) {
+				return formatCurrency(val);
+		}}
 	});
 
 	<?php foreach (array_keys($filters) as $key) : ?>
