@@ -89,7 +89,12 @@ class UserBet extends AppModel {
 			if ($bet['UserBet']['type'] == 'parlay' || $bet['UserBet']['type'] == 'teaser') {
 				$bet['UserBet']['Parlay'] = $this->getParlays($userid, $bet['UserBet']['id']);
 			}
-			$bet['UserBet']['winning'] = self::calcWinning($bet['Score'], $bet['UserBet']);
+			$nullRisk = is_null($bet['UserBet']['risk']);
+			if ($nullRisk) {
+				$bet['UserBet']['risk'] = 1;
+			}
+			$winning = self::calcWinning($bet['Score'], $bet['UserBet']);
+			$bet['UserBet']['winning'] = $winning;
 		}
 		return $bets;
 	}

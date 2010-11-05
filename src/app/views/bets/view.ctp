@@ -65,13 +65,26 @@ $(function () {
 		<th>Winnings</th>
 		<th>Book <span class="clickable extra-click" id="filter_book"><img src="<?= $html->url('/img/icons/green_arrow_down.gif') ?>" /></span></th>
 		<th>Delete</th>
+		<th>View</th>
 	</tr>
 
 	<?php
 	$i = 0;
-	foreach ($bets as $bet) :
+	foreach ($bets as $bet) {
 		$i++;
+		dispBet($html, $i, $bet);
+		if (!empty($bet['parlays'])) {
+			foreach ($bet['parlays'] as $parlay) {
+				dispBet($html, null, $parlay);
+			}
+		}
+	}
 	?>
+	</table>
+</div>
+<?php
+function dispBet($html, $i, $bet) {
+?>
 	<tr>
 		<td><?= $i ?></td>
 		<td class="date"><?= date("n/j/y", strtotime($bet['date'])) ?></td>
@@ -81,12 +94,18 @@ $(function () {
 		<td class="number"><?= $bet['line'] ?></td>
 		<td><?= $bet['home'] ?></td>
 		<td><?= $bet['visitor'] ?></td>
-		<td class="number"><?= money_format('%n', $bet['risk']) ?></td>
-		<td class="number"><?= $bet['odds'] ?></td>
-		<td class="number"><?= money_format('%(n', $bet['winning']) ?></td>
+		<td class="number"><?= empty($i) ? '' : nullMoney($bet['risk']) ?></td>
+		<td class="number"><?= empty($i) ? '' : $bet['odds'] ?></td>
+		<td class="number"><?= (empty($i) ? ($bet['winning'] >= 0 ? 'Y' : 'N') : nullMoney($bet['winning'])) ?></td>
 		<td><?= $bet['book'] ?></td>
 		<td style="text-align: center"><?= $html->link('X', '/bets/delete/'.$bet['betid']) ?></td>
+		<td style="text-align: center"><?= $html->link('V', '/bets/v/'.$bet['betid']) ?></td>
 	</tr>
-	<?php endforeach;// ($bets as $bet) : ?>
-	</table>
-</div>
+<?php
+}
+function nullMoney($money) {
+	if (is_null($money)) {
+		return '';
+	}
+	return money_format('%(n', $money);
+}

@@ -8,6 +8,17 @@ class BetsController extends AppController {
 
 	public function index() {
 	}
+	
+	public function v($id = null) {
+		if (empty($id)) {
+			$this->Session->setFlash('Invalid id');
+		}
+		$this->UserBet->id = $id;
+		$scoreid = $this->UserBet->read('scoreid');
+		$this->Score->id = $id;
+		$score = $this->Score->read();
+		$this->set('score', $score);
+	}
 
 	public function delete($id = null) {
 		if (empty($id)) {
@@ -434,7 +445,7 @@ class BetsController extends AppController {
 		case 'second_total':
 			return $userBet['direction'];
 		case 'parlay':		
-			return 'Parlay';
+			return count($userBet['Parlay']).' team parlay';
 		case 'teaser':
 			return 'Teaser';
 		}
@@ -447,10 +458,19 @@ class BetsController extends AppController {
 		$userBetGameDate = strtotime($userBet['game_date']);
 		$scoreGameDate = strtotime($score['game_date']);
 
+		$parlayBetGameDate = 0;
+		$parlays = false;
+		if (!empty($userBet['Parlay'])) {
+			$parlays = $this->reformatBets($userBet['Parlay']);
+			foreach ($parlays as $row) {
+				$parlayBetGameDate = max($parlayBetGameDate, strtotime($row['date']));
+			}
+		}
+
 		$fields = array(
 		    'betid' => $userBet['id'],
 		    'scoreid' => $score['id'],
-		    'date' => date('Y-m-d', max($userBetGameDate, $scoreGameDate)),
+		    'date' => date('Y-m-d', max($userBetGameDate, $scoreGameDate, $parlayBetGameDate)),
 		    'league' => $score['league'],
 		    'beton' => $this->getBetOn($userBet, $score),
 		    'type' => $userBet['type'],
@@ -460,7 +480,8 @@ class BetsController extends AppController {
 		    'risk' => $userBet['risk'],
 		    'odds' => $userBet['odds'],
 		    'winning' => $userBet['winning'],
-		    'book' => $userBet['source']
+		    'book' => $userBet['source'],
+		    'parlays' => $parlays
 		);
 		return $fields;
 	}
