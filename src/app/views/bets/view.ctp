@@ -9,7 +9,9 @@ echo $javascript->link('filtermenu.js');
 <script type="text/javascript">
 $(function () {
 	var data = <?= json_encode($graphData) ?>;
-	$.plot($("#graph"), data);
+	$.plot($("#graph"), data, {
+		xaxis: { mode: "time" }
+	});
 
 	<?php foreach (array_keys($filters) as $key) : ?>
 	var m = new SS.FilterMenu('<?= $key ?>', '#hiddenForm', '#filter_<?= $key ?>');

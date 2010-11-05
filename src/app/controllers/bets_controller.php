@@ -309,10 +309,11 @@ class BetsController extends AppController {
 		$i = 0;
 		foreach ($bets as $bet) {
 			$winning = $bet['winning'];
+			$date = strtotime($bet['date'])*1000;
 			if (!is_null($winning)) {
 				$earned += $winning;
 			}
-			$earnedData[] = array($i, $earned);
+			$earnedData[] = array($date, $earned);
 			$i++;
 		}
 		return array($earnedData);
