@@ -10,7 +10,7 @@ p {
 	margin: 7px 0;
 }
 table .number {
-	text-align: right;
+	text-align: right !important;
 }
 table .date {
 	text-align: center;

@@ -594,9 +594,72 @@ class BetsController extends AppController {
 		$this->set('record', $record);
 		$allStats = $this->allStats($bets);
 		$this->set('allStats', $allStats);
+		$groupStats = $this->getGroupStats($bets);
+		$this->set('groupStats', $groupStats);
 		$this->set('graphData', $this->graphData($bets));
 
 		$this->set('bets', $bets);
+	}
+
+	private function getGroupStats(&$bets) {
+		$groupStats = array(
+		    'Odds' => $this->calcGroupStats($bets, array(
+			'odds' => array(
+			    new CalcBetween(false, -201),
+			    new CalcBetween(-200, -125),
+			    new CalcBetween(-124, -111),
+			    new CalcBetween(-110, -101),
+			    new CalcBetween(100, 110),
+			    new CalcBetween(111, 124),
+			    new CalcBetween(125, 185),
+			    new CalcBetween(186, 300),
+			    new CalcBetween(301, false)
+			)
+		    )),
+		    'Risk' => $this->calcGroupStats($bets, array(
+			'risk' => array(
+			    new CalcBetween(false, 100),
+			    new CalcBetween(101, 200),
+			    new CalcBetween(201, 300),
+			    new CalcBetween(301, 400),
+			    new CalcBetween(401, 500),
+			    new CalcBetween(501, 600),
+			    new CalcBetween(601, 700),
+			    new CalcBetween(701, 800),
+			    new CalcBetween(801, 900),
+			    new CalcBetween(901, 1000),
+			    new CalcBetween(1001, 1100),
+			    new CalcBetween(1101, 1200),
+			    new CalcBetween(1201, false)
+			)
+		    ))
+		);
+		return $groupStats;
+	}
+
+	private function calcGroupStats(&$bets, $conditions) {
+		$matches = array();
+		foreach ($conditions as $field => $cond) {
+			foreach ($cond as $k => $val) {
+				$matches[$k] = array('CalcStat' => $val, 'matching' => array());
+			}
+			foreach ($bets as $bet) {
+				foreach ($cond as $k => $CalcStat) {
+					if ($CalcStat->matches($bet[$field])) {
+						$matches[$k]['matching'][] = $bet;
+					}
+				}
+			}
+			break; // We only support 1 condition at this point
+		}
+		$ret = array();
+		foreach ($matches as $match) {
+			$ret[] = array(
+			    'CalcStat' => $match['CalcStat'],
+			    'record' => $this->winLossTie($match['matching'])
+			);
+		}
+		return $ret;
 	}
 
 	private function _sort_bets($left, $right) {
@@ -611,5 +674,33 @@ class BetsController extends AppController {
 		} else {
 			return $asc ? -1 : 1;
 		}
+	}
+}
+
+interface CalcStat {
+	public function matches($val);
+}
+
+class CalcBetween implements CalcStat {
+	private $start;
+	private $stop;
+	public function __construct($start, $stop) {
+		$this->start = $start;
+		$this->stop = $stop;
+	}
+	public function getDef() {
+		return array($this->start, $this->stop);
+	}
+	public function matches($val) {
+		if (is_null($val)) {
+			return false;
+		}
+		if ($this->start === false) {
+			return $val <= $this->stop;
+		}
+		if ($this->stop === false) {
+			return $val >= $this->start;
+		}
+		return $this->start <= $val && $val <= $this->stop;
 	}
 }

@@ -59,7 +59,31 @@ $(function () {
 		<tr><td>Average Breakeven Winning Percentage</td><td class="number"><?= round($allStats['breakEven']*100) ?>%</td></tr>
 	</table>
 </div>
+<div id="groupStats">
+	<?php
+	foreach ($groupStats as $label => $stats) {
+		echo "<h2>$label</h2><table class='spaced-table cell-left'>";
+		foreach ($stats as $row) {
+			$def = $row['CalcStat']->getDef();
+			$record = $row['record'];
 
+			echo "<tr><td>";
+			if ($def[0] === false) {
+				echo "less than {$def[1]}";
+			} else if ($def[1] === false) {
+				echo "greater than {$def[0]}";
+			} else {
+				echo "{$def[0]} to {$def[1]}";
+			}
+			echo "</td>";
+
+			echo "<td>{$record['win']} - {$record['loss']} - {$record['tie']}</td>";
+			echo "<td class='number'>$".number_format($record['dollarsWon'], 2)."</td></tr>\n";
+		}
+		echo "</table>";
+	}
+	?>
+</div>
 <div id="betTable">
 	<table>
 	<tr>
