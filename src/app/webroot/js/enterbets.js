@@ -191,7 +191,16 @@ $.extend(SS.Superbar.prototype, {
 		html += '</ul>';
 		this.dropdownDiv.html(html).find('li')
 			.click($.proxy(this.selectCurrent, this))
-			.hover(function() {$(this).addClass('hover')}, function() {$(this).removeClass('hover')});
+			.hover(function() {$(this).addClass('hover')}, function() {$(this).removeClass('hover')})
+			.ready($.proxy(this.reposDropdown, this));
+	},
+
+	reposDropdown: function() {
+		var p = this.jSelect.position();
+		var l = p.left;
+		$(this.dropdownDiv).css({
+			left: l + 'px'
+		});
 	},
 
 	gameClick : function (scoreid) {
@@ -222,6 +231,7 @@ $.extend(SS.Superbar.prototype, {
 				height : this.divHeight+'px'
 			});
 			this.dropdownDiv = ndiv;
+			$(window).resize($.proxy(this.reposDropdown, this));
 		}
 		this.dropdownDiv.css('display', 'block');		
 		$(window).one('click', $.proxy(this.hideDiv, this));
