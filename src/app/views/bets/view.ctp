@@ -34,6 +34,7 @@ $(function () {
 	} ?>
 	<input type="hidden" name="sort" value="<?= "$sortKey,$sortDir" ?>" />
 </form>
+<?= $session->flash() ?>
 <div id="graph">Graph of Data</div>
 <div id="record">
 	<table class="spaced-table cell-centered">
