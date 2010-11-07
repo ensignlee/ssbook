@@ -68,12 +68,16 @@ $(function () {
 			$record = $row['record'];
 
 			echo "<tr><td>";
-			if ($def[0] === false) {
-				echo "less than {$def[1]}";
-			} else if ($def[1] === false) {
-				echo "greater than {$def[0]}";
+			if (count($def) == 2) {
+				if ($def[0] === false) {
+					echo "less than {$def[1]}";
+				} else if ($def[1] === false) {
+					echo "greater than {$def[0]}";
+				} else {
+					echo "{$def[0]} to {$def[1]}";
+				}
 			} else {
-				echo "{$def[0]} to {$def[1]}";
+				echo $def;
 			}
 			echo "</td>";
 

@@ -632,6 +632,15 @@ class BetsController extends AppController {
 			    new CalcBetween(1101, 1200),
 			    new CalcBetween(1201, false)
 			)
+		    )),
+		    'Bet Type' => $this->calcGroupStats($bets, array(
+			'type' => array(
+			    new CalcIn('spread', 'half_spread', 'second_spread'),
+			    new CalcIn('total', 'half_total', 'second_total'),
+			    new CalcIn('moneyline', 'half_moneyline', 'second_moneyline'),
+			    new CalcIn('parlay'),
+			    new CalcIn('teaser')
+			)
 		    ))
 		);
 		return $groupStats;
@@ -702,5 +711,18 @@ class CalcBetween implements CalcStat {
 			return $val >= $this->start;
 		}
 		return $this->start <= $val && $val <= $this->stop;
+	}
+}
+
+class CalcIn implements CalcStat {
+	private $args;
+	public function __construct() {
+		$this->args = func_get_args();
+	}
+	public function getDef() {
+		return $this->args[0];
+	}
+	public function matches($val) {
+		return in_array($val, $this->args);
 	}
 }
