@@ -109,7 +109,7 @@ function dispBet($html, $i, $bet) {
 		<td class="number"><?= (empty($i) ? ($bet['winning'] >= 0 ? 'W' : 'L') : nullMoney($bet['winning'])) ?></td>
 		<td><?= $bet['book'] ?></td>
 		<td style="text-align: center"><?= empty($i) ? '' : $html->link('X', '/bets/delete/'.$bet['betid']) ?></td>
-		<td style="text-align: center"><?= $html->link('V', '/bets/v/'.$bet['betid']) ?></td>
+		<td style="text-align: center"><?= $html->link('V', '/bets/v/'.$bet['scoreid']) ?></td>
 	</tr>
 <?php
 }
