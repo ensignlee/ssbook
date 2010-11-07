@@ -684,9 +684,13 @@ $.extend(SS.Enterbets.prototype, {
 	setupEvents : function(bet, data, iden) {
 		var _this = this;
 		bet.find('.spread').keyup(function() {_this.spreadChange(bet, bet.find('.spread').val());});
+		bet.find('.spread').change(function() {_this.spreadChange(bet, bet.find('.spread').val());});
 		bet.find('.risk').keyup(function() {_this.riskChange(bet, bet.find('.risk').val());});
+		bet.find('.risk').change(function() {_this.riskChange(bet, bet.find('.risk').val());});
 		bet.find('.odds').keyup(function() {_this.oddsChange(bet, bet.find('.odds').val());});
+		bet.find('.odds').change(function() {_this.oddsChange(bet, bet.find('.odds').val());});
 		bet.find('.towin').keyup(function() {_this.towinChange(bet, bet.find('.towin').val());});
+		bet.find('.towin').change(function() {_this.towinChange(bet, bet.find('.towin').val());});
 		bet.find('.close img').click(function() {_this.closeBet(bet);});
 
 		var typeC = function() {_this.typeChange(bet, bet.find('.type').val(), data, iden);};
