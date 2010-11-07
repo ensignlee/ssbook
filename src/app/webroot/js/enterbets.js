@@ -4,6 +4,23 @@ if (typeof SS == 'undefined') {
 
 (function ($) {
 
+// Shortcut '/' to search bar function
+$(function() {
+	$(window).keydown(function(e) {
+		if ($(e.target).attr("class") == 'dateselect') {
+			return;
+		}
+		if ($(e.target).attr('name') == 'superbar') {
+			return;
+		}
+		if (e.which == 191) { // the '/'
+			$('#superbar').focus();
+			e.stopPropagation();
+			return false;
+		}
+	});
+});
+
 SS.calcWin = function(risk, odds) {
 	if(odds > 0) {
 		return risk*odds/100;
@@ -18,6 +35,7 @@ SS.Superbar = function(selector, Enterbets, Accorselect) {
 	this.jSelect.keydown($.proxy(this.onKeyPress, this));
 	this.jSelect.keyup($.proxy(this.onKeyUp, this));
 	this.jSelect.focus($.proxy(this.onFocus, this));
+	this.jSelect.blur($.proxy(this.onBlur, this));
 
 	this.url = SS.Cake.base + '/bets/ajax/superbar';
 	this.divHeight = '300px';
@@ -35,12 +53,17 @@ $.extend(SS.Superbar.prototype, {
 	focus : function() {
 		this.jSelect.focus();
 	},
+		
+	onBlur: function() {
+		this.jSelect.toggleClass('focused');
+	},
 
 	getValue : function() {
 		return this.jSelect.val();
 	},
 
 	onFocus : function(e) {
+		this.jSelect.toggleClass('focused');
 		if (this.doneLoadingBet) {
 			this.lastVal = null;
 			this.onKeyUp();

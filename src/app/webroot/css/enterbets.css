@@ -1,5 +1,9 @@
 #superbar {
 	width: 600px;
+	font-size: 18px;
+}
+#superbar.focused {
+	border: 2px solid #3e76c0;
 }
 .dropdown {
 	position: absolute;
