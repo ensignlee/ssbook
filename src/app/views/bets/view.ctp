@@ -69,8 +69,8 @@ $(function () {
 		<th>Bet On <span class="clickable extra-click" id="filter_beton"><img src="<?= $html->url('/img/icons/green_arrow_down.gif') ?>" /></span></th>
 		<th>Bet Type <span class="clickable extra-click" id="filter_type"><img src="<?= $html->url('/img/icons/green_arrow_down.gif') ?>" /></span></th>
 		<th>Line</th>
-		<th>Home <span class="clickable extra-click" id="filter_home"><img src="<?= $html->url('/img/icons/green_arrow_down.gif') ?>" /></span></th>
 		<th>Visitor <span class="clickable extra-click" id="filter_visitor"><img src="<?= $html->url('/img/icons/green_arrow_down.gif') ?>" /></span></th>
+		<th>Home <span class="clickable extra-click" id="filter_home"><img src="<?= $html->url('/img/icons/green_arrow_down.gif') ?>" /></span></th>
 		<th>Risk</th>
 		<th>Odds</th>
 		<th>Winnings</th>
@@ -103,8 +103,8 @@ function dispBet($html, $i, $bet) {
 		<td><?= $bet['beton'] ?></td>
 		<td><?= $bet['type'] ?></td>
 		<td class="number"><?= $bet['line'] ?></td>
-		<td><?= $bet['home'] ?></td>
 		<td><?= $bet['visitor'] ?></td>
+		<td><?= $bet['home'] ?></td>
 		<td class="number"><?= empty($i) ? '' : nullMoney($bet['risk']) ?></td>
 		<td class="number"><?= empty($i) ? '' : $bet['odds'] ?></td>
 		<td class="number"><?= (empty($i) ? ($bet['winning'] >= 0 ? 'W' : 'L') : nullMoney($bet['winning'])) ?></td>
