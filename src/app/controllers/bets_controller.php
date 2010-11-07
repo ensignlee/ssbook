@@ -305,25 +305,24 @@ class BetsController extends AppController {
 
 	private function graphData($bets) {
 		$earnedData = array();
-		$earned = 0;
-		$i = 0;
-		usort($bets, array($this, '_sortDate'));
-		$lastDate = 0;
 		foreach ($bets as $bet) {
 			$winning = $bet['winning'];
-			$date = strtotime($bet['date'])*1000;
-			if (($date - $lastDate) < 2*60*60*1000) {
-				$date = $lastDate + 2*60*60*1000;
-			}
-			$lastDate = $date;
-
+			$date = date('Y-m-d', strtotime($bet['date']));
 			if (!is_null($winning)) {
-				$earned += $winning;
+				if (!isset($earnedData[$date])) {
+					$earnedData[$date] = 0;
+				}
+				$earnedData[$date] += $winning;
 			}
-			$earnedData[] = array($date, $earned);
-			$i++;
 		}
-		return array($earnedData);
+		$earned = 0;
+		$graphData = array();
+		ksort($earnedData);
+		foreach ($earnedData as $Ymd => $earnings) {
+			$earned += $earnings;
+			$graphData[] = array(strtotime($Ymd)*1000, $earned);
+		}
+		return array($graphData);
 	}
 	
 	private function _sortDate($betl, $betr) {
