@@ -94,6 +94,15 @@ $(function () {
 	</table>
 </div>
 <?php
+function parlayNull($winning) {
+	if (is_null($winning)) {
+		return '';
+	}
+	if (empty($winning)) {
+		return 'T';
+	}
+	return $winning >= 0 ? 'W' : 'L';
+}
 function dispBet($html, $i, $bet) {
 ?>
 	<tr>
@@ -107,10 +116,10 @@ function dispBet($html, $i, $bet) {
 		<td><?= $bet['home'] ?></td>
 		<td class="number"><?= empty($i) ? '' : nullMoney($bet['risk']) ?></td>
 		<td class="number"><?= empty($i) ? '' : $bet['odds'] ?></td>
-		<td class="number"><?= (empty($i) ? ($bet['winning'] >= 0 ? 'W' : 'L') : nullMoney($bet['winning'])) ?></td>
+		<td class="number"><?= (empty($i) ? parlayNull($bet['winning']) : nullMoney($bet['winning'])) ?></td>
 		<td><?= $bet['book'] ?></td>
 		<td style="text-align: center"><?= empty($i) ? '' : $html->link('X', '/bets/delete/'.$bet['betid']) ?></td>
-		<td style="text-align: center"><?= $html->link('V', '/bets/v/'.$bet['scoreid']) ?></td>
+		<td style="text-align: center"><?= empty($bet['scoreid']) ? '' : $html->link('V', '/bets/v/'.$bet['scoreid']) ?></td>
 	</tr>
 <?php
 }

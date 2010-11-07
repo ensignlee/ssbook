@@ -346,25 +346,33 @@ class BetsController extends AppController {
 				case 'league':
 					$vals = explode(',', $val);
 					$set = array();
-					$fixedCond[$key] = array();
 					foreach ($vals as &$val) {
-						$sqlval = $this->LeagueType->contains($val);
-						if ($sqlval !== false) {
+						if (strtolower($val) == 'mixed') {
 							$fixedCond[$key][] = $val;
-							$set[] = $sqlval;
+						} else {
+							$sqlval = $this->LeagueType->contains($val);
+							if ($sqlval !== false) {
+								if (!isset($fixedCond[$key])) {
+									$fixedCond[$key] = array();
+								}
+								$fixedCond[$key][] = $val;
+								$set[] = $sqlval;
+							}
 						}
 					}
 					if (!empty($set)) {
-						$ret[$key] = $set;
+						$ret['or'] = array($key => $set, 'or' => array($key => null));
 					}
 					break;
 				case 'book':
 					$vals = explode(',', $val);
 					$set = array();
-					$fixedCond[$key] = array();
 					foreach ($vals as &$val) {
 						$sqlval = $this->SourceType->contains($val);
 						if ($sqlval !== false) {
+							if (!isset($fixedCond[$key])) {
+								$fixedCond[$key] = array();
+							}
 							$fixedCond[$key][] = $val;
 							$set[] = $sqlval;
 						}
@@ -489,7 +497,7 @@ class BetsController extends AppController {
 		    'betid' => $userBet['id'],
 		    'scoreid' => $score['id'],
 		    'date' => date('Y-m-d', max($userBetGameDate, $scoreGameDate, $parlayBetGameDate)),
-		    'league' => $score['league'],
+		    'league' => $this->getLeague($userBet, $score['league']),
 		    'beton' => $this->getBetOn($userBet, $score),
 		    'type' => $userBet['type'],
 		    'line' => (float)$userBet['spread'],
@@ -502,6 +510,20 @@ class BetsController extends AppController {
 		    'parlays' => $parlays
 		);
 		return $fields;
+	}
+	
+	private function getLeague($userBet, $league) {
+		if (!empty($userBet['Parlay'])) {
+			foreach ($userBet['Parlay'] as $parlay) {
+				if (empty($league)) {
+					$league = $parlay['Score']['league'];
+				}
+				if ($league != $parlay['Score']['league']) {
+					return 'Mixed';
+				}
+			}
+		}
+		return $league;
 	}
 
 	private function isMatchingBet($bet, $cond, $keys) {
@@ -563,7 +585,7 @@ class BetsController extends AppController {
 
 		$bets = $this->UserBet->getAll($this->Auth->user('id'), null, $sqlcond);
 		$bets = $this->reformatBets($bets);
-		$bets = $this->filterNonSql($bets, $cond, array('beton'));
+		$bets = $this->filterNonSql($bets, $cond, array('beton', 'league'));
 		usort($bets, array($this, '_sort_bets'));
 		
 		$filters = $this->setFilters($bets, array('home', 'visitor', 'type', 'league', 'beton', 'book'));

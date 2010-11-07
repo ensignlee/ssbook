@@ -5,7 +5,8 @@ class UserBet extends AppModel {
 	var $belongsTo = array(
 		'Score' => array(
 			'className' => 'Score',
-			'foreignKey' => 'scoreid'
+			'foreignKey' => 'scoreid',
+			'type' => 'LEFT OUTER'
 		)
 	);
 

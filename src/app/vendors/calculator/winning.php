@@ -19,9 +19,19 @@ abstract class Winning_GameType {
 		$game = $this->getGame();
 		//TODO : Is Parlay gradeable?
 		if (is_null($game) || is_null($game['id'])) {
-			return true;
+			$bet = $this->getBet();
+			return $this->allGraded($bet['Parlay']);
 		}
 		return (!is_null($game['home_score_total']) && !is_null($game['visitor_score_total']));
+	}
+	
+	private function allGraded($games) {
+		foreach ($games as $game) {
+			if (is_null($game['Score']['home_score_total']) || is_null($game['Score']['visitor_score_total'])) {
+				return false;
+			}
+		}
+		return true;
 	}
 	
 	abstract protected function processGame();
@@ -77,6 +87,10 @@ abstract class Winning_GameType {
 
 	protected $homeScore = 'home_score_total';
 	protected $visitorScore = 'visitor_score_total';
+
+	public function getBet() {
+		return $this->winning->getBet();
+	}
 
 	public function getGame() {
 		return $this->winning->getGame();
