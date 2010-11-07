@@ -506,6 +506,7 @@ class BetsController extends AppController {
 		    'odds' => $userBet['odds'],
 		    'winning' => $userBet['winning'],
 		    'book' => $userBet['source'],
+		    'direction' => $userBet['direction'],
 		    'parlays' => $parlays
 		);
 		return $fields;
@@ -596,9 +597,57 @@ class BetsController extends AppController {
 		$this->set('allStats', $allStats);
 		$groupStats = $this->getGroupStats($bets);
 		$this->set('groupStats', $groupStats);
+		$analysisStats = $this->getAnalysisStats($bets);
+		$this->set('analysisStats', $analysisStats);
 		$this->set('graphData', $this->graphData($bets));
 
 		$this->set('bets', $bets);
+	}
+
+	private function getAnalysisStats(&$bets) {
+		$analys = array();
+		foreach($bets as $bet) {
+			list($type, $stat) = $this->analyseBet($bet);
+			if (!empty($stat)) {
+				if (!isset($analys[$type])) {
+					$analys[$type] = array();
+				}
+				if (!isset($analys[$type][$stat])) {
+					$analys[$type][$stat] = array();
+				}
+				$analys[$type][$stat][] = $bet;
+			}
+		}
+		$ret = array();
+		foreach ($analys as $type => $stats) {
+			foreach ($stats as $stat => &$theBets) {
+				$ret[$type][$stat] = array();
+				$ret[$type][$stat] = $this->winLossTie($theBets);
+			}
+		}
+		return $ret;
+	}
+
+	private function analyseBet($bet) {
+		$type = $bet['type'];
+		$stat = false;
+		if (!in_array($type, array('parlay','teaser'))) {
+			$stat = $bet['direction'];
+			if (!in_array($type, array('total','half_total','second_total'))) {
+				$stat = $stat.'_'.($this->isFavorite($bet) ? 'favorite' : 'underdog');
+			}
+		}
+		return array($type, $stat);
+	}
+
+	private function isFavorite(&$bet) {
+		if ($bet['line'] > 0) {
+			return false;
+		} else if ($bet['line'] < 0) {
+			return true;
+		} else {
+			return $bet['odds'] < 0;
+		}
 	}
 
 	private function getGroupStats(&$bets) {

@@ -88,6 +88,31 @@ $(function () {
 	}
 	?>
 </div>
+<div id="analysisStats">
+<?php
+	$types = array('spread', 'moneyline', 'total');
+	$halfs = array('', 'first_', 'second_');
+	$dirs = array('home','visitor','over','under');
+	$favorites = array('', '_favorite', '_underdog');
+	foreach ($types as $type) {
+		echo "<h2>$type</h2><table class='spaced-table cell-left'>";
+		foreach ($halfs as $half) {
+			foreach ($dirs as $dir) {
+				foreach ($favorites as $favorite) {
+					$record = empty($analysisStats[$half.$type][$dir.$favorite]) ? array() : $analysisStats[$half.$type][$dir.$favorite]; 
+					if (!empty($record)) {
+						$disptype = $half.$type;
+						$dirfav = $dir.$favorite;
+						echo "<tr><td>$disptype $dirfav</td><td>{$record['win']} - {$record['loss']} - {$record['tie']}</td>";
+						echo "<td class='number'>$".number_format($record['dollarsWon'], 2)."</td></tr>\n";	
+					}
+				}
+			}
+		}
+		echo "</table>";
+	}
+?>
+</div>
 <div id="betTable">
 	<table>
 	<tr>
