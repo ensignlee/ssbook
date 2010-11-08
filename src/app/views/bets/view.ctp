@@ -114,8 +114,10 @@ $(function () {
 ?>
 </div>
 <div id="betTable">
+<form method='post' action='<?= $html->url('/bets/tag') ?>'>
 	<table>
 	<tr>
+		<th>&nbsp;</th>
 		<th>&nbsp;</th>
 		<th>Date</th>
 		<th>League <span class="clickable extra-click" id="filter_league"><img src="<?= $html->url('/img/icons/green_arrow_down.gif') ?>" /></span></th>
@@ -128,6 +130,7 @@ $(function () {
 		<th>Odds</th>
 		<th>Winnings</th>
 		<th>Book <span class="clickable extra-click" id="filter_book"><img src="<?= $html->url('/img/icons/green_arrow_down.gif') ?>" /></span></th>
+		<th>Tags <span class="clickable extra-click" id="filter_tag"><img src="<?= $html->url('/img/icons/green_arrow_down.gif') ?>" /></span></th>
 		<th>Delete</th>
 		<th>View</th>
 	</tr>
@@ -145,6 +148,10 @@ $(function () {
 	}
 	?>
 	</table>
+	<label for='tagvalue'>Tag: </label>
+	<input type='text' name='tagvalue' id='tagvalue' />
+	<input type='submit' />
+	</form>
 </div>
 <?php
 function parlayNull($winning) {
@@ -159,6 +166,7 @@ function parlayNull($winning) {
 function dispBet($html, $i, $bet) {
 ?>
 	<tr>
+		<td><?= empty($i) ? '' : "<input type='checkbox' name='tag[{$bet['betid']}]' />" ?></td>
 		<td><?= $i ?></td>
 		<td class="date"><?= date("n/j/y", strtotime($bet['date'])) ?></td>
 		<td><?= $bet['league'] ?></td>
@@ -171,6 +179,7 @@ function dispBet($html, $i, $bet) {
 		<td class="number"><?= empty($i) ? '' : $bet['odds'] ?></td>
 		<td class="number"><?= (empty($i) ? parlayNull($bet['winning']) : nullMoney($bet['winning'])) ?></td>
 		<td><?= $bet['book'] ?></td>
+		<td><?= $bet['tag'] ?></td>
 		<td style="text-align: center"><?= empty($i) ? '' : $html->link('X', '/bets/delete/'.$bet['betid']) ?></td>
 		<td style="text-align: center"><?= empty($bet['scoreid']) ? '' : $html->link('V', '/bets/v/'.$bet['scoreid']) ?></td>
 	</tr>

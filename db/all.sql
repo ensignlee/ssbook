@@ -1,16 +1,16 @@
 -- phpMyAdmin SQL Dump
--- version 2.11.1.2
+-- version 3.3.7deb1
 -- http://www.phpmyadmin.net
 --
 -- Host: localhost
--- Generation Time: Oct 10, 2010 at 10:04 PM
--- Server version: 5.0.45
--- PHP Version: 5.2.4
+-- Generation Time: Nov 07, 2010 at 07:06 PM
+-- Server version: 5.1.49
+-- PHP Version: 5.3.3-1ubuntu9.1
 
 SET SQL_MODE="NO_AUTO_VALUE_ON_ZERO";
 
 --
--- Database: `ssdb`
+-- Database: `sharpbettracker`
 --
 
 -- --------------------------------------------------------
@@ -20,9 +20,9 @@ SET SQL_MODE="NO_AUTO_VALUE_ON_ZERO";
 --
 
 CREATE TABLE `league_types` (
-  `id` smallint(5) unsigned NOT NULL auto_increment,
-  `name` varchar(250) character set utf8 collate utf8_unicode_ci NOT NULL,
-  PRIMARY KEY  (`id`)
+  `id` smallint(5) unsigned NOT NULL AUTO_INCREMENT,
+  `name` varchar(250) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
@@ -32,17 +32,17 @@ CREATE TABLE `league_types` (
 --
 
 CREATE TABLE `odds` (
-  `id` int(10) unsigned NOT NULL auto_increment,
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `scoreid` int(10) unsigned NOT NULL,
   `created` datetime NOT NULL,
   `type` enum('moneyline','half_moneyline','spread','half_spread','total','half_total') NOT NULL,
-  `spread_home` float default NULL,
-  `spread_visitor` float default NULL,
-  `total` float default NULL,
+  `spread_home` float DEFAULT NULL,
+  `spread_visitor` float DEFAULT NULL,
+  `total` float DEFAULT NULL,
   `odds_home` int(11) NOT NULL COMMENT 'over',
   `odds_visitor` int(11) NOT NULL COMMENT 'under',
   `sourceid` int(10) unsigned NOT NULL,
-  PRIMARY KEY  (`id`),
+  PRIMARY KEY (`id`),
   KEY `source` (`sourceid`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=latin1;
 
@@ -53,20 +53,20 @@ CREATE TABLE `odds` (
 --
 
 CREATE TABLE `scores` (
-  `id` int(10) unsigned NOT NULL auto_increment,
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `game_date` datetime NOT NULL,
   `sourceid` int(10) unsigned NOT NULL,
-  `source_gameid` int(11) default NULL COMMENT 'unique id possibly given by source',
-  `home` varchar(250) collate utf8_unicode_ci NOT NULL,
-  `visitor` varchar(250) collate utf8_unicode_ci NOT NULL,
+  `source_gameid` varchar(64) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'unique id possibly given by source',
+  `home` varchar(250) COLLATE utf8_unicode_ci NOT NULL,
+  `visitor` varchar(250) COLLATE utf8_unicode_ci NOT NULL,
   `league` smallint(5) unsigned NOT NULL,
-  `home_score_half` smallint(6) default NULL,
-  `home_score_total` smallint(6) default NULL,
-  `visitor_score_half` smallint(6) default NULL,
-  `visitor_score_total` smallint(6) default NULL,
-  `created` timestamp NOT NULL default '0000-00-00 00:00:00',
-  `modified` timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
-  PRIMARY KEY  (`id`),
+  `home_score_half` smallint(6) DEFAULT NULL,
+  `home_score_total` smallint(6) DEFAULT NULL,
+  `visitor_score_half` smallint(6) DEFAULT NULL,
+  `visitor_score_total` smallint(6) DEFAULT NULL,
+  `created` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
+  `modified` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
   KEY `game_date` (`game_date`),
   KEY `source` (`sourceid`),
   KEY `league` (`league`),
@@ -80,10 +80,22 @@ CREATE TABLE `scores` (
 --
 
 CREATE TABLE `source_types` (
-  `id` int(10) unsigned NOT NULL auto_increment,
-  `name` varchar(250) character set utf8 collate utf8_unicode_ci NOT NULL,
-  PRIMARY KEY  (`id`)
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `name` varchar(250) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=latin1;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tags`
+--
+
+CREATE TABLE `tags` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -92,13 +104,13 @@ CREATE TABLE `source_types` (
 --
 
 CREATE TABLE `users` (
-  `id` mediumint(8) unsigned NOT NULL auto_increment,
-  `username` varchar(50) collate utf8_unicode_ci default NULL,
-  `password` char(40) character set latin1 default NULL,
-  `first_name` varchar(100) collate utf8_unicode_ci NOT NULL,
-  `last_name` varchar(100) collate utf8_unicode_ci NOT NULL,
-  `email` varchar(100) collate utf8_unicode_ci NOT NULL,
-  PRIMARY KEY  (`id`)
+  `id` mediumint(8) unsigned NOT NULL AUTO_INCREMENT,
+  `username` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `password` char(40) CHARACTER SET latin1 DEFAULT NULL,
+  `first_name` varchar(100) COLLATE utf8_unicode_ci NOT NULL,
+  `last_name` varchar(100) COLLATE utf8_unicode_ci NOT NULL,
+  `email` varchar(100) COLLATE utf8_unicode_ci NOT NULL,
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 -- --------------------------------------------------------
@@ -108,24 +120,37 @@ CREATE TABLE `users` (
 --
 
 CREATE TABLE `user_bets` (
-  `id` int(10) unsigned NOT NULL auto_increment,
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `userid` mediumint(8) unsigned NOT NULL,
-  `scoreid` int(10) unsigned default NULL,
+  `scoreid` int(10) unsigned DEFAULT NULL,
   `game_date` datetime NOT NULL,
   `type` enum('moneyline','half_moneyline','second_moneyline','spread','half_spread','second_spread','total','half_total','second_total','other','parlay','teaser') NOT NULL,
-  `direction` enum('home','visitor','over','under') default NULL,
-  `spread` float default NULL,
-  `odds` smallint(6) default NULL,
-  `risk` float unsigned default NULL,
-  `pt` enum('parlay','teaser') default NULL,
-  `parlayid` int(10) unsigned default NULL,
-  `sourceid` int(10) unsigned default NULL,
+  `direction` enum('home','visitor','over','under') DEFAULT NULL,
+  `spread` float DEFAULT NULL,
+  `odds` smallint(6) DEFAULT NULL,
+  `risk` float unsigned DEFAULT NULL,
+  `pt` enum('parlay','teaser') DEFAULT NULL,
+  `parlayid` int(10) unsigned DEFAULT NULL,
+  `sourceid` int(10) unsigned DEFAULT NULL,
   `created` datetime NOT NULL,
   `modified` datetime NOT NULL,
-  PRIMARY KEY  (`id`),
+  PRIMARY KEY (`id`),
   KEY `scoreid` (`scoreid`),
   KEY `userid` (`userid`),
   KEY `source` (`sourceid`)
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `user_bets_tags`
+--
+
+CREATE TABLE `user_bets_tags` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `user_bets_id` int(10) unsigned NOT NULL,
+  `tag_id` int(10) unsigned NOT NULL,
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=latin1;
 
 --

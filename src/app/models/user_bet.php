@@ -9,6 +9,14 @@ class UserBet extends AppModel {
 			'type' => 'LEFT OUTER'
 		)
 	);
+	var $hasAndBelongsToMany = array(
+		'Tag' =>
+		    array(
+			'className'              => 'Tag',
+			'joinTable'              => 'user_bets_tags',
+			'foreignKey'             => 'user_bets_id',
+			'associationForeignKey'  => 'tag_id',
+			'unique'                 => false));
 
 	public function possibleTypes() {
 		return array(

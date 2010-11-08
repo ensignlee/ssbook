@@ -2,7 +2,7 @@
 
 class BetsController extends AppController {
 	var $name = 'Bets';
-	var $uses = array('LeagueType', 'Odd', 'Score', 'SourceType', 'UserBet');
+	var $uses = array('LeagueType', 'Odd', 'Score', 'SourceType', 'UserBet', 'Tag', 'UserBetsTag');
 	var $helpers = array('Html','Ajax','Javascript');
 	var $components = array('Auth', 'Session', 'RequestHandler');
 
@@ -18,6 +18,23 @@ class BetsController extends AppController {
 		$this->Score->id = $id;
 		$score = $this->Score->read();
 		$this->set('score', $score);
+	}
+
+	public function tag() {
+		$tagname = $this->params['form']['tagvalue'];
+		$ids = array_keys($this->params['form']['tag']);
+		$tag = $this->Tag->findByName($tagname);
+		if (empty($tag)) {
+			$this->Tag->save(array('name' => $tagname));
+			$tag = $this->Tag->findByName($tagname);
+		}
+		$userbetids = array();
+		foreach ($ids as $id) {
+			$this->UserBetsTag->create();
+			$this->UserBetsTag->save(array('user_bets_id' => $id, 'tag_id' => $tag['Tag']['id']));
+		}
+		$this->Session->setFlash("Saved $tagname");
+		$this->redirect('/bets/view');
 	}
 
 	public function delete($id = null) {
@@ -395,6 +412,7 @@ class BetsController extends AppController {
 					}
 					break;
 				case 'beton':
+				case 'tag':
 					$vals = explode(',', $val);
 					if (!empty($vals)) {
 						$fixedCond[$key] = $vals;
@@ -428,7 +446,13 @@ class BetsController extends AppController {
 					$distincts[$key] = array();
 				}
 				if (!empty($bet[$key])) {
-					$distincts[$key][$bet[$key]] = true;
+					if ($key == 'tag') {
+						foreach (explode(',', $bet[$key]) as $v) {
+							$distincts[$key][trim($v)] = true;
+						}
+					} else {
+						$distincts[$key][$bet[$key]] = true;
+					}
 				}
 			}
 		}
@@ -491,6 +515,10 @@ class BetsController extends AppController {
 				$parlayBetGameDate = max($parlayBetGameDate, strtotime($row['date']));
 			}
 		}
+		$tags = array();
+		foreach ($bet['Tag'] as $tag) {
+			$tags[] = $tag['name'];
+		}
 
 		$fields = array(
 		    'betid' => $userBet['id'],
@@ -507,6 +535,7 @@ class BetsController extends AppController {
 		    'winning' => $userBet['winning'],
 		    'book' => $userBet['source'],
 		    'direction' => $userBet['direction'],
+		    'tag' => implode(',', $tags),
 		    'parlays' => $parlays
 		);
 		return $fields;
@@ -530,7 +559,9 @@ class BetsController extends AppController {
 		foreach ($keys as $key) {
 			if (isset($cond[$key])) {
 				foreach ($cond[$key] as $match) {
-					if ($match == $bet[$key]) {
+					if ($key == 'tag' && in_array($match, explode(',', $bet[$key]))) {
+						return true;
+					} else if ($match == $bet[$key]) {
 						return true;
 					}
 				}
@@ -567,7 +598,8 @@ class BetsController extends AppController {
 		    'type' => $this->urlGetVar('type'),
 		    'league' => $this->urlGetVar('league'),
 		    'beton' => $this->urlGetVar('beton'),
-		    'book' => $this->urlGetVar('book')
+		    'book' => $this->urlGetVar('book'),
+		    'tag' => $this->urlGetVar('tag')
 		);		
 		list($sqlcond, $cond) = $this->fixCond($cond);
 		$this->set('cond', $cond);
@@ -585,10 +617,10 @@ class BetsController extends AppController {
 
 		$bets = $this->UserBet->getAll($this->Auth->user('id'), null, $sqlcond);
 		$bets = $this->reformatBets($bets);
-		$bets = $this->filterNonSql($bets, $cond, array('beton', 'league'));
+		$bets = $this->filterNonSql($bets, $cond, array('beton', 'league', 'tag'));
 		usort($bets, array($this, '_sort_bets'));
 		
-		$filters = $this->setFilters($bets, array('home', 'visitor', 'type', 'league', 'beton', 'book'));
+		$filters = $this->setFilters($bets, array('home', 'visitor', 'type', 'league', 'beton', 'book', 'tag'));
 		$this->set('filters', $filters);
 
 		$record = $this->winLossTie($bets);
