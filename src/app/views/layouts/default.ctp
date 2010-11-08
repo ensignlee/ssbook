@@ -31,18 +31,36 @@ SS.Cake = {
 	<div id="container">
 		<div id="header">
 			<?= $this->Html->link($this->Html->image('logo.png', array('height' => '55px', 'width' => '360px', 'alt' => 'logo')), '/', array('escape' => false)); ?>
+
 		</div>
 		<div id="navbar">
 			<div class='nav'>
 			<ul>
+<?php if (empty($user)) { ?>
+				<li><?= $html->link('View', '/pages/view') ?></li>
+				<li><?= $html->link('Enter', '/pages/enter') ?></li>
+<?php } else { ?>
 				<li><?= $html->link('View', '/bets/view') ?></li>
 				<li><?= $html->link('Enter', '/bets') ?></li>
+<?php } ?>
 				<li><?= $html->link('Create', '/users/create') ?></li>
 			</ul>
 			</div>
 		</div>
 		<div id="banner">
 			<?= $this->Html->image('girls_header.jpg') ?>
+<div id="loginBox">
+<?php
+if (empty($user)) {
+	echo $form->create('User', array('action' => 'login'));
+	echo $form->input('username');
+	echo $form->input('password');
+	echo $form->end('Login');
+} else {
+	echo $user['username'].' '.$html->link('logout', '/users/logout');
+}
+?>
+</div>
 		</div>
 		<div id="content">
 

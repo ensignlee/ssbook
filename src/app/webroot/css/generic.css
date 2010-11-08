@@ -124,6 +124,16 @@ body {
 	height: 64px;
 	padding-top: 10px;
 }
+#loginBox {
+	width: 280px;
+	height: 70px;
+	float: right;
+	background-color: white;
+	text-align: center;
+	padding: 10px;
+	margin-right: 14px;
+	margin-top: 20px;
+}
 #banner {
 	background-color: #959FA4;
 }
