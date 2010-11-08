@@ -128,7 +128,9 @@ class Espn extends Espn_Log {
 
 				// Only remove the game_date if it already exists
 				if (!empty($this->shell->Score->id)) {
-					unset($score['game_date']);
+					if (date('h', strtotime($score['game_date'])) <= 0) {
+						unset($score['game_date']);
+					}
 					$league = $this->shell->Score->read('league');
 					if (empty($league) || $league['Score']['league'] != $score['league']) {
 						$this->log("Score league does not match".json_encode($score), 'error');
@@ -259,7 +261,7 @@ class Espn_NFL extends Espn_Scorer {
 
 		$row['league'] = $this->league;
 		$status = Espn::replaceNull(pq(".game-status", $score)->text());
-		if ($status == "Final" || $status == "Final/OT") {
+		if (strpos($status,"Final") !== false) {
 			$status = "";
 		}
 		if ($status == "TBD") {
@@ -338,6 +340,7 @@ class Espn_MLB extends Espn_Scorer {
 
 class Espn_NBA extends Espn_MLB {
 	
+	protected $statusLine = 'statusLine2Left';
 	public $leagueName = 'NBA';
 
 	public function getUrl($date) {
@@ -351,7 +354,7 @@ class Espn_NBA extends Espn_MLB {
 			$row['visitor_score_half'] = $visitor;
 			$row['home_score_half'] = $home;
 		} catch (Exception $e) {
-			$this->log('Could not find score'.$e->getMessage());
+			$this->log('Could not find score '.$e->getMessage());
 		}
 		return $row;
 	}
