@@ -128,7 +128,7 @@ class Espn extends Espn_Log {
 
 				// Only remove the game_date if it already exists
 				if (!empty($this->shell->Score->id)) {
-					if (date('h', strtotime($score['game_date'])) <= 0) {
+					if (date('H', strtotime($score['game_date'])) <= 0) {
 						unset($score['game_date']);
 					}
 					$league = $this->shell->Score->read('league');
