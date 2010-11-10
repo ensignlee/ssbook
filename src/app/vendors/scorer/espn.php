@@ -247,6 +247,10 @@ class Espn_NFL extends Espn_Scorer {
 		if (empty($dateStr)) {
 			$this->log('Unable to find dateStr '.json_encode($score), 'error');
 		}
+		if (strpos($dateStr, "Today") !== false) {
+			$this->log("Date is today '$dateStr'");
+			$dateStr = date('Y-m-d');
+		}
 		$away = pq(".visitor", $score);
 		$home = pq(".home", $score);
 		$row['visitor'] = pq('.team-name a', $away)->text();
