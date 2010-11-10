@@ -2,8 +2,9 @@
 	padding: 0 4px;
 }
 #graph {
-	width: 800px;
-	height: 400px;
+	width: 600px;
+	height: 300px;
+	float: left;
 }
 
 .context-menu-item.item-checked .context-menu-item-inner {
@@ -20,4 +21,39 @@ table div.context-menu .context-menu-item .context-menu-item-inner {
 }
 table div.context-menu .context-menu-item-hover .context-menu-item-inner {
 	padding: 0px 16px 0px 35px;
+}
+.stat-style-table .header-table {
+	width: 400px;
+	padding: 20px 40px;
+	float: left;
+}
+.stat-style-table .header-table table {
+	width: 100%;
+}
+.stat-style-table table td {
+	border: 1px solid black;
+}
+table.buttons {
+	border-collapse: collapse;
+	border-spacing: 0px;
+}
+table.buttons td {
+	text-align: center;
+	cursor: pointer;
+	padding: 5px;
+	border: 1px solid black;
+	background-color: #b3becd;
+}
+#record {
+	width: 350px;
+	float: right;
+	margin-top: 15px;
+}
+#record .header-table {
+	width: 350px;
+}
+#record table {
+	width: 350px;
+	border: 1px solid black;
+	margin-bottom: 4px;
 }

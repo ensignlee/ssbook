@@ -6,6 +6,7 @@ echo $javascript->link('jquery.flot.min.js');
 echo $javascript->link('jquery.contextmenu.js');
 echo $javascript->link('filtermenu.js');
 echo $javascript->link('generic.js');
+echo $javascript->link('viewbets.js');
 ?>
 <script type="text/javascript">
 $(function () {
@@ -36,7 +37,7 @@ $(function () {
 </form>
 <?= $session->flash() ?>
 <div id="graph">Graph of Data</div>
-<div id="record">
+<div id="record"><div class='header-table'><h2><div>Record</div></h2>
 	<table class="spaced-table cell-centered">
 		<tr>
 			<th>Record</th>
@@ -58,16 +59,33 @@ $(function () {
 		<tr><td>Average Odds Per Bet</td><td class="number"><?= round($allStats['avgOdds']) ?></td></tr>
 		<tr><td>Average Breakeven Winning Percentage</td><td class="number"><?= round($allStats['breakEven']*100) ?>%</td></tr>
 	</table>
-</div>
-<div id="groupStats">
+</div></div>
+<div id="groupStats" class="stat-style-table clear">
 	<?php
+	$first = true;
+	echo "<div class='header-table'><h2><div>W-L-T Grouped By:</div></h2>";
+	echo "<table class='buttons'><tr>";
 	foreach ($groupStats as $label => $stats) {
-		echo "<h2>$label</h2><table class='spaced-table cell-left'>";
+		$perc = round(100/count($groupStats));
+		echo "<td width='$perc%'>$label</td>";
+	}
+	echo "</tr></table>";
+	foreach ($groupStats as $label => $stats) {
+
+		if (!$first) {
+			$hidden = 'hidden';
+		} else {
+			$hidden = '';
+			$first = false;
+		}
+
+		$label = preg_replace('/[^a-z]+/', '_', strtolower($label));
+		echo "<table class='spaced-table cell-left $hidden show_$label'>";
 		foreach ($stats as $row) {
 			$def = $row['CalcStat']->getDef();
 			$record = $row['record'];
 
-			echo "<tr><td>";
+			echo "<tr><td width='160px'>";
 			if (count($def) == 2) {
 				if ($def[0] === false) {
 					echo "less than {$def[1]}";
@@ -81,24 +99,44 @@ $(function () {
 			}
 			echo "</td>";
 
-			echo "<td>{$record['win']} - {$record['loss']} - {$record['tie']}</td>";
+			echo "<td class='label'>{$record['win']} - {$record['loss']} - {$record['tie']}</td>";
 			echo "<td class='number'>$".number_format($record['dollarsWon'], 2)."</td></tr>\n";
 		}
 		echo "</table>";
 	}
+	echo "</div>";
 	?>
 </div>
-<div id="analysisStats">
+<div id="analysisStats" class="stat-style-table">
 <?php
-	$types = array('spread', 'moneyline', 'total');
+	$types = array('Spread', 'Moneyline', 'Total');
 	$halfs = array('', 'first_', 'second_');
 	$dirs = array('home','visitor','over','under');
 	$favorites = array('', '_favorite', '_underdog');
+
+	$first = true;
+	echo "<div class='header-table'><h2><div>W-L-T Grouped by Bet Type:</div></h2>";
+	echo "<table class='buttons'><tr>";
+	foreach ($types as $label) {
+		$perc = round(100/count($types));
+		echo "<td width='$perc%'>$label</td>";
+	}
+	echo "</tr></table>";
 	foreach ($types as $type) {
-		echo "<h2>$type</h2><table class='spaced-table cell-left'>";
+
+		if (!$first) {
+			$hidden = 'hidden';
+		} else {
+			$hidden = '';
+			$first = false;
+		}
+
+		$label = preg_replace('/[^a-z]+/', '_', strtolower($type));
+		echo "<table class='spaced-table cell-left $hidden show_$label'>";
 		foreach ($halfs as $half) {
 			foreach ($dirs as $dir) {
 				foreach ($favorites as $favorite) {
+					$type = strtolower($type);
 					$record = empty($analysisStats[$half.$type][$dir.$favorite]) ? array() : $analysisStats[$half.$type][$dir.$favorite]; 
 					if (!empty($record)) {
 						$disptype = $half.$type;
@@ -113,7 +151,7 @@ $(function () {
 	}
 ?>
 </div>
-<div id="betTable">
+<div id="betTable" class="clear">
 <form method='post' action='<?= $html->url('/bets/tag') ?>'>
 	<table>
 	<tr>

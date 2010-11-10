@@ -12,6 +12,9 @@ p {
 table .number {
 	text-align: right !important;
 }
+table .label {
+	text-align: center !important;
+}
 table .date {
 	text-align: center;
 }
@@ -34,6 +37,26 @@ table.spaced-table th, table.spaced-table td {
 #content ul {
 	list-style-type: circle;
 	padding: .5em 1.5em;
+}
+.hidden {
+	display: none;
+}
+
+.clear {
+	clear: both;
+}
+
+/** Table Styles **/
+
+div.header-table h2 {
+	background: url('../img/table_head_right.jpg') no-repeat right top;
+	color: white;
+	margin: 0;
+	padding: 0;
+}
+div.header-table h2 div {
+	background: url('../img/table_head_left.jpg') no-repeat left top;
+	padding: 5px 15px;
 }
 
 /** CSS LAYOUT **/
