@@ -152,7 +152,11 @@ $(function () {
 ?>
 </div>
 <div id="betTable" class="clear">
-<form method='post' action='<?= $html->url('/bets/tag') ?>'>
+	<form method='post' action='<?= $html->url('/bets/tag') ?>'>
+	<label for='tagvalue'>Tag: </label>
+	<input type='text' name='tagvalue' id='tagvalue' />
+	<input type='submit' />
+
 	<table>
 	<tr>
 		<th>&nbsp;</th>
@@ -186,9 +190,6 @@ $(function () {
 	}
 	?>
 	</table>
-	<label for='tagvalue'>Tag: </label>
-	<input type='text' name='tagvalue' id='tagvalue' />
-	<input type='submit' />
 	</form>
 </div>
 <?php
