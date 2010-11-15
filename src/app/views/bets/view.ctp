@@ -110,7 +110,7 @@ $(function () {
 <div id="analysisStats" class="stat-style-table clearfix">
 <?php
 	$types = array('Spread', 'Moneyline', 'Total');
-	$halfs = array('', 'first_', 'second_');
+	$halfs = array('', 'half_', 'second_');
 	$dirs = array('home','visitor','over','under');
 	$favorites = array('', '_favorite', '_underdog');
 
