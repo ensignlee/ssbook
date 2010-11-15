@@ -494,9 +494,9 @@ class BetsController extends AppController {
 		case 'second_total':
 			return $userBet['direction'];
 		case 'parlay':		
-			return count($userBet['Parlay']).' team parlay';
+			return count($userBet['Parlay']).' Team Parlay';
 		case 'teaser':
-			return 'Teaser';
+			return count($userBet['Parlay']).' Team Teaser';
 		}
 	}
 
