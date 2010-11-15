@@ -517,7 +517,7 @@ class BetsController extends AppController {
 		}
 		$tags = array();
 		foreach ($bet['Tag'] as $tag) {
-			$tags[] = $tag['name'];
+			$tags[] = trim($tag['name']);
 		}
 
 		$fields = array(
@@ -555,19 +555,30 @@ class BetsController extends AppController {
 		return $league;
 	}
 
-	private function isMatchingBet($bet, $cond, $keys) {
-		foreach ($keys as $key) {
-			if (isset($cond[$key])) {
-				foreach ($cond[$key] as $match) {
-					if ($key == 'tag' && in_array($match, explode(',', $bet[$key]))) {
-						return true;
-					} else if ($match == $bet[$key]) {
-						return true;
-					}
+	// Each cond is or.
+	private function betMatchCond($betval, $cond, $key) {
+		foreach ($cond as $match) {
+			if ($key == 'tag') {
+				if (in_array($match, explode(',', $betval))) {
+					return true;
 				}
+			} else if ($match == $betval) {
+				return true;
 			}
 		}
 		return false;
+	}
+
+	// Each key is and
+	private function isMatchingBet($bet, $cond, $keys) {
+		foreach ($keys as $key) {
+			if (isset($cond[$key])) {
+				if (!$this->betMatchCond($bet[$key], $cond[$key], $key)) {
+					return false;
+				}
+			}
+		}
+		return true;
 	}
 
 	private function filterNonSql(&$bets, $cond, $keys) {
