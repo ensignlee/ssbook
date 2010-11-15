@@ -29,6 +29,17 @@ SS.calcWin = function(risk, odds) {
 	}
 };
 
+SS.calcOdds = function(risk, towin) {
+	if (risk == towin) {
+		return 100;
+	}
+	if (risk < towin) {
+		return towin*100/risk;
+	} else {
+		return risk*-100/towin;
+	}
+};
+
 SS.Superbar = function(selector, Enterbets, Accorselect) {
 	this.jSelect = $(selector);
 
@@ -535,6 +546,14 @@ $.extend(SS.Enterbets.prototype, {
 			return Math.round(win/-1*odds)/100;
 		}
 	},
+
+	calcOdds : function (risk, towin) {
+		if (risk == 0 || towin == 0) {
+			return 0;
+		}
+	
+		return Math.round(SS.calcOdds(risk, towin)*100)/100;
+	},
 	
 	calcWin : function (risk, odds) {
 		if(odds == 0)
@@ -543,6 +562,8 @@ $.extend(SS.Enterbets.prototype, {
 		return Math.round(SS.calcWin(risk, odds)*100)/100;
 	},
 
+	currentlyChanging : 'risk',
+
 	oddsChange : function(bet, val) {
 		var odds = parseFloat(bet.find('.odds').val());
 		var towin = parseFloat(bet.find('.towin').val());
@@ -550,15 +571,22 @@ $.extend(SS.Enterbets.prototype, {
 		if (odds == 0 || odds == NaN) {
 			return;
 		}
+		this.currentlyChanging = 'odds';
 		this.riskChange(bet, val);
 		this.validate(bet);
 	},
 
 	riskChange : function(bet, val) {
+		var towin = parseFloat(bet.find('.towin').val());
 		var risk = parseFloat(bet.find('.risk').val());
 		var odds = parseFloat(bet.find('.odds').val());
 		if (!(isNaN(risk) || isNaN(odds)) && risk > 0 && odds != 0) {
+			this.currentlyChanging = 'risk';
 			bet.find('.towin').val(this.calcWin(risk, odds));
+		}
+		if ((!isNaN(towin) && !isNaN(risk)) && (isNaN(odds) || odds == 0 || this.currentlyChanging == 'risk2') && this.currentlyChanging != 'odds') {
+			this.currentlyChanging = 'risk2';
+			bet.find('.odds').val(this.calcOdds(risk, towin));
 		}
 		this.validate(bet);
 	},
@@ -566,8 +594,14 @@ $.extend(SS.Enterbets.prototype, {
 	towinChange : function(bet, val) {
 		var towin = parseFloat(bet.find('.towin').val());
 		var odds = parseFloat(bet.find('.odds').val());
-		if (!(isNaN(towin) || isNaN(odds)) && towin > 0 && odds != 0) {
+		var risk = parseFloat(bet.find('.risk').val());
+		if (!(isNaN(towin) || isNaN(odds)) && towin > 0 && odds != 0 && this.currentlyChanging != 'towin2') {
+			this.currentlyChanging = 'towin';
 			bet.find('.risk').val(this.calcRisk(towin, odds));
+		}
+		if ((!isNaN(towin) && !isNaN(risk)) && (isNaN(odds) || odds == 0 || this.currentlyChanging == 'towin2')) {
+			this.currentlyChanging = 'towin2';
+			bet.find('.odds').val(this.calcOdds(risk, towin));
 		}
 		this.validate(bet);
 	},
