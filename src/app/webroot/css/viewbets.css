@@ -22,9 +22,9 @@ table div.context-menu .context-menu-item .context-menu-item-inner {
 table div.context-menu .context-menu-item-hover .context-menu-item-inner {
 	padding: 0px 16px 0px 35px;
 }
-.stat-style-table .header-table {
+.stat-style-table {
 	width: 400px;
-	padding: 20px 40px;
+	margin: 20px 40px;
 	float: left;
 }
 .stat-style-table .header-table table {

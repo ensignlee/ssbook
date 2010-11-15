@@ -45,6 +45,14 @@ table.spaced-table th, table.spaced-table td {
 .clear {
 	clear: both;
 }
+/** Float fix http://www.positioniseverything.net/easyclearing.html */
+.clearfix:after {
+    content: ".";
+    display: block;
+    height: 0;
+    clear: both;
+    visibility: hidden;
+}
 
 /** Table Styles **/
 

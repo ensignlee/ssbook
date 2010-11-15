@@ -16,6 +16,9 @@
 		echo $this->Javascript->link('http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.2/jquery-ui.min.js');
 		echo $this->Javascript->link('date');
 ?>
+<!--[if IE]>
+<?= $this->Html->css('ie_all') ?>
+<![endif]-->
 <script type='text/javascript'>
 var SS = {};
 SS.Cake = {

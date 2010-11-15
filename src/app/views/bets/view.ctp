@@ -2,11 +2,11 @@
 $html->css('viewbets', 'stylesheet', array('inline' => false));
 $html->css('jquery.contextmenu', 'stylesheet', array('inline' => false));
 
-echo $javascript->link('jquery.flot.min.js');
-echo $javascript->link('jquery.contextmenu.js');
-echo $javascript->link('filtermenu.js');
-echo $javascript->link('generic.js');
-echo $javascript->link('viewbets.js');
+echo $javascript->link('jquery.flot.min');
+echo $javascript->link('jquery.contextmenu');
+echo $javascript->link('filtermenu');
+echo $javascript->link('generic');
+echo $javascript->link('viewbets');
 ?>
 <script type="text/javascript">
 $(function () {
@@ -60,7 +60,7 @@ $(function () {
 		<tr><td>Average Breakeven Winning Percentage</td><td class="number"><?= round($allStats['breakEven']*100) ?>%</td></tr>
 	</table>
 </div></div>
-<div id="groupStats" class="stat-style-table clear">
+<div id="groupStats" class="stat-style-table clear clearfix">
 	<?php
 	$first = true;
 	echo "<div class='header-table'><h2><div>W-L-T Grouped By:</div></h2>";
@@ -107,7 +107,7 @@ $(function () {
 	echo "</div>";
 	?>
 </div>
-<div id="analysisStats" class="stat-style-table">
+<div id="analysisStats" class="stat-style-table clearfix">
 <?php
 	$types = array('Spread', 'Moneyline', 'Total');
 	$halfs = array('', 'first_', 'second_');
@@ -149,6 +149,7 @@ $(function () {
 		}
 		echo "</table>";
 	}
+	echo "</div>";
 ?>
 </div>
 <div id="betTable" class="clear">
