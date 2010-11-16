@@ -30,6 +30,7 @@ class Espn extends Espn_Log {
 		$this->types[] = new Espn_NFL();
 		$this->types[] = new Espn_NCAAF();
 		$this->types[] = new Espn_NHL();
+		$this->types[] = new Espn_NCAAB();
 
 		$this->setSourceId();
 		$this->date = $this->shell->Score->getLastGameDate($this->sourceid);
@@ -322,12 +323,14 @@ class Espn_MLB extends Espn_Scorer {
 		return $out;
 	}
 
+	protected $teamname = '.team-name';
+
 	protected function parseScore($score, $gametime) {
 		$row = array();
 		$away = pq("tr[id$='awayHeader']", $score);
 		$home = pq("tr[id$='homeHeader']", $score);
-		$row['visitor'] = pq('.team-name', $away)->text();
-		$row['home'] = pq('.team-name', $home)->text();
+		$row['visitor'] = pq($this->teamname, $away)->text();
+		$row['home'] = pq($this->teamname, $home)->text();
 		$row['visitor_score_total'] = Espn::replaceNull(pq('.team-score', $away)->text());
 		$row['home_score_total'] = Espn::replaceNull(pq('.team-score', $home)->text());
 		$row['league'] = $this->league;
@@ -341,6 +344,42 @@ class Espn_MLB extends Espn_Scorer {
 		return $row;
 	}
 }
+
+class Espn_NCAAB extends Espn_NBA {
+
+	public $leagueName = 'NCAAB';
+	protected $teamname = '.team-name .name-link';
+
+	public function getUrl($date) {
+		return  sprintf('http://scores.espn.go.com/ncb/scoreboard?date=%s&confId=50', date('Ymd', strtotime($date)));
+	}
+
+	protected function getHalf($score) {
+		$titles = pq('th[id*="lsh"]', $score);
+		$periods = array();
+		foreach ($titles as $title) {
+			$id = pq($title)->attr('id');
+			if (!preg_match('/[0-9T]$/', $id, $m)) {
+				throw new Exception('Unable to find scores'.json_encode($score));
+			}
+			$cid = $m[0];
+			$periods[$cid] = pq($title)->text();
+		}
+		$one = null;
+		foreach ($periods as $num => $p) {
+			if ($p === "1") {
+				$one = $num;
+			}
+		}
+		if (empty($one)) {
+			throw new Exception('Unable to locate periods 1'.json_encode($score));
+		}
+		$visitor = pq("td[id$=als{$one}]", $score)->text();
+		$home = pq("td[id$=hls{$one}]", $score)->text();
+		return array($visitor, $home);
+	}
+}
+	
 
 class Espn_NBA extends Espn_MLB {
 	
