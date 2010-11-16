@@ -233,6 +233,8 @@ class Pinnacle extends Pinnacle_Log {
 			return 'NHL';
 		case 'basketball nba';
 			return 'NBA';
+		case 'basketball ncaa';
+			return 'NCAAB';
 		default:
 			return false;
 		}
