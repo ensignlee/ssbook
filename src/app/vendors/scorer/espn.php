@@ -422,7 +422,7 @@ class Espn_NBA extends Espn_MLB {
 				$two = $num;
 			}
 		}
-		if (empty($one) || empty($two)) {
+		if (is_null($one) || is_null($two)) {
 			throw new Exception('Unable to locate periods 1 and 2'.json_encode($score));
 		}
 		$visitor = pq("td[id$=als{$one}]", $score)->text() + pq("td[id$=als{$two}]", $score)->text();

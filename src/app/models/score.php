@@ -79,7 +79,7 @@ class Score extends AppModel {
 		return $out;
 	}
 
-	public function findMatching($game, $timeframe = 1800) {
+	public function findMatching($game, $timeframe = 4400) {
 		$start = date('Y-m-d H:i:s', strtotime($game['game_date']) - $timeframe);
 		$end = date('Y-m-d H:i:s', strtotime($game['game_date']) + $timeframe);
 		$existing_games = $this->find('all', array('conditions' => array(
