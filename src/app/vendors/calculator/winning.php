@@ -17,7 +17,6 @@ abstract class Winning_GameType {
 
 	protected function isGradeable() {
 		$game = $this->getGame();
-		//TODO : Is Parlay gradeable?
 		if (is_null($game) || is_null($game['id'])) {
 			$bet = $this->getBet();
 			return $this->allGraded($bet['Parlay']);
@@ -123,7 +122,7 @@ class Winning_Parlay extends Winning_GameType {
 				$win = null;
 				break;
 			} else {
-				$isWin = $isWin > 0;
+				$isWin = $isWin >= 0;
 				$win = $win && $isWin;
 			}
 		}
