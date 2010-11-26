@@ -500,6 +500,13 @@ class BetsController extends AppController {
 		}
 	}
 
+	private function floatOrNull($num) {
+		if (is_null($num)) {
+			return null;
+		}
+		return (float)$num;
+	}
+
 	private function reformatBet($bet) {
 		$userBet = $bet['UserBet'];
 		$score = $bet['Score'];
@@ -527,7 +534,7 @@ class BetsController extends AppController {
 		    'league' => $this->getLeague($userBet, $score['league']),
 		    'beton' => $this->getBetOn($userBet, $score),
 		    'type' => $userBet['type'],
-		    'line' => (float)$userBet['spread'],
+		    'line' => $this->floatOrNull($userBet['spread']),
 		    'home' => $score['home'],
 		    'visitor' => $score['visitor'],
 		    'risk' => $userBet['risk'],
