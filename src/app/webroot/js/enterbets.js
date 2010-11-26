@@ -381,6 +381,7 @@ $.extend(SS.Enterbets.prototype, {
 		case 'moneyline':
 		case 'half_moneyline':
 		case 'second_moneyline':
+			return true;
 		case 'spread':
 		case 'half_spread':
 		case 'second_spread':
