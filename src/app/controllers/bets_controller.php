@@ -302,10 +302,10 @@ class BetsController extends AppController {
 
 				$odds = $bet['odds'];
 				if ($odds > 0) {
-					$allStats['breakEven'] += 1/(($odds/100)+1);
+					$allStats['breakEven'] += 1/(($odds/ 100)+1);
 					$allStats['odds'] += ($odds-100);
 				} else {
-					$allStats['breakEven'] += 1/($odds/(-100)+1);
+					$allStats['breakEven'] += 1- (1/(($odds/-100)+1));
 					$allStats['odds'] += ($odds+100);
 				}
 			}
