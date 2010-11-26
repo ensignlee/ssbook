@@ -163,17 +163,17 @@ $(function () {
 		<th>&nbsp;</th>
 		<th>&nbsp;</th>
 		<th>Date</th>
-		<th>League <span class="clickable extra-click" id="filter_league"><img src="<?= $html->url('/img/icons/green_arrow_down.gif') ?>" /></span></th>
-		<th>Bet On <span class="clickable extra-click" id="filter_beton"><img src="<?= $html->url('/img/icons/green_arrow_down.gif') ?>" /></span></th>
-		<th>Bet Type <span class="clickable extra-click" id="filter_type"><img src="<?= $html->url('/img/icons/green_arrow_down.gif') ?>" /></span></th>
+		<th>League <span class="clickable extra-click" id="filter_league"><img alt="\/" src="<?= $html->url('/img/icons/green_arrow_down.gif') ?>" /></span></th>
+		<th>Bet On <span class="clickable extra-click" id="filter_beton"><img alt="\/" src="<?= $html->url('/img/icons/green_arrow_down.gif') ?>" /></span></th>
+		<th>Bet Type <span class="clickable extra-click" id="filter_type"><img alt="\/" src="<?= $html->url('/img/icons/green_arrow_down.gif') ?>" /></span></th>
 		<th>Line</th>
-		<th>Visitor <span class="clickable extra-click" id="filter_visitor"><img src="<?= $html->url('/img/icons/green_arrow_down.gif') ?>" /></span></th>
-		<th>Home <span class="clickable extra-click" id="filter_home"><img src="<?= $html->url('/img/icons/green_arrow_down.gif') ?>" /></span></th>
+		<th>Visitor <span class="clickable extra-click" id="filter_visitor"><img alt="\/" src="<?= $html->url('/img/icons/green_arrow_down.gif') ?>" /></span></th>
+		<th>Home <span class="clickable extra-click" id="filter_home"><img alt="\/" src="<?= $html->url('/img/icons/green_arrow_down.gif') ?>" /></span></th>
 		<th>Risk</th>
 		<th>Odds</th>
 		<th>Winnings</th>
-		<th>Book <span class="clickable extra-click" id="filter_book"><img src="<?= $html->url('/img/icons/green_arrow_down.gif') ?>" /></span></th>
-		<th>Tags <span class="clickable extra-click" id="filter_tag"><img src="<?= $html->url('/img/icons/green_arrow_down.gif') ?>" /></span></th>
+		<th>Book <span class="clickable extra-click" id="filter_book"><img alt="\/" src="<?= $html->url('/img/icons/green_arrow_down.gif') ?>" /></span></th>
+		<th>Tags <span class="clickable extra-click" id="filter_tag"><img alt="\/" src="<?= $html->url('/img/icons/green_arrow_down.gif') ?>" /></span></th>
 		<th>Delete</th>
 		<th>View</th>
 	</tr>
