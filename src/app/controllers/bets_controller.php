@@ -319,11 +319,25 @@ class BetsController extends AppController {
 		return $allStats;
 	}
 
+	private function minNull($left, $right) {
+		if (is_null($left)) {
+			return $right;
+		}
+		if (is_null($right)) {
+			return $left;
+		}
+		return min($left, $right);
+	}
+
 	private function graphData($bets) {
 		$earnedData = array();
+		$dateTimeMin = null;
 		foreach ($bets as $bet) {
 			$winning = $bet['winning'];
-			$date = date('Y-m-d', strtotime($bet['date']));
+			$dateTime = strtotime($bet['date']);
+			$dateTimeMin = $this->minNull($dateTimeMin, $dateTime);
+			
+			$date = date('Y-m-d', $dateTime);
 			if (!is_null($winning)) {
 				if (!isset($earnedData[$date])) {
 					$earnedData[$date] = 0;
@@ -333,10 +347,13 @@ class BetsController extends AppController {
 		}
 		$earned = 0;
 		$graphData = array();
-		ksort($earnedData);
-		foreach ($earnedData as $Ymd => $earnings) {
-			$earned += $earnings;
-			$graphData[] = array(strtotime($Ymd)*1000, $earned);
+		if (!empty($earnedData)) {
+			$graphData[] = array(strtotime(date('Y-m-d', $dateTimeMin)." -1 day")*1000, 0);
+			ksort($earnedData);
+			foreach ($earnedData as $Ymd => $earnings) {
+				$earned += $earnings;
+				$graphData[] = array(strtotime($Ymd)*1000, $earned);
+			}
 		}
 		return array($graphData);
 	}
