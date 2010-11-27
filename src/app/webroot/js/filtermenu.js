@@ -30,20 +30,46 @@ $.extend(SS.FilterMenu.prototype, {
 				icon: SS.Cake.base+'/img/icons/sort-descend.png'}},
 			$.contextMenu.separator
 		];
-		$.each(filters, function(key, val) {
+
+		if (filters['range']) {
 			var obj = {};
-			obj[val] = {
-				onclick: function(menuItem) {
-					return self.putCheckMark(menuItem, val);
-				}
+			var handler = {
+				onclick: function() {
+					return false;
+				},
+				hoverClassName: 'none'
 			};
-			if (filtersSelected[val]) {
-				obj[val]['className'] = 'item-checked';
-				obj[val]['data'] = {'filter':val};
-			}
+			
+			var gtename = 'gte'+this.name;
+			var gteval = filtersSelected['gte'] !== undefined ? filtersSelected['gte'] : '';
+			var keyHtml = '<label for="'+gtename+'">&gt;=</label> <input type="text" name="'+gtename+'" id="'+gtename+'" value="'+gteval+'" />';
+			obj[keyHtml] = handler;
+			
+			var ltename = 'lte'+this.name;
+			var lteval = filtersSelected['lte'] !== undefined ? filtersSelected['lte'] : '';
+			keyHtml = '<label for="'+ltename+'">&lt;=</label> <input type="text" name="'+ltename+'" id="'+ltename+'" value="'+lteval+'" />';
+			obj[keyHtml] = handler;
+			
 			menu.push(obj);
-		});
-		menu.push($.contextMenu.separator);
+			menu.push($.contextMenu.separator);
+		}
+		
+		if (filters['list'] !== undefined) {
+			$.each(filters['list'], function(key, val) {
+				var obj = {};
+				obj[val] = {
+					onclick: function(menuItem) {
+						return self.putCheckMark(menuItem, val);
+					}
+				};
+				if (filtersSelected[val]) {
+					obj[val]['className'] = 'item-checked';
+					obj[val]['data'] = {'filter':val};
+				}
+				menu.push(obj);
+			});
+			menu.push($.contextMenu.separator);
+		}		
 		menu.push({
 			'<b>Apply</b>' : function(menuItem, menu) {
 				self.applyFilter(menu);
@@ -76,7 +102,14 @@ $.extend(SS.FilterMenu.prototype, {
 			if (data) {
 				filters.push(data);
 			}
-		});		
+		});
+		// Expected to be in this order by the backend. Alos need to put in blank
+		// with the comma in order for it to know if the first gte value is blank
+		$.each(['#gte'+this.name, '#lte'+this.name], function (key, val) {
+			$.each(cmenu.menu.find(val), function() {
+				filters.push($(this).val());
+			});
+		});
 		
 		if (this.sortDir) {
 			$(this.hiddenForm).find('[name=sort]').val(this.name+','+this.sortDir);
@@ -85,7 +118,8 @@ $.extend(SS.FilterMenu.prototype, {
 	       var f = $(this.hiddenForm);
 	       var inputs = f.find('[name='+this.name+']');
 	       var filtString = filters.join(',');
-	       if (inputs.length == 0 && filtString.length) {
+	       // Check for "," which is 2 empty filters for the lte and gte
+	       if (inputs.length == 0 && filtString.length && filtString != ',') {
 		       f.append($('<input type="hidden" name="'+this.name+'" />'));
 	       }
 	       f.ready(function() {

@@ -418,6 +418,55 @@ class BetsController extends AppController {
 						$fixedCond[$key] = $vals;
 					}
 					break;
+				case 'game_date':
+					$vals = explode(',', $val);
+					$sqlkey = 'UserBet.game_date';
+					if (!empty($vals) && count($vals) == 2) {
+						list($gte, $lte) = $vals;
+						$fixVals = array();
+						if (!numberSafeEmpty($gte)) {
+							$ret[$sqlkey.' >='] = date('Y-m-d', strtotime($gte));
+						}
+						$fixVals['gte'] = $gte;
+						if (!numberSafeEmpty($lte)) {
+							$ret[$sqlkey.' <='] = date('Y-m-d', strtotime($lte));
+						}
+						$fixVals['lte'] = $lte;
+						if (!empty($fixVals)) {
+							$fixedCond[$key] = $fixVals;
+						}
+					}
+					break;
+				case 'spread':
+				case 'odds':
+				case 'risk':
+					$vals = explode(',', $val);					
+					if (!empty($vals) && count($vals) == 2) {
+						list($gte, $lte) = $vals;
+						$fixVals = array();
+						if (!numberSafeEmpty($gte)) {
+							$ret[$key.' >='] = $gte;
+						}
+						$fixVals['gte'] = $gte;
+						if (!numberSafeEmpty($lte)) {
+							$ret[$key.' <='] = $lte;
+						}
+						$fixVals['lte'] = $lte;
+						if (!empty($fixVals)) {
+							$fixedCond[$key] = $fixVals;
+						}
+					}					
+					break;
+				case 'winning':
+					$vals = explode(',', $val);
+					if (!empty($vals) && count($vals) == 2) {
+						list($gte, $lte) = $vals;
+						$fixVals = array();
+						$fixVals['gte'] = $gte;
+						$fixVals['lte'] = $lte;
+						$fixedCond[$key] = $fixVals;
+					}
+					break;
 				default:
 					$vals = explode(',', $val);					
 					if (!empty($vals)) {
@@ -437,8 +486,7 @@ class BetsController extends AppController {
 		);
 	}
 
-	private function setFilters(&$bets, $distinct) {
-		$ret = array();
+	private function setFilters(&$bets, $distinct, $range) {
 		$distincts = array();
 		foreach ($bets as $bet) {
 			foreach ($distinct as $key) {
@@ -456,18 +504,36 @@ class BetsController extends AppController {
 				}
 			}
 		}
+
+		$ret = array();
 		foreach ($distinct as $key) {
 			if (isset($distincts[$key])) {
-				$ret[$key] = array_keys($distincts[$key]);
+				$keys = array_keys($distincts[$key]);
+				sort($keys);
+				$ret[$key] = array('list' => $keys);
 			}
 		}
+		foreach ($range as $key) {
+			if (isset($ret[$key])) {
+				$ret[$key]['range'] = true;
+			} else {
+				$ret[$key] = array('range' => true);
+			}
+		}
+		
 		return $ret;
 	}
 
 	private function getCondAsMap($cond) {
 		$ret = array();
 		foreach ($cond as $key => $rows) {
-			$ret[$key] = array_combine(array_values($rows), array_fill(0, count($rows), true));
+			// If is array and array of values, not hash map. Then convert to a
+			// key value map where all labels are true
+			if (is_array($rows) && isset($rows[0])) {
+				$ret[$key] = array_combine(array_values($rows), array_fill(0, count($rows), true));
+			} else {
+				$ret[$key] = $rows;
+			}
 		}
 		return $ret;
 	}
@@ -564,13 +630,24 @@ class BetsController extends AppController {
 
 	// Each cond is or.
 	private function betMatchCond($betval, $cond, $key) {
-		foreach ($cond as $match) {
-			if ($key == 'tag') {
-				if (in_array($match, explode(',', $betval))) {
+		if ($key == 'winning') {
+			$match = true;
+			if (!numberSafeEmpty($cond['gte'])) {
+				$match = $match && ($betval >= $cond['gte']);
+			}
+			if (!numberSafeEmpty($cond['lte'])) {
+				$match = $match && ($betval <= $cond['lte']);
+			}
+			return $match;
+		} else {
+			foreach ($cond as $match) {
+				if ($key == 'tag') {
+					if (in_array($match, explode(',', $betval))) {
+						return true;
+					}
+				}  else if ($match == $betval) {
 					return true;
 				}
-			} else if ($match == $betval) {
-				return true;
 			}
 		}
 		return false;
@@ -617,7 +694,12 @@ class BetsController extends AppController {
 		    'league' => $this->urlGetVar('league'),
 		    'beton' => $this->urlGetVar('beton'),
 		    'book' => $this->urlGetVar('book'),
-		    'tag' => $this->urlGetVar('tag')
+		    'tag' => $this->urlGetVar('tag'),
+		    'risk' => $this->urlGetVar('risk'),
+		    'game_date' => $this->urlGetVar('game_date'),
+		    'odds' => $this->urlGetVar('odds'),
+		    'spread' => $this->urlGetVar('spread'),
+		    'winning' => $this->urlGetVar('winning')
 		);		
 		list($sqlcond, $cond) = $this->fixCond($cond);
 		$this->set('cond', $cond);
@@ -635,10 +717,12 @@ class BetsController extends AppController {
 
 		$bets = $this->UserBet->getAll($this->Auth->user('id'), null, $sqlcond);
 		$bets = $this->reformatBets($bets);
-		$bets = $this->filterNonSql($bets, $cond, array('beton', 'league', 'tag'));
+		$bets = $this->filterNonSql($bets, $cond, array('beton', 'league', 'tag', 'winning'));
 		usort($bets, array($this, '_sort_bets'));
 		
-		$filters = $this->setFilters($bets, array('home', 'visitor', 'type', 'league', 'beton', 'book', 'tag'));
+		$filters = $this->setFilters($bets, 
+			array('home', 'visitor', 'type', 'league', 'beton', 'book', 'tag'),
+			array('risk', 'game_date', 'spread', 'odds', 'risk', 'winning'));
 		$this->set('filters', $filters);
 
 		$record = $this->winLossTie($bets);

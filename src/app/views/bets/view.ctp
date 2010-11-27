@@ -24,14 +24,21 @@ $(function () {
 
 	<?php foreach (array_keys($filters) as $key) : ?>
 	var m = new SS.FilterMenu('<?= $key ?>', '#hiddenForm', '#filter_<?= $key ?>');
-	<?php $list = $filters[$key]; sort($list); ?>
+	<?php $list = $filters[$key]; ?>
 	m.init(<?= json_encode($list) ?>, <?= json_encode(isset($condAsMap[$key]) ? $condAsMap[$key] : '') ?>);
 	<?php endforeach;// (array_keys($filters) as $key) : ?>
 });
 </script>
 <form id="hiddenForm" method="get" action="">
 	<?php foreach ($condAsMap as $key => $rows) {
-		echo "<input type='hidden' name='$key' value=\"".htmlentities(implode(',', array_keys($rows)))."\" />";
+		$values = array_unique(array_values($rows));
+		// All values are true
+		if (!empty($values) && count($values) == 1 && $values[0] === true) {
+			$labels = array_keys($rows);
+		} else {
+			$labels = array_values($rows);
+		}
+		echo "<input type='hidden' name='$key' value=\"".htmlentities(implode(',', $labels))."\" />";
 	} ?>
 	<input type="hidden" name="sort" value="<?= "$sortKey,$sortDir" ?>" />
 </form>
@@ -157,21 +164,22 @@ $(function () {
 	<label for='tagvalue'>Tag: </label>
 	<input type='text' name='tagvalue' id='tagvalue' />
 	<input type='submit' />
+	<?= $html->link('Reset', '/bets/view') ?>
 
 	<table>
 	<tr>
 		<th>&nbsp;</th>
 		<th>&nbsp;</th>
-		<th>Date</th>
+		<th>Date <span class="clickable extra-click" id="filter_game_date"><img alt="\/" src="<?= $html->url('/img/icons/green_arrow_down.gif') ?>" /></span></th>
 		<th>League <span class="clickable extra-click" id="filter_league"><img alt="\/" src="<?= $html->url('/img/icons/green_arrow_down.gif') ?>" /></span></th>
 		<th>Bet On <span class="clickable extra-click" id="filter_beton"><img alt="\/" src="<?= $html->url('/img/icons/green_arrow_down.gif') ?>" /></span></th>
 		<th>Bet Type <span class="clickable extra-click" id="filter_type"><img alt="\/" src="<?= $html->url('/img/icons/green_arrow_down.gif') ?>" /></span></th>
-		<th>Line</th>
+		<th>Line <span class="clickable extra-click" id="filter_spread"><img alt="\/" src="<?= $html->url('/img/icons/green_arrow_down.gif') ?>" /></span></th>
 		<th>Visitor <span class="clickable extra-click" id="filter_visitor"><img alt="\/" src="<?= $html->url('/img/icons/green_arrow_down.gif') ?>" /></span></th>
 		<th>Home <span class="clickable extra-click" id="filter_home"><img alt="\/" src="<?= $html->url('/img/icons/green_arrow_down.gif') ?>" /></span></th>
-		<th>Risk</th>
-		<th>Odds</th>
-		<th>Winnings</th>
+		<th>Risk <span class="clickable extra-click" id="filter_risk"><img alt="\/" src="<?= $html->url('/img/icons/green_arrow_down.gif') ?>" /></span></th>
+		<th>Odds <span class="clickable extra-click" id="filter_odds"><img alt="\/" src="<?= $html->url('/img/icons/green_arrow_down.gif') ?>" /></span></th>
+		<th>Winnings <span class="clickable extra-click" id="filter_winning"><img alt="\/" src="<?= $html->url('/img/icons/green_arrow_down.gif') ?>" /></span></th>
 		<th>Book <span class="clickable extra-click" id="filter_book"><img alt="\/" src="<?= $html->url('/img/icons/green_arrow_down.gif') ?>" /></span></th>
 		<th>Tags <span class="clickable extra-click" id="filter_tag"><img alt="\/" src="<?= $html->url('/img/icons/green_arrow_down.gif') ?>" /></span></th>
 		<th>Delete</th>

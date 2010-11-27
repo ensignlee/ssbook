@@ -7,6 +7,13 @@
 	float: left;
 }
 
+.context-menu-item-inner input {
+	width: 5em;
+}
+.context-menu-item-inner label {
+	font-size: 1.3em;
+}
+
 .context-menu-item.item-checked .context-menu-item-inner {
 	background-image: url(../img/icons/check.png) !important;
 }
