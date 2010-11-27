@@ -428,7 +428,7 @@ class BetsController extends AppController {
 						}
 						$fixVals['gte'] = $gte;
 						if (!numberSafeEmpty($lte)) {
-							$ret[$sqlkey.' <='] = date('Y-m-d', strtotime($lte));
+							$ret[$sqlkey.' <='] = date('Y-m-d 23:59:59', strtotime($lte));
 						}
 						$fixVals['lte'] = $lte;
 						if (!empty($fixVals)) {
