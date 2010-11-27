@@ -784,18 +784,42 @@ SS.Accorselect = function(select, Enterbets, startdateselect, enddateselect) {
 	this.jEnddate = $(enddateselect);
 	this.Enterbets = Enterbets;
 	this.url = SS.Cake.base + '/bets/ajax/accorselect';
+	this.isFocused = false;
+	this.hasChanged = false;
 }
 
 $.extend(SS.Accorselect.prototype, {
 	
 	setupDates : function() {
-		var _this = this;
-		this.jStartdate.change(function() {
-			_this.find();
-		});
-		this.jEnddate.change(function() {
-			_this.find();
-		});		
+		this.jStartdate.change($.proxy(this.onChange, this));
+		this.jEnddate.change($.proxy(this.onChange, this));
+
+		this.jStartdate.focus($.proxy(this.onFocus, this));
+		this.jStartdate.blur($.proxy(this.onBlur, this));
+		this.jEnddate.focus($.proxy(this.onFocus, this));
+		this.jEnddate.blur($.proxy(this.onBlur, this));
+	},
+
+	onFocus: function() {
+		this.isFocused = true;
+	},
+
+	onBlur: function() {
+		this.isFocused = false;
+		if (this.hasChanged) {
+			this.onChange();
+		}
+	},
+
+	onChange: function() {
+		this.hasChanged = true;
+		window.setTimeout($.proxy(function() {
+
+			if (!this.hasFocus()) {
+				this.find();
+			}
+
+		}, this), 10);
 	},
 
 	render : function(json) {
@@ -805,6 +829,7 @@ $.extend(SS.Accorselect.prototype, {
 		var enddate = json.enddate;
 		this.setStartdate(startdate);
 		this.setEnddate(enddate);
+		this.hasChanged = false;
 
 		$.each(leagues, function(league, games) {
 			h += '<h1 class="head">'+league+'</h1><ul>';
@@ -851,12 +876,17 @@ $.extend(SS.Accorselect.prototype, {
 		return Date.parse(this.jEnddate.val());
 	},
 
+	hasFocus: function() {
+		return this.isFocused;
+	},
+
 	find : function() {
 		this.findDates(this.getStartdate(), this.getEnddate());
 	},
 
 	findDates : function(startdate, enddate) {
 		var _this = this;
+		this.jSelect.html('<img src="'+SS.Cake.base+'/img/ajax-loader.gif" />');
 		$.getJSON(this.url, {
 				startdate : startdate.toString('yyyy-MM-dd'),
 				enddate : enddate.toString('yyyy-MM-dd')
