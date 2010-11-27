@@ -38,15 +38,15 @@ SS.Cake = {
 		</div>
 		<div id="navbar">
 			<div class='nav'>
-			<ul>
+			<ul class='clearfix'>
 <?php if (empty($user)) { ?>
-				<li><?= $html->link('View', '/pages/view') ?></li>
-				<li><?= $html->link('Enter', '/pages/enter') ?></li>
+				<li><?= $html->link('Enter Bets', '/pages/enter') ?></li>
+				<li><?= $html->link('View Bets', '/pages/view') ?></li>
+				<li class="far-right"><?= $html->link('Register', '/users/create') ?></li>
 <?php } else { ?>
-				<li><?= $html->link('View', '/bets/view') ?></li>
-				<li><?= $html->link('Enter', '/bets') ?></li>
-<?php } ?>
-				<li><?= $html->link('Create', '/users/create') ?></li>
+				<li><?= $html->link('Enter Bets', '/bets') ?></li>
+				<li><?= $html->link('View Bets', '/bets/view') ?></li>
+<?php } ?>				
 			</ul>
 			</div>
 		</div>

@@ -99,9 +99,6 @@ body {
 	margin-top: 5px;
 	clear: both;
 }
-#navbar ul {
-	margin: 13px 0 0 20px;
-}
 #footer a {
 	color: #d1e5ff;
 	text-decoration: none;
@@ -135,13 +132,11 @@ body {
 	height: 50px;
 	color: #FFFFFF;
 	font-weight: bold;
-}
-#navbar ul {
-	margin: 13px 0 0 20px;
-	float: left; /*Cover the lis*/
+	position: relative;
 }
 #navbar ul li {
 	margin: 0 20px;
+	padding-top: 10px;
 	float: left;
 }
 #navbar ul li a {
@@ -150,6 +145,9 @@ body {
 }
 #navbar ul li a:hover {
 	text-decoration: underline;
+}
+#navbar ul li.far-right{
+	float: right;
 }
 #header {
 	height: 64px;
