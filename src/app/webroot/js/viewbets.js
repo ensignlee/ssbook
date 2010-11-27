@@ -17,6 +17,16 @@ $(function() {
 		hideAll(this);
 		$('.show_'+text).css('display', 'table');
 	});
+
+	$(function() {
+		// On click, set all checkboxes to whether or not this one is checked
+		$('.check-all-parent').click(function() {
+			$('.check-all').attr('checked', !!$(this).attr('checked'));
+		});
+		$('.check-all').click(function() {
+			$('.check-all-parent').attr('checked', false);
+		});
+	})
 });
 
 })(jQuery);

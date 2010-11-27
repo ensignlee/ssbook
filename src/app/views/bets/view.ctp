@@ -168,7 +168,7 @@ $(function () {
 
 	<table>
 	<tr>
-		<th>&nbsp;</th>
+		<th><input type="checkbox" class="check-all-parent" name="dummy" /></th>
 		<th>&nbsp;</th>
 		<th>Date <span class="clickable extra-click" id="filter_game_date"><img alt="\/" src="<?= $html->url('/img/icons/green_arrow_down.gif') ?>" /></span></th>
 		<th>League <span class="clickable extra-click" id="filter_league"><img alt="\/" src="<?= $html->url('/img/icons/green_arrow_down.gif') ?>" /></span></th>
@@ -214,7 +214,7 @@ function parlayNull($winning) {
 function dispBet($html, $i, $bet) {
 ?>
 	<tr>
-		<td><?= empty($i) ? '' : "<input type='checkbox' name='tag[{$bet['betid']}]' />" ?></td>
+		<td><?= empty($i) ? '' : "<input class='check-all' type='checkbox' name='tag[{$bet['betid']}]' />" ?></td>
 		<td><?= $i ?></td>
 		<td class="date"><?= date("n/j/y", strtotime($bet['date'])) ?></td>
 		<td><?= $bet['league'] ?></td>
