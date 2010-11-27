@@ -160,10 +160,11 @@ $(function () {
 ?>
 </div>
 <div id="betTable" class="clear">
-	<form method='post' action='<?= $html->url('/bets/tag') ?>'>
+	<form method='post' action='<?= $html->url('/bets/modify') ?>'>
 	<label for='tagvalue'>Tag: </label>
 	<input type='text' name='tagvalue' id='tagvalue' />
-	<input type='submit' />
+	<input type='submit' name="Tag" value='Tag'  />
+	<input type="submit" name="Delete" value="Delete Bets" />
 	<?= $html->link('Reset', '/bets/view') ?>
 
 	<table>
@@ -182,7 +183,6 @@ $(function () {
 		<th>Winnings <span class="clickable extra-click" id="filter_winning"><img alt="\/" src="<?= $html->url('/img/icons/green_arrow_down.gif') ?>" /></span></th>
 		<th>Book <span class="clickable extra-click" id="filter_book"><img alt="\/" src="<?= $html->url('/img/icons/green_arrow_down.gif') ?>" /></span></th>
 		<th>Tags <span class="clickable extra-click" id="filter_tag"><img alt="\/" src="<?= $html->url('/img/icons/green_arrow_down.gif') ?>" /></span></th>
-		<th>Delete</th>
 		<th>View</th>
 	</tr>
 
@@ -228,7 +228,6 @@ function dispBet($html, $i, $bet) {
 		<td class="number"><?= (empty($i) ? parlayNull($bet['winning']) : nullMoney($bet['winning'])) ?></td>
 		<td><?= $bet['book'] ?></td>
 		<td><?= $bet['tag'] ?></td>
-		<td style="text-align: center"><?= empty($i) ? '' : $html->link('X', '/bets/delete/'.$bet['betid']) ?></td>
 		<td style="text-align: center"><?= empty($bet['scoreid']) ? '' : $html->link('V', '/bets/v/'.$bet['scoreid']) ?></td>
 	</tr>
 <?php

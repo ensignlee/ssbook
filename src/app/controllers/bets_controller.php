@@ -19,16 +19,48 @@ class BetsController extends AppController {
 		$this->set('score', $score);
 	}
 
-	public function tag() {
+	public function modify() {
+		$form = $this->params['form'];
+		$ids = array_keys($this->params['form']['tag']);
+
+		if (!empty($form['Delete'])) {
+			$this->deleteMass($ids);
+		} else if (!empty($form['Tag'])) {
+			$this->tag($ids);
+		}
+		
+		$this->redirect($this->referer());
+	}
+
+	private function deleteMass($ids) {
+		$success = 0;
+
+		foreach ($ids as $id) {
+			$this->UserBet->id = $id;
+			if ($this->UserBet->delete()) {
+				$success++;
+			}
+		}
+
+		if ($success > 0) {
+			$this->Session->setFlash("Deleted $success bet(s)");
+		} else {
+			$this->Session->setFlash("No bets removed");
+		}
+	}
+
+	private function tag($ids) {
+		if (empty($ids)) {
+			return false;
+		}
+		
 		$tagname = trim($this->params['form']['tagvalue']);
 
 		// None is a reserved tag name
 		if (strtolower($tagname) == 'none') {
 			$this->Session->setFlash("Unable to give tag name of None");
-			$this->redirect($this->referer());
 		}
-
-		$ids = array_keys($this->params['form']['tag']);
+		
 		$tag = $this->Tag->findByName($tagname);
 		if (empty($tag)) {
 			$this->Tag->save(array('name' => $tagname));
@@ -39,20 +71,14 @@ class BetsController extends AppController {
 			$this->UserBetsTag->create();
 			$this->UserBetsTag->save(array('user_bets_id' => $id, 'tag_id' => $tag['Tag']['id']));
 		}
-		$this->Session->setFlash("Saved $tagname");
-		$this->redirect($this->referer());
+		$this->Session->setFlash("Saved $tagname");		
 	}
 
 	public function delete($id = null) {
 		if (empty($id)) {
 			$this->Session->setFlash('Invalid id');
 		}
-		$this->UserBet->id = $id;
-		if ($this->UserBet->delete()) {
-			$this->Session->setFlash('Bet Removed');
-		} else {
-			$this->Session->setFlash('Unable to remove bet');
-		}
+		$this->delete(array($id));
 		$this->redirect($this->referer());
 	}
 
