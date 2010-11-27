@@ -12,7 +12,7 @@ class SourceType extends LeagueType {
 	}
 
 	public function getOrSet($name) {
-		if (empty($name)) {
+		if (empty($name) || strtolower(trim($name)) == 'none') {
 			return null;
 		}
 

@@ -379,6 +379,7 @@ class BetsController extends AppController {
 		$ret = array();
 		$fixedCond = array();
 		$possibleTypes = $this->getBetTypes();
+		$retAnd = array();
 		foreach ($cond as $key => $val) {
 			if ($val !== false) {
 				switch ($key) {
@@ -400,13 +401,22 @@ class BetsController extends AppController {
 						}
 					}
 					if (!empty($set)) {
-						$ret['or'] = array($key => $set, 'or' => array($key => null));
+						$retAnd[] = array('or' => array(
+						    array($key => $set),
+						    array($key => null)
+						));
 					}
 					break;
 				case 'book':
 					$vals = explode(',', $val);
 					$set = array();
+					$bookAnd = array();
 					foreach ($vals as &$val) {
+						if (strtolower($val) == 'none') {
+							$fixedCond[$key][] = $val;
+							$bookAnd[] = array('UserBet.sourceid' => null);
+						}
+
 						$sqlval = $this->SourceType->contains($val);
 						if ($sqlval !== false) {
 							if (!isset($fixedCond[$key])) {
@@ -417,7 +427,10 @@ class BetsController extends AppController {
 						}
 					}
 					if (!empty($set)) {
-						$ret['UserBet.sourceid'] = $set;
+						$bookAnd[] = array('UserBet.sourceid' => $set);
+					}
+					if (!empty($bookAnd)) {
+						$retAnd[] = array('or' => $bookAnd);
 					}
 					break;
 				case 'type':
@@ -499,6 +512,9 @@ class BetsController extends AppController {
 				}
 			}
 		}
+		if (!empty($retAnd)) {
+			$ret['and'] = $retAnd;
+		}
 		return array($ret, $fixedCond);
 	}
 
@@ -531,6 +547,9 @@ class BetsController extends AppController {
 		$ret = array();
 		foreach ($distinct as $key) {
 			if (isset($distincts[$key])) {
+				if (in_array($key, array('book', 'tag'))) {
+					$distincts[$key]['None'] = true;
+				}
 				$keys = array_keys($distincts[$key]);
 				sort($keys);
 				$ret[$key] = array('list' => $keys);
@@ -665,6 +684,9 @@ class BetsController extends AppController {
 		} else {
 			foreach ($cond as $match) {
 				if ($key == 'tag') {
+					if (strtolower($match) == 'none' && empty($betval)) {
+						return true;
+					}
 					if (in_array($match, explode(',', $betval))) {
 						return true;
 					}
