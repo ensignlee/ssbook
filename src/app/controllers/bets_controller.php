@@ -20,7 +20,14 @@ class BetsController extends AppController {
 	}
 
 	public function tag() {
-		$tagname = $this->params['form']['tagvalue'];
+		$tagname = trim($this->params['form']['tagvalue']);
+
+		// None is a reserved tag name
+		if (strtolower($tagname) == 'none') {
+			$this->Session->setFlash("Unable to give tag name of None");
+			$this->redirect($this->referer());
+		}
+
 		$ids = array_keys($this->params['form']['tag']);
 		$tag = $this->Tag->findByName($tagname);
 		if (empty($tag)) {
@@ -33,7 +40,7 @@ class BetsController extends AppController {
 			$this->UserBetsTag->save(array('user_bets_id' => $id, 'tag_id' => $tag['Tag']['id']));
 		}
 		$this->Session->setFlash("Saved $tagname");
-		$this->redirect('/bets/view');
+		$this->redirect($this->referer());
 	}
 
 	public function delete($id = null) {
@@ -46,7 +53,7 @@ class BetsController extends AppController {
 		} else {
 			$this->Session->setFlash('Unable to remove bet');
 		}
-		$this->redirect('/bets/view');
+		$this->redirect($this->referer());
 	}
 
 	private function superbar($params, $date) {
