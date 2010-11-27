@@ -124,7 +124,7 @@
  * the cake shell command: cake schema run create Sessions
  *
  */
-	Configure::write('Session.save', 'cache');
+	Configure::write('Session.save', 'php');
 
 /**
  * The model name to be used for the session model.
@@ -200,7 +200,7 @@
 /**
  * A random numeric string (digits only) used to encrypt/decrypt strings.
  */
-	Configure::write('Security.cipherSeed', 'THISISCIPHER!@#$%^&*(');
+	Configure::write('Security.cipherSeed', '235333104896');
 
 /**
  * Apply timestamps with the last modified time to static assets (js, css, images).

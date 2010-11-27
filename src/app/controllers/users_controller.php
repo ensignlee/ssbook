@@ -3,21 +3,29 @@
 class UsersController extends AppController {
 
 	var $name = 'Users';
-	var $components = array('Auth', 'Session');
 
 	public function beforeFilter() {
 		$this->Auth->allow(array('create'));
+		$this->Auth->autoRedirect = false;
 	}
- 
-	/**
-	*  The AuthComponent provides the needed functionality
-	*  for login, so you can leave this function blank.
-	*/
+	
 	function login() {
+		if ($this->Auth->user()) {
+			if (!empty($this->data) && !empty($this->data['User'])) {
+				$user = $this->data['User'];
+				if (!empty($user['remember'])) {
+					$this->RememberMe->remember($user['username'], $user['password']);
+				}
+			}
+
+			// Will redirect back to the same page once, to clear the post data, if started here
+			$this->redirect($this->Auth->redirect());
+		}
 	}
 
 	function logout() {
 		$this->Auth->logout();
+		$this->RememberMe->delete();
 		$this->redirect('/');
 	}
 

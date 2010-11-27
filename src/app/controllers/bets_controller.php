@@ -3,8 +3,7 @@
 class BetsController extends AppController {
 	var $name = 'Bets';
 	var $uses = array('LeagueType', 'Odd', 'Score', 'SourceType', 'UserBet', 'Tag', 'UserBetsTag');
-	var $helpers = array('Html','Ajax','Javascript');
-	var $components = array('Auth', 'Session', 'RequestHandler');
+	var $components = array('RequestHandler');
 
 	public function index() {
 	}

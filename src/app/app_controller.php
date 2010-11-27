@@ -1,10 +1,12 @@
 <?php
 class AppController extends Controller {
-	var $components = array('Auth');
-	var $helpers = array('Html', 'Javascript', 'Session', 'Form');
+	var $components = array('RememberMe', 'Auth', 'Session');
+	var $helpers = array('Html', 'Javascript', 'Form', 'Session');
 
 	public function beforeFilter() {
 		parent::beforeFilter();
+
+		$this->RememberMe->check();
 	}
 
 	public function beforeRender() {

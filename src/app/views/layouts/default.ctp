@@ -58,7 +58,9 @@ if (empty($user)) {
 	echo $form->create('User', array('action' => 'login'));
 	echo $form->input('username');
 	echo $form->input('password');
-	echo $form->end('Login');
+	echo "Remember: ".$form->checkbox('remember', array('checked' => true));
+	echo $form->submit('Login', array('div' => false));
+	echo $form->end();
 } else {
 	echo $user['username'].' '.$html->link('logout', '/users/logout');
 }
