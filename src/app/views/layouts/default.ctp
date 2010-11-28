@@ -46,7 +46,7 @@ SS.Cake = {
 <?php } else { ?>
 				<li><?= $html->link('Enter Bets', '/bets') ?></li>
 				<li><?= $html->link('View Bets', '/bets/view') ?></li>
-				<li class="far-right"><?= $html->link('Logout', '/users/logout') ?></li>
+				<li class="far-right"><?= $html->link("Logout ({$user['username']})", '/users/logout') ?></li>
 <?php } ?>				
 			</ul>
 			</div>
@@ -63,7 +63,7 @@ if (empty($user)) {
 	echo $form->submit('Login', array('div' => false));
 	echo $form->end();
 } else {
-	echo $user['username'];
+	echo rand(0,1) ? 'Cameron is cool' : 'Edmund is cool';
 }
 ?>
 </div>
