@@ -1,5 +1,6 @@
 (function($) {
 
+// On window load
 $(function() {
 	function convertLabel(str) {
 		return str.toLowerCase().replace(/[^a-z]+/g, '_');
@@ -18,15 +19,27 @@ $(function() {
 		$('.show_'+text).css('display', 'table');
 	});
 
-	$(function() {
-		// On click, set all checkboxes to whether or not this one is checked
-		$('.check-all-parent').click(function() {
-			$('.check-all').attr('checked', !!$(this).attr('checked'));
-		});
-		$('.check-all').click(function() {
-			$('.check-all-parent').attr('checked', false);
-		});
-	})
+	// On click, set all checkboxes to whether or not this one is checked
+	$('.check-all-parent').click(function() {
+		$('.check-all').attr('checked', !!$(this).attr('checked'));
+	});
+	$('.check-all').click(function() {
+		$('.check-all-parent').attr('checked', false);
+	});
+
+	// Lookup the shortlink and fix event to click
+	$('.shortlink').click(function() {
+		var jel = $(this);
+		var thisurl = decodeURIComponent(jel.data('url'));
+		$.getJSON(
+			SS.Cake.base + '/bets/shortlink',
+			{shorturl: thisurl},
+			function(data) {
+				jel.parent('div').html('<span>'+data['shorturl']+'</span>');
+			}
+		);
+		return false;
+	});
 });
 
 })(jQuery);

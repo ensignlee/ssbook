@@ -43,10 +43,17 @@ $(function () {
 		echo "<input type='hidden' name='$key' value=\"".htmlentities(implode(',', $labels))."\" />";
 	} ?>
 	<input type="hidden" name="sort" value="<?= "$sortKey,$sortDir" ?>" />
+	       <?php
+	       if ($isPublic) {
+		       echo '<input type="hidden" name="share" value="'.$share.'" />';
+	       }
+	       ?>
 </form>
 <?= $session->flash() ?>
 <div id="graph">Graph of Data</div>
-<div id="record"><div class='header-table'><h2><div>Record</div></h2>
+<div id="record">
+	<h1 style="text-align: center"><?= $viewingUser['User']['username'] ?></h1><br />
+<div class='header-table'><h2><div>Record</div></h2>
 	<table class="spaced-table cell-centered">
 		<tr>
 			<th>Record</th>
@@ -161,17 +168,27 @@ $(function () {
 	echo "</div>";
 ?>
 </div>
+<?php
+$urlParams = $this->params['url'];
+unset($urlParams['url']);
+$urlParams['share'] = $share;
+$fullurl = $html->url('/' . $this->params['url']['url'], true). '?'. http_build_query($urlParams);
+?>
+<?php if (!$isPublic): ?><div id="shareLink" class="clear"><a href="#" class="shortlink" data-url="<?= h($fullurl) ?>">Click to get link to share page</a></div><?php endif;// (!$isPublic): ?>
 <div id="betTable" class="clear">
+	<?php if (!$isPublic): ?>
 	<form method='post' action='<?= $html->url('/bets/modify') ?>'>
 	<label for='tagvalue'>Tag: </label>
 	<input type='text' name='tagvalue' id='tagvalue' />
 	<input type='submit' name="Tag" value='Tag'  />
 	<input type="submit" name="Delete" value="Delete Bets" />
-	<?= $html->link('Reset', '/bets/view') ?>
+	<?php endif;// (!$isPublic): ?>
+
+	<?= $html->link('Reset Filters', '/bets/view') ?>
 
 	<table>
 	<tr>
-		<th><input type="checkbox" class="check-all-parent" name="dummy" /></th>
+		<?php if (!$isPublic): ?><th><input type="checkbox" class="check-all-parent" name="dummy" /></th><?php endif;// (!$isPublic): ?>
 		<th>&nbsp;</th>
 		<th>Date <span class="clickable extra-click" id="filter_game_date"><img alt="\/" src="<?= $html->url('/img/icons/green_arrow_down.gif') ?>" /></span></th>
 		<th>League <span class="clickable extra-click" id="filter_league"><img alt="\/" src="<?= $html->url('/img/icons/green_arrow_down.gif') ?>" /></span></th>
@@ -192,16 +209,16 @@ $(function () {
 	$i = 0;
 	foreach ($bets as $bet) {
 		$i++;
-		dispBet($html, $i, $bet);
+		dispBet($html, $i, $bet, $isPublic);
 		if (!empty($bet['parlays'])) {
 			foreach ($bet['parlays'] as $parlay) {
-				dispBet($html, null, $parlay);
+				dispBet($html, null, $parlay, $isPublic);
 			}
 		}
 	}
 	?>
 	</table>
-	</form>
+	<?php if (!$isPublic): ?></form><?php endif;// (!$isPublic): ?>
 </div>
 <?php
 function parlayNull($winning) {
@@ -213,10 +230,10 @@ function parlayNull($winning) {
 	}
 	return $winning >= 0 ? 'W' : 'L';
 }
-function dispBet($html, $i, $bet) {
+function dispBet($html, $i, $bet, $isPublic) {
 ?>
 	<tr>
-		<td><?= empty($i) ? '' : "<input class='check-all' type='checkbox' name='tag[{$bet['betid']}]' />" ?></td>
+		<?php if (!$isPublic): ?><td><?= empty($i) ? '' : "<input class='check-all' type='checkbox' name='tag[{$bet['betid']}]' />" ?></td><?php endif;// (!$isPublic): ?>
 		<td><?= $i ?></td>
 		<td class="date"><?= date("n/j/y", strtotime($bet['date'])) ?></td>
 		<td><?= $bet['league'] ?></td>

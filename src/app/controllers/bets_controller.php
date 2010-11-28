@@ -2,8 +2,13 @@
 
 class BetsController extends AppController {
 	var $name = 'Bets';
-	var $uses = array('LeagueType', 'Odd', 'Score', 'SourceType', 'UserBet', 'Tag', 'UserBetsTag');
+	var $uses = array('LeagueType', 'Odd', 'Score', 'SourceType', 'UserBet', 'Tag', 'UserBetsTag', 'User');
 	var $components = array('RequestHandler');
+
+	public function beforeFilter() {
+		$this->Auth->allow('view');
+		parent::beforeFilter();
+	}
 
 	public function index() {
 	}
@@ -46,6 +51,21 @@ class BetsController extends AppController {
 			$this->Session->setFlash("Deleted $success bet(s)");
 		} else {
 			$this->Session->setFlash("No bets removed");
+		}
+	}
+
+	public function shortlink() {
+		$url = $this->urlGetVar('shorturl', false);
+		$this->set('url', $url);
+		if (!empty($url)) {
+			App::import('vendor', 'google_short_link');
+			$GoogleShortLink = new GoogleShortLink(
+				'api',
+				Configure::read('google.shortlink.hostname'),
+				Configure::read('google.shortlink.secret')
+			);
+			$shorturl = $GoogleShortLink->createHashedShortLink($url);
+			$this->set('shorturl', $shorturl);
 		}
 	}
 
@@ -755,6 +775,23 @@ class BetsController extends AppController {
 		return $ret;
 	}
 
+	private function getPublicUserId() {
+		$share = $this->urlGetVar('share', null);
+		if (empty($share)) {
+			return null;
+		}
+		$str = Security::cipher(base64_decode($share), 'publicid');
+		if (strpos($str, 'p=') === 0) {
+			list($p, $id) = explode('=', $str);
+			return $id;
+		}
+		return null;
+	}
+
+	private function getShare($id) {
+		return base64_encode(Security::cipher("p=$id", 'publicid'));
+	}
+
 	public function view() {
 		
 		$cond = array(
@@ -785,7 +822,17 @@ class BetsController extends AppController {
 		$this->set('sortKey', $this->sortKey);
 		$this->set('sortDir', $this->sortDir);
 
-		$userid = $this->Auth->user('id');
+		$publicuserid = $this->getPublicUserId();
+		$userid = empty($publicuserid) ? $this->Auth->user('id') : $publicuserid;
+		$viewingUser = $this->User->findById($userid);
+		$this->set('viewingUser', $viewingUser);
+
+		$this->set('isPublic', !empty($publicuserid));
+		$this->set('share', $this->getShare($userid));
+		if (empty($viewingUser)) {
+			$this->redirect('/');
+		}
+
 		// For filters we set them to the list of all bets
 		$bets = $this->UserBet->getAll($userid);
 		$bets = $this->reformatBets($bets);

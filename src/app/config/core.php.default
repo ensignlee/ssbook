@@ -298,3 +298,6 @@ Cache::config('default', array(
 	'engine' => 'File', 
 	'duration' => 3600
 ));
+
+Configure::write('google.shortlink.hostname', 'http://go.sharpbettracker.com');
+Configure::write('google.shortlink.secret', '');
