@@ -785,15 +785,20 @@ class BetsController extends AppController {
 		$this->set('sortKey', $this->sortKey);
 		$this->set('sortDir', $this->sortDir);
 
-		$bets = $this->UserBet->getAll($this->Auth->user('id'), null, $sqlcond);
+		$userid = $this->Auth->user('id');
+		// For filters we set them to the list of all bets
+		$bets = $this->UserBet->getAll($userid);
 		$bets = $this->reformatBets($bets);
-		$bets = $this->filterNonSql($bets, $cond, array('beton', 'league', 'tag', 'winning'));
-		usort($bets, array($this, '_sort_bets'));
-		
-		$filters = $this->setFilters($bets, 
+		$filters = $this->setFilters($bets,
 			array('home', 'visitor', 'type', 'league', 'beton', 'book', 'tag'),
 			array('risk', 'game_date', 'spread', 'odds', 'risk', 'winning'));
 		$this->set('filters', $filters);
+
+		// Display only sql, and nonsql matching bets
+		$bets = $this->UserBet->getAll($userid, null, $sqlcond);
+		$bets = $this->reformatBets($bets);
+		$bets = $this->filterNonSql($bets, $cond, array('beton', 'league', 'tag', 'winning'));
+		usort($bets, array($this, '_sort_bets'));
 
 		$record = $this->winLossTie($bets);
 		$this->set('record', $record);

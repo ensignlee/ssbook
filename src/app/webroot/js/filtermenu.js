@@ -55,14 +55,14 @@ $.extend(SS.FilterMenu.prototype, {
 		}
 		
 		if (filters['list'] !== undefined) {
-			var filtersSet = filtersSelected.length > 0;
+			var filtersSet = (typeof filtersSelected) != 'string';
 			var addobj = {
 				'All' : {
 					onclick: function(menuItem, menu) {
 						self.toggleAll(menuItem, menu);
 						return false;
 					},
-					className: 'all-filter-item item-checked'
+					className: filtersSet ? 'all-filter-item' : 'all-filter-item item-checked'
 				}
 			}
 			menu.push(addobj);
@@ -102,6 +102,10 @@ $.extend(SS.FilterMenu.prototype, {
 		cmenu.hide();
 	},
 
+	isAllChecked: function(cmenu) {
+		return $(cmenu.menu).find('.all-filter-item.item-checked').length > 0;
+	},
+
 	onHide: function(cmenu) {
 		var self = this;
 		if (!cmenu.menu) {
@@ -109,12 +113,14 @@ $.extend(SS.FilterMenu.prototype, {
 		}
 
 		var filters = [];
-		$.each(cmenu.menu.find('.item-checked'), function () {
-			var data = $(this).data('filter');
-			if (data) {
-				filters.push(data);
-			}
-		});
+		if (!this.isAllChecked(cmenu)) {
+			$.each(cmenu.menu.find('.item-checked'), function () {
+				var data = $(this).data('filter');
+				if (data) {
+					filters.push(data);
+				}
+			});
+		}
 		// Expected to be in this order by the backend. Alos need to put in blank
 		// with the comma in order for it to know if the first gte value is blank
 		$.each(['#gte'+this.name, '#lte'+this.name], function (key, val) {
