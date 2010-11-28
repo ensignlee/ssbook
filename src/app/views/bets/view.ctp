@@ -16,10 +16,12 @@ $(function () {
 			color: 'rgb(62,118,182)',
 			data: dollarsWon
 		}],{
+			legend: {position: "nw"},
 			xaxis: { mode: "time"},
 			yaxis: { tickFormatter: function(val) {
 				return formatCurrency(val);
-		}}
+			}			
+		}
 	});
 
 	<?php foreach (array_keys($filters) as $key) : ?>
