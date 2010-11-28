@@ -663,7 +663,7 @@ class BetsController extends AppController {
 		$fields = array(
 		    'betid' => $userBet['id'],
 		    'scoreid' => $score['id'],
-		    'date' => date('Y-m-d', max($userBetGameDate, $scoreGameDate, $parlayBetGameDate)),
+		    'date' => date('Y-m-d H:i:s', max($userBetGameDate, $scoreGameDate, $parlayBetGameDate)),
 		    'league' => $this->getLeague($userBet, $score['league']),
 		    'beton' => $this->getBetOn($userBet, $score),
 		    'type' => $userBet['type'],
@@ -929,12 +929,30 @@ class BetsController extends AppController {
 		return $ret;
 	}
 
-	private function _sort_bets($left, $right) {
-		$left = $left[$this->sortKey];
-		$right = $right[$this->sortKey];
+	private function _sort_bets_null($oleft, $oright, $asc) {
+		if (is_null($oleft) ^ is_null($oright)) {
+			return is_null($oleft) ? -1 : 1; // null is considered larger that not null
+		}
+		return 0;
+	}
+
+	private function _sort_bets($oleft, $oright) {
+		$left = $oleft[$this->sortKey];
+		$right = $oright[$this->sortKey];
 		$asc = $this->sortDir == 'asc';
 		if ($left == $right) {
-			return 0;
+			$null = $this->_sort_bets_null($oleft['winning'], $oright['winning'], $asc);
+			if ($null == 0) {
+				$str = strcmp($oleft['league'], $oright['league']);
+				if ($str == 0) {
+					$str = strcmp($oleft['beton'], $oright['beton']);
+					return $asc ? $str : -1 * $str;
+				} else {
+					return $asc ? $str : -1 * $str;
+				}
+			} else {
+				return $asc ? $str : -1 * $null;
+			}
 		}
 		if ($left > $right) {
 			return $asc ? 1 : -1;
