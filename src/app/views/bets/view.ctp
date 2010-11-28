@@ -184,7 +184,7 @@ $fullurl = $html->url('/' . $this->params['url']['url'], true). '?'. http_build_
 	<input type="submit" name="Delete" value="Delete Bets" />
 	<?php endif;// (!$isPublic): ?>
 
-	<?= $html->link('Reset Filters', '/bets/view') ?>
+	<a name="Bets"><?= $html->link('Reset Filters', '/bets/view') ?></a>
 
 	<table>
 	<tr>
@@ -231,8 +231,12 @@ function parlayNull($winning) {
 	return $winning >= 0 ? 'W' : 'L';
 }
 function dispBet($html, $i, $bet, $isPublic, &$betTypes) {
+	$colorStyle = '';
+	if (time() - strtotime($bet['created']) < 30) {
+		$colorStyle = 'style="background-color: #FFF7D7"';
+	}
 ?>
-	<tr>
+	<tr <?=$colorStyle?>>
 		<?php if (!$isPublic): ?><td><?= empty($i) ? '' : "<input class='check-all' type='checkbox' name='tag[{$bet['betid']}]' />" ?></td><?php endif;// (!$isPublic): ?>
 		<td><?= $i ?></td>
 		<td class="date"><?= date("n/j/y", strtotime($bet['date'])) ?></td>

@@ -60,6 +60,8 @@ class UserBet extends AppModel {
 			'parlayid' => isset($bet['parlayid']) ? $bet['parlayid'] : null,
 			'pt' => isset($bet['pt']) ? $bet['pt'] : null
 		);
+		$tagname = empty($bet['tag']) ? '' : $bet['tag'];
+
 		if (!empty($bet['book'])) {
 			$save['sourceid'] = $this->getSaveSource($bet['book']);
 			$bet['sourceid'] = $save['sourceid'];
@@ -67,6 +69,9 @@ class UserBet extends AppModel {
 		$success = $this->save($save);
 		if ($success) {
 			$bet['id'] = $this->id;
+			if (!empty($tagname)) {
+				$this->Tag->saveBetsWithTag($tagname, array($bet['id']));
+			}
 		}
 		return $success;
 	}	

@@ -80,18 +80,10 @@ class BetsController extends AppController {
 		if (strtolower($tagname) == 'none') {
 			$this->Session->setFlash("Unable to give tag name of None");
 		}
-		
-		$tag = $this->Tag->findByName($tagname);
-		if (empty($tag)) {
-			$this->Tag->save(array('name' => $tagname));
-			$tag = $this->Tag->findByName($tagname);
+				
+		if ($this->Tag->saveBetsWithTag($tagname, $ids)) {
+			$this->Session->setFlash("Saved $tagname");
 		}
-		$userbetids = array();
-		foreach ($ids as $id) {
-			$this->UserBetsTag->create();
-			$this->UserBetsTag->save(array('user_bets_id' => $id, 'tag_id' => $tag['Tag']['id']));
-		}
-		$this->Session->setFlash("Saved $tagname");		
 	}
 
 	public function delete($id = null) {
@@ -203,7 +195,8 @@ class BetsController extends AppController {
 				'scoreid' => str_replace('SS', '', $dbkey),
 				'book' => $form['book'][$iden],
 				'date_std' => isset($form['date_std'][$iden]) ? $form['date_std'][$iden] : null,
-				'parlay' => $this->parseParlay($form['parlay'][$iden])
+				'parlay' => $this->parseParlay($form['parlay'][$iden]),
+				'tag' => $form['tag'][$iden]
 			);
 			if ($bet['type'] == 'parlay' || $bet['type'] == 'teaser') {
 				$date_std = 0;
@@ -235,7 +228,7 @@ class BetsController extends AppController {
 		// Flash redirect
 		App::import('Helper', 'Html');
 		$html = new HtmlHelper();
-		$link = $html->link('View your bets', '/bets/view');
+		$link = $html->link('View your bets', '/bets/view#Bets');
 		$this->Session->setFlash("Bet(s) entered successfully. $link");
 		$this->redirect('/bets/');
 	}
@@ -246,7 +239,7 @@ class BetsController extends AppController {
 		
 		foreach ($bets as $bet) {
 			if ($this->UserBet->persist($userid, $bet)) {
-				$saved[] = $bet;
+				$saved[] = $bet;				
 			} else {
 				$notSaved[] = $bet;
 			}
@@ -698,7 +691,8 @@ class BetsController extends AppController {
 		    'book' => $userBet['source'],
 		    'direction' => $userBet['direction'],
 		    'tag' => implode(',', $tags),
-		    'parlays' => $parlays
+		    'parlays' => $parlays,
+		    'created' => $userBet['created']
 		);
 		return $fields;
 	}
