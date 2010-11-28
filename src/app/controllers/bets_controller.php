@@ -775,7 +775,7 @@ class BetsController extends AppController {
 		$this->set('cond', $cond);
 		$this->set('condAsMap', $this->getCondAsMap($cond));
 
-		$sort = $this->urlGetVar('sort', 'date,desc');
+		$sort = $this->urlGetVar('sort', 'default,desc');
 		if (strpos($sort, ',') !== false) {
 			list($this->sortKey, $this->sortDir) = explode(',', $sort);
 		} else {
@@ -929,36 +929,40 @@ class BetsController extends AppController {
 		return $ret;
 	}
 
-	private function _sort_bets_null($oleft, $oright, $asc) {
+	private function _sort_bets_null($oleft, $oright) {
 		if (is_null($oleft) ^ is_null($oright)) {
-			return is_null($oleft) ? -1 : 1; // null is considered larger that not null
+			return is_null($oleft) ? 1 : -1; // null is considered larger that not null
 		}
 		return 0;
 	}
 
-	private function _sort_bets($oleft, $oright) {
-		$left = $oleft[$this->sortKey];
-		$right = $oright[$this->sortKey];
-		$asc = $this->sortDir == 'asc';
+	private function _cmp_bets($left, $right, $asc) {
 		if ($left == $right) {
-			$null = $this->_sort_bets_null($oleft['winning'], $oright['winning'], $asc);
-			if ($null == 0) {
-				$str = strcmp($oleft['league'], $oright['league']);
-				if ($str == 0) {
-					$str = strcmp($oleft['beton'], $oright['beton']);
-					return $asc ? $str : -1 * $str;
-				} else {
-					return $asc ? $str : -1 * $str;
-				}
-			} else {
-				return $asc ? $str : -1 * $null;
-			}
+			return 0;
 		}
 		if ($left > $right) {
 			return $asc ? 1 : -1;
 		} else {
 			return $asc ? -1 : 1;
 		}
+	}
+
+	private function _sort_bets($oleft, $oright) {
+		
+		// Default sort is 1. Winning Null 2. Datetime
+		$default = $this->sortKey == 'default';
+		$sortKey = $default ? 'date' : $this->sortKey;
+
+		$left = $oleft[$sortKey];
+		$right = $oright[$sortKey];
+		$asc = $this->sortDir == 'asc';
+		if ($default) {
+			$null = $this->_sort_bets_null($oleft['winning'], $oright['winning']);
+			if ($null != 0) {
+				return $asc ? $null : -1 * $null;
+			}
+		}
+		return $this->_cmp_bets($left, $right, $asc);
 	}
 }
 
