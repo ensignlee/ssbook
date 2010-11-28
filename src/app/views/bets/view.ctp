@@ -155,8 +155,8 @@ $(function () {
 					$type = strtolower($type);
 					$record = empty($analysisStats[$half.$type][$dir.$favorite]) ? array() : $analysisStats[$half.$type][$dir.$favorite]; 
 					if (!empty($record)) {
-						$disptype = $half.$type;
-						$dirfav = $dir.$favorite;
+						$disptype = $betTypes[$half.$type];
+						$dirfav = Inflector::humanize($dir.$favorite);
 						echo "<tr><td>$disptype $dirfav</td><td>{$record['win']} - {$record['loss']} - {$record['tie']}</td>";
 						echo "<td class='number'>$".number_format($record['dollarsWon'], 2)."</td></tr>\n";	
 					}
@@ -209,10 +209,10 @@ $fullurl = $html->url('/' . $this->params['url']['url'], true). '?'. http_build_
 	$i = 0;
 	foreach ($bets as $bet) {
 		$i++;
-		dispBet($html, $i, $bet, $isPublic);
+		dispBet($html, $i, $bet, $isPublic, $betTypes);
 		if (!empty($bet['parlays'])) {
 			foreach ($bet['parlays'] as $parlay) {
-				dispBet($html, null, $parlay, $isPublic);
+				dispBet($html, null, $parlay, $isPublic, $betTypes);
 			}
 		}
 	}
@@ -230,7 +230,7 @@ function parlayNull($winning) {
 	}
 	return $winning >= 0 ? 'W' : 'L';
 }
-function dispBet($html, $i, $bet, $isPublic) {
+function dispBet($html, $i, $bet, $isPublic, &$betTypes) {
 ?>
 	<tr>
 		<?php if (!$isPublic): ?><td><?= empty($i) ? '' : "<input class='check-all' type='checkbox' name='tag[{$bet['betid']}]' />" ?></td><?php endif;// (!$isPublic): ?>
@@ -238,7 +238,7 @@ function dispBet($html, $i, $bet, $isPublic) {
 		<td class="date"><?= date("n/j/y", strtotime($bet['date'])) ?></td>
 		<td><?= $bet['league'] ?></td>
 		<td><?= $bet['beton'] ?></td>
-		<td><?= $bet['type'] ?></td>
+		<td><?= $betTypes[$bet['type']] ?></td>
 		<td class="number"><?= $bet['line'] ?></td>
 		<td><?= $bet['visitor'] ?></td>
 		<td><?= $bet['home'] ?></td>

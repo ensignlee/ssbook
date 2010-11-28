@@ -20,17 +20,17 @@ class UserBet extends AppModel {
 
 	public function possibleTypes() {
 		return array(
-		    'moneyline',
-		    'half_moneyline',
-		    'second_moneyline',
-		    'spread',
-		    'half_spread',
-		    'second_spread',
-		    'total',
-		    'half_total',
-		    'second_total',
-		    'parlay',
-		    'teaser'
+		    'moneyline' => 'Moneyline',
+		    'half_moneyline' => '1st Half Moneyline',
+		    'second_moneyline' => '2nd Half Moneyline',
+		    'spread' => 'Spread',
+		    'half_spread' => '1st Half Spread',
+		    'second_spread' => '2nd Half Spread',
+		    'total' => 'Total',
+		    'half_total' => '1st Half Total',
+		    'second_total' => '2nd Half Total',
+		    'parlay' => 'Parlay',
+		    'teaser' => 'Teaser'
 		);
 	}
 

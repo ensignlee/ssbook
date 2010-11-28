@@ -72,10 +72,10 @@ $.extend(SS.FilterMenu.prototype, {
 					onclick: function(menuItem, menu) {
 						return self.putCheckMark(menuItem, val, menu);
 					},
-					data: {'filter':val},
+					data: {'filter':key},
 					className: 'filter-item'
 				};
-				if (!filtersSet || filtersSelected[val]) {
+				if (!filtersSet || filtersSelected[key]) {
 					obj[val]['className'] = 'filter-item item-checked';
 				}
 				menu.push(obj);
@@ -164,7 +164,7 @@ $.extend(SS.FilterMenu.prototype, {
 
 	putCheckMark: function (menuItem, filter, cmenu) {
 		$(cmenu.menu).find('.all-filter-item').removeClass('item-checked');
-		$(menuItem).toggleClass('item-checked').data('filter', filter);
+		$(menuItem).toggleClass('item-checked');
 		return false;
 	}
 });

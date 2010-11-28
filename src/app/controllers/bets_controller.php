@@ -564,13 +564,11 @@ class BetsController extends AppController {
 	}
 
 	private function getBetTypes() {
-		return array_combine(
-			$this->UserBet->possibleTypes(),
-			array_map(array('Inflector', 'humanize'), $this->UserBet->possibleTypes())
-		);
+		return $this->UserBet->possibleTypes();
 	}
 
 	private function setFilters(&$bets, $distinct, $range) {
+		$betTypes = $this->getBetTypes();
 		$distincts = array();
 		foreach ($bets as $bet) {
 			foreach ($distinct as $key) {
@@ -580,10 +578,14 @@ class BetsController extends AppController {
 				if (!empty($bet[$key])) {
 					if ($key == 'tag') {
 						foreach (explode(',', $bet[$key]) as $v) {
-							$distincts[$key][trim($v)] = true;
+							$distincts[$key][trim($v)] = $v;
 						}
 					} else {
-						$distincts[$key][$bet[$key]] = true;
+						$v = $bet[$key];
+						if ($key == 'type') {
+							$v = $betTypes[$v];
+						}
+						$distincts[$key][$bet[$key]] = $v;
 					}
 				}
 			}
@@ -593,11 +595,11 @@ class BetsController extends AppController {
 		foreach ($distinct as $key) {
 			if (isset($distincts[$key])) {
 				if (in_array($key, array('book', 'tag'))) {
-					$distincts[$key]['None'] = true;
+					$distincts[$key]['none'] = 'None';
 				}
-				$keys = array_keys($distincts[$key]);
-				sort($keys);
-				$ret[$key] = array('list' => $keys);
+				$list = $distincts[$key];
+				ksort($list);
+				$ret[$key] = array('list' => $list);
 			}
 		}
 		foreach ($range as $key) {
@@ -645,7 +647,7 @@ class BetsController extends AppController {
 		case 'total':
 		case 'half_total':
 		case 'second_total':
-			return $userBet['direction'];
+			return Inflector::humanize($userBet['direction']);
 		case 'parlay':		
 			return count($userBet['Parlay']).' Team Parlay';
 		case 'teaser':
@@ -857,6 +859,8 @@ class BetsController extends AppController {
 		$this->set('analysisStats', $analysisStats);
 		$this->set('graphData', $this->graphData($bets));
 
+		$this->set('betTypes', $this->getBetTypes());
+
 		$this->set('bets', $bets);
 	}
 
@@ -1047,7 +1051,7 @@ class CalcIn implements CalcStat {
 		$this->args = func_get_args();
 	}
 	public function getDef() {
-		return $this->args[0];
+		return Inflector::humanize($this->args[0]);
 	}
 	public function matches($val) {
 		return in_array($val, $this->args);
