@@ -492,7 +492,7 @@ class BetsController extends AppController {
 						$fixedCond[$key] = $vals;
 					}
 					break;
-				case 'game_date':
+				case 'date':
 					$vals = explode(',', $val);
 					$sqlkey = 'UserBet.game_date';
 					if (!empty($vals) && count($vals) == 2) {
@@ -799,7 +799,7 @@ class BetsController extends AppController {
 		    'book' => $this->urlGetVar('book'),
 		    'tag' => $this->urlGetVar('tag'),
 		    'risk' => $this->urlGetVar('risk'),
-		    'game_date' => $this->urlGetVar('game_date'),
+		    'date' => $this->urlGetVar('date'),
 		    'odds' => $this->urlGetVar('odds'),
 		    'spread' => $this->urlGetVar('spread'),
 		    'winning' => $this->urlGetVar('winning')
@@ -834,7 +834,7 @@ class BetsController extends AppController {
 		$bets = $this->reformatBets($bets);
 		$filters = $this->setFilters($bets,
 			array('home', 'visitor', 'type', 'league', 'beton', 'book', 'tag'),
-			array('risk', 'game_date', 'spread', 'odds', 'risk', 'winning'));
+			array('risk', 'date', 'spread', 'odds', 'risk', 'winning'));
 		$this->set('filters', $filters);
 
 		// Display only sql, and nonsql matching bets

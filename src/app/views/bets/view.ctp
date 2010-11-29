@@ -190,7 +190,7 @@ $fullurl = $html->url('/' . $this->params['url']['url'], true). '?'. http_build_
 	<tr>
 		<?php if (!$isPublic): ?><th><input type="checkbox" class="check-all-parent" name="dummy" /></th><?php endif;// (!$isPublic): ?>
 		<th>&nbsp;</th>
-		<th>Date <span class="clickable extra-click" id="filter_game_date"><img alt="\/" src="<?= $html->url('/img/icons/green_arrow_down.gif') ?>" /></span></th>
+		<th>Date <span class="clickable extra-click" id="filter_date"><img alt="\/" src="<?= $html->url('/img/icons/green_arrow_down.gif') ?>" /></span></th>
 		<th>League <span class="clickable extra-click" id="filter_league"><img alt="\/" src="<?= $html->url('/img/icons/green_arrow_down.gif') ?>" /></span></th>
 		<th>Bet On <span class="clickable extra-click" id="filter_beton"><img alt="\/" src="<?= $html->url('/img/icons/green_arrow_down.gif') ?>" /></span></th>
 		<th>Bet Type <span class="clickable extra-click" id="filter_type"><img alt="\/" src="<?= $html->url('/img/icons/green_arrow_down.gif') ?>" /></span></th>
