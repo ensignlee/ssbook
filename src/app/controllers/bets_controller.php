@@ -815,6 +815,7 @@ class BetsController extends AppController {
 			$this->sortKey = $sort;
 			$this->sortDir = 'desc';
 		}
+		$this->sortKey = in_array($this->sortKey, array_keys($cond)) ? $this->sortKey : 'default';
 		$this->set('sortKey', $this->sortKey);
 		$this->set('sortDir', $this->sortDir);
 
