@@ -326,7 +326,7 @@ class BetsController extends AppController {
 				$record['dollarsWon'] += $winning;
 			}
 		}
-		$record['winningPercentage'] = safe_div($record['win'], ($record['win']+$record['loss']+$record['tie']));
+		$record['winningPercentage'] = safe_div($record['win'], ($record['win']+$record['loss']));
 		return $record;
 	}
 
