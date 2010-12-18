@@ -65,7 +65,6 @@ if (empty($user)) {
 	echo $form->submit('Login', array('div' => false));
 	echo $form->end();
 } else {
-	echo "<h4>Did you know?</h4>";
 	echo $randomTip->get($this->name, $this->action);
 }
 ?>
