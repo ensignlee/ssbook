@@ -6,7 +6,7 @@ class RandomTipHelper extends AppHelper {
 		if (empty($Tips)) {
 			return "";
 		} else {
-			return "<h4>Did you know</h4>".$Tips->getTip();
+			return "<h4>Did you know?</h4>".$Tips->getTip();
 		}
 	}
 	private function getObject($name, $action) {
