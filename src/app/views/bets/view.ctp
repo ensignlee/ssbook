@@ -2,7 +2,7 @@
 $html->css('viewbets', 'stylesheet', array('inline' => false));
 $html->css('jquery.contextmenu', 'stylesheet', array('inline' => false));
 
-echo $javascript->link('jquery.flot.min');
+echo $javascript->link('jquery.flot');
 echo $javascript->link('jquery.contextmenu');
 echo $javascript->link('filtermenu');
 echo $javascript->link('generic');
@@ -12,15 +12,15 @@ echo $javascript->link('viewbets');
 $(function () {
 	var dollarsWon = <?= json_encode($graphData[0]) ?>;
 	$.plot($("#graph"), [{
-			label: "Dollars Won",
-			color: 'rgb(62,118,182)',
-			data: dollarsWon
+			"label": "Dollars Won",
+			"color": 'rgb(62,118,182)',
+			"data": dollarsWon
 		}],{
-			legend: {position: "nw"},
-			xaxis: { mode: "time"},
-			yaxis: { tickFormatter: function(val) {
+			"legend": {position: "nw"},
+			"xaxis": { mode: "time"},
+			"yaxis": { tickFormatter: function(val) {
 				return formatCurrency(val);
-			}			
+			}
 		}
 	});
 

@@ -11,12 +11,14 @@
 
 		echo $this->Html->css('reset');
 		echo $this->Html->css('generic');
-
+		
 		echo $this->Javascript->link('http://ajax.googleapis.com/ajax/libs/jquery/1.4.3/jquery.min.js');
 		echo $this->Javascript->link('http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.2/jquery-ui.min.js');
 		echo $this->Javascript->link('date');
+		echo $this->Javascript->link('sharpbettracker');
 ?>
 <!--[if IE]>
+<?= $this->Javascript->link('excanvas.min'); ?>
 <?= $this->Html->css('ie_all') ?>
 <![endif]-->
 <script type='text/javascript'>
