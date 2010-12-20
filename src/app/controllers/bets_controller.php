@@ -2,7 +2,17 @@
 
 class BetsController extends AppController {
 	var $name = 'Bets';
-	var $uses = array('LeagueType', 'Odd', 'Score', 'SourceType', 'UserBet', 'Tag', 'UserBetsTag', 'User');
+	var $uses = array(
+	    'LeagueType',
+	    'Odd',
+	    'Score',
+	    'SourceType',
+	    'UserBet',
+	    'Tag',
+	    'UserBetsTag',
+	    'User',
+	    'SourceSportName'
+	);
 	var $components = array('RequestHandler');
 
 	public function beforeFilter() {
@@ -141,13 +151,13 @@ class BetsController extends AppController {
 		// v or @
 		if (strpos($text, ' v ') !== false) {
 			$teams = explode('v', $text);
-			$options['home'] = trim($teams[0]);
-			$options['visitor'] = trim($teams[1]);
+			$options['home'] = $this->SourceSportName->lookup($teams[0]);
+			$options['visitor'] = $this->SourceSportName->lookup($teams[1]);
 			$text = '';
 		} else if (strpos($text, ' @ ') !== false) {
 			$teams = explode('@', $text);
-			$options['home'] = trim($teams[1]);
-			$options['visitor'] = trim($teams[0]);
+			$options['home'] = $this->SourceSportName->lookup($teams[1]);
+			$options['visitor'] = $this->SourceSportName->lookup($teams[0]);
 			$text = '';
 		}
 		
@@ -156,7 +166,7 @@ class BetsController extends AppController {
 			if (($rawt = strtotime($text)) > strtotime('2010-01-01')) {
 				$options['game_date'] = date('Y-m-d', $rawt);
 			} else {
-				$options['name'] = $text;
+				$options['name'] = $this->SourceSportName->lookup($text);
 			}
 		}		
 			

@@ -49,13 +49,25 @@ class Score extends AppModel {
 				}
 				break;
 			case 'name':
-				$conds['or'] = array('home LIKE' => "%$option%", 'visitor LIKE' => "%$option%");
+				if (!is_array($option)) {
+					$conds['or'] = array('home LIKE' => "%$option%", 'visitor LIKE' => "%$option%");
+				} else {
+					$conds['or'] = array('home' => $option, 'visitor' => $option);
+				}
 				break;
 			case 'home':
-				$conds['home LIKE'] = "%$option%";
+				if (!is_array($option)) {
+					$conds['home LIKE'] = "%$option%";
+				} else {
+					$conds['home'] = $option;
+				}
 				break;
 			case 'visitor':
-				$conds['visitor LIKE'] = "%$option%";
+				if (!is_array($option)) {
+					$conds['visitor LIKE'] = "%$option%";
+				} else {
+					$conds['visitor'] = $option;
+				}
 				break;
 			case 'league':
 				$conds['league'] = $option;
