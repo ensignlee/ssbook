@@ -106,6 +106,7 @@ class Espn extends Espn_Log {
 	public function saveType() {
 		$success = 0;
 		if (!empty($this->scores)) {
+			$this->log('Found '.count($this->scores).' to save.');
 			foreach ($this->scores as $score) {
 
 				if (isset($score['game_date'])) {
@@ -140,7 +141,7 @@ class Espn extends Espn_Log {
 				
 				if ($this->shell->Score->save($score)) {
 					$success++;
-					$this->log("Saving {$score['visitor']} @ {$score['home']}");
+					$this->log("Saving {$score['visitor']} @ {$score['home']} {$this->shell->Score->id}");
 				} else {
 					$this->log('Unable to save game'.json_encode(array($score, $this->shell->Score->validationErrors)), 'error');
 				}
