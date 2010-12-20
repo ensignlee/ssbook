@@ -63,7 +63,7 @@ class Score extends AppModel {
 			default:
 				throw new Exception("$option is not supported");
 			}
-		}		
+		}
 
 		$resAfter = $this->find('all', array('conditions' => $conds, 'order' => 'game_date ASC'));
 		$out = array();

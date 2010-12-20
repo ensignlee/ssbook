@@ -117,9 +117,28 @@ class BetsController extends AppController {
 			    date('Y-m-d 23:59:59', strtotime($params['enddate']))
 			);
 		}
+		
+		// Date?
 		if (!isset($options['game_date'])) {
 			$options['close_date'] = $date;
 		}
+
+		$textLen = strlen($text);
+		// League
+		$leagues = $this->LeagueType->getList();
+		preg_match_all(strtolower('(\b'.implode('\b|\b', $leagues).'\b)'), $text, $matches);
+		$lid = array();
+		if (!empty($matches)) {
+			foreach ($matches[0] as $match) {
+				$lid[] = $this->LeagueType->contains($match);
+				$text = preg_replace("|\b$match\b|", '', $text);
+			}
+			if (!empty($lid)) {
+				$options['league'] = $lid;
+			}
+		}
+
+		// v or @
 		if (strpos($text, ' v ') !== false) {
 			$teams = explode('v', $text);
 			$options['home'] = trim($teams[0]);
@@ -130,10 +149,8 @@ class BetsController extends AppController {
 			$options['home'] = trim($teams[1]);
 			$options['visitor'] = trim($teams[0]);
 			$text = '';
-		} else if (($lid = $this->LeagueType->contains($text)) !== false) {
-			$options['league'] = $lid;
-			$text = '';
 		}
+		
 		$text = trim($text);
 		if (!empty($text)) {
 			if (($rawt = strtotime($text)) > strtotime('2010-01-01')) {
