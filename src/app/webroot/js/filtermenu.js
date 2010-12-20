@@ -87,7 +87,8 @@ $.extend(SS.FilterMenu.prototype, {
 				self.applyFilter(menu);
 			}
 		});
-		$(self.selector).contextMenu(menu, {
+		
+		this.getSelector(true).contextMenu(menu, {
 			theme: 'vista',
 			hideCallback: function() {
 				self.onHide(this);
@@ -96,6 +97,16 @@ $.extend(SS.FilterMenu.prototype, {
 			constrainToScreen: false
 		});
 		this.formSerial = $(this.hiddenForm).serialize();
+	},
+	
+	getSelector: function(force) {
+		if (force) {
+			var p = $(this.selector).parent('.clickable');
+			if (p.length) {
+				return p;
+			}
+		}
+		return $(this.selector);
 	},
 
 	applyFilter: function(cmenu) {

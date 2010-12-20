@@ -190,18 +190,18 @@ $fullurl = $html->url('/' . $this->params['url']['url'], true). '?'. http_build_
 	<tr>
 		<?php if (!$isPublic): ?><th><input type="checkbox" class="check-all-parent" name="dummy" /></th><?php endif;// (!$isPublic): ?>
 		<th>&nbsp;</th>
-		<th>Date <span class="clickable extra-click" id="filter_date"><img alt="\/" src="<?= $html->url('/img/icons/green_arrow_down.gif') ?>" /></span></th>
-		<th>League <span class="clickable extra-click" id="filter_league"><img alt="\/" src="<?= $html->url('/img/icons/green_arrow_down.gif') ?>" /></span></th>
-		<th>Bet On <span class="clickable extra-click" id="filter_beton"><img alt="\/" src="<?= $html->url('/img/icons/green_arrow_down.gif') ?>" /></span></th>
-		<th>Bet Type <span class="clickable extra-click" id="filter_type"><img alt="\/" src="<?= $html->url('/img/icons/green_arrow_down.gif') ?>" /></span></th>
-		<th>Line <span class="clickable extra-click" id="filter_spread"><img alt="\/" src="<?= $html->url('/img/icons/green_arrow_down.gif') ?>" /></span></th>
-		<th>Visitor <span class="clickable extra-click" id="filter_visitor"><img alt="\/" src="<?= $html->url('/img/icons/green_arrow_down.gif') ?>" /></span></th>
-		<th>Home <span class="clickable extra-click" id="filter_home"><img alt="\/" src="<?= $html->url('/img/icons/green_arrow_down.gif') ?>" /></span></th>
-		<th>Risk <span class="clickable extra-click" id="filter_risk"><img alt="\/" src="<?= $html->url('/img/icons/green_arrow_down.gif') ?>" /></span></th>
-		<th>Odds <span class="clickable extra-click" id="filter_odds"><img alt="\/" src="<?= $html->url('/img/icons/green_arrow_down.gif') ?>" /></span></th>
-		<th>Winnings <span class="clickable extra-click" id="filter_winning"><img alt="\/" src="<?= $html->url('/img/icons/green_arrow_down.gif') ?>" /></span></th>
-		<th>Book <span class="clickable extra-click" id="filter_book"><img alt="\/" src="<?= $html->url('/img/icons/green_arrow_down.gif') ?>" /></span></th>
-		<th>Tags <span class="clickable extra-click" id="filter_tag"><img alt="\/" src="<?= $html->url('/img/icons/green_arrow_down.gif') ?>" /></span></th>
+		<th class="clickable">Date <span class="extra-click" id="filter_date"><img alt="\/" src="<?= $html->url('/img/icons/green_arrow_down.gif') ?>" /></span></th>
+		<th class="clickable">League <span class="extra-click" id="filter_league"><img alt="\/" src="<?= $html->url('/img/icons/green_arrow_down.gif') ?>" /></span></th>
+		<th class="clickable">Bet On <span class="extra-click" id="filter_beton"><img alt="\/" src="<?= $html->url('/img/icons/green_arrow_down.gif') ?>" /></span></th>
+		<th class="clickable">Bet Type <span class="extra-click" id="filter_type"><img alt="\/" src="<?= $html->url('/img/icons/green_arrow_down.gif') ?>" /></span></th>
+		<th class="clickable">Line <span class="extra-click" id="filter_spread"><img alt="\/" src="<?= $html->url('/img/icons/green_arrow_down.gif') ?>" /></span></th>
+		<th class="clickable">Visitor <span class="extra-click" id="filter_visitor"><img alt="\/" src="<?= $html->url('/img/icons/green_arrow_down.gif') ?>" /></span></th>
+		<th class="clickable">Home <span class="extra-click" id="filter_home"><img alt="\/" src="<?= $html->url('/img/icons/green_arrow_down.gif') ?>" /></span></th>
+		<th class="clickable">Risk <span class="extra-click" id="filter_risk"><img alt="\/" src="<?= $html->url('/img/icons/green_arrow_down.gif') ?>" /></span></th>
+		<th class="clickable">Odds <span class="extra-click" id="filter_odds"><img alt="\/" src="<?= $html->url('/img/icons/green_arrow_down.gif') ?>" /></span></th>
+		<th class="clickable">Winnings <span class="extra-click" id="filter_winning"><img alt="\/" src="<?= $html->url('/img/icons/green_arrow_down.gif') ?>" /></span></th>
+		<th class="clickable">Book <span class="extra-click" id="filter_book"><img alt="\/" src="<?= $html->url('/img/icons/green_arrow_down.gif') ?>" /></span></th>
+		<th class="clickable">Tags <span class="extra-click" id="filter_tag"><img alt="\/" src="<?= $html->url('/img/icons/green_arrow_down.gif') ?>" /></span></th>
 		<th>View</th>
 	</tr>
 
