@@ -4,13 +4,6 @@ App::import('Model', 'LeagueType');
 class SourceType extends LeagueType {
 	var $name = 'SourceType';
 
-	public function getName($id) {
-		if (empty($this->_cacheMap)) {
-			$this->_cacheMap = $this->find('list');
-		}
-		return isset($this->_cacheMap[$id]) ? $this->_cacheMap[$id] : '';
-	}
-
 	public function getOrSet($name) {
 		if (empty($name) || strtolower(trim($name)) == 'none') {
 			return null;

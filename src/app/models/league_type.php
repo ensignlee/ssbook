@@ -2,7 +2,7 @@
 
 class LeagueType extends AppModel {
 	var $name = 'LeagueType';
-	private $_cacheMap = array();
+	protected $_cacheMap = array();
 
 	public function contains($name) {
 		$out = $this->find('first', array('conditions' => array('name' => trim($name))));
