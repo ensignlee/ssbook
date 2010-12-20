@@ -81,6 +81,14 @@ class Espn extends Espn_Log {
 		}
 	}
 
+	public static function makeId($date, $league, $home, $visitor) {
+		$both = array(strtolower($home), strtolower($visitor));
+		sort($both); // Do this to keep duplicates popping up from ESPN screwups
+		$league = (int)($league);
+		$date = date('Ymd', strtotime($date));
+		return $date.$league.md5($both[0].$both[1]);
+	}
+
 	/**
 	 * Potentially this should be set before we actually change the names
 	 * to something more human readible. This way we can match games
@@ -94,12 +102,12 @@ class Espn extends Espn_Log {
 			empty($score['league']) || empty($score['game_date'])) {
 			new Exception("Unable to create id from score".json_encode($score));
 		}
-		$home = strtolower($score['home']);
-		$visitor = strtolower($score['visitor']);
+		$home = $score['home'];
+		$visitor = $score['visitor'];
 		$league = $score['league'];
-		$date = date('Ymd', strtotime($score['game_date']));
+		$date = $score['game_date'];
 
-		$id = $date.$league.md5($home.$visitor);
+		$id = self::makeId($date, $league, $home, $visitor);
 		return $id;
 	}
 
