@@ -36,6 +36,11 @@ abstract class Winning_GameType {
 	abstract protected function processGame();
 
 	public static function calcWin($risk, $odds) {
+		// For parlays that may not have odds set
+		if ($odds == 0) {
+			$odds = 100;
+		}
+		
 		if($odds > 0) {
 			return $risk*$odds/100;
 		} else {
