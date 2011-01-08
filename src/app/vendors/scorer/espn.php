@@ -29,6 +29,7 @@ class Espn extends Espn_Log {
 		$this->types[] = new Espn_NBA();
 		$this->types[] = new Espn_NFL();
 		$this->types[] = new Espn_NCAAF();
+		$this->types[] = new Espn_NCAAF_AA();
 		$this->types[] = new Espn_NHL();
 		$this->types[] = new Espn_NCAAB();
 
@@ -205,6 +206,15 @@ abstract class Espn_Scorer extends Espn_Log {
 		$out = date('Y-m-d H:i:s', $strtime);
 		return $out;
 	}
+}
+
+class Espn_NCAAF_AA extends Espn_NFL {
+
+	public $leagueName = 'NCAAF';
+	
+        public function getUrl($date) {
+                return sprintf('http://scores.espn.go.com/ncf/scoreboard?confId=81&date=%s', date('Ymd', strtotime($date)));
+        }
 }
 
 class Espn_NCAAF extends Espn_NFL {
