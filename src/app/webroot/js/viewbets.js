@@ -31,6 +31,7 @@ $(function() {
 	$('.shortlink').click(function() {
 		var jel = $(this);
 		var thisurl = decodeURIComponent(jel.data('url'));
+		jel.text('Please Wait...');
 		$.getJSON(
 			SS.Cake.base + '/bets/shortlink',
 			{shorturl: thisurl},

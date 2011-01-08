@@ -75,6 +75,13 @@ class BetsController extends AppController {
 				Configure::read('google.shortlink.secret')
 			);
 			$shorturl = $GoogleShortLink->createHashedShortLink($url);
+			if ($shorturl === false) {
+				// Sometime the service has problems
+				$shorturl = $GoogleShortLink->createHashedShortLink($url);
+				if ($shorturl === false) {
+					$shorturl = $url;
+				}
+			}
 			$this->set('shorturl', $shorturl);
 		}
 	}
