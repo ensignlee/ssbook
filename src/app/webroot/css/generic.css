@@ -192,3 +192,20 @@ body {
 .cake-sql-log {
 	margin-top: 3em;
 }
+
+/* Modal */
+#simplemodal-overlay {
+	background-color: black;
+}
+#simplemodal-container {
+	background-color: white;
+	border: 1px solid black;
+}
+#simplemodal-data {
+	padding: 5px;
+}
+
+.confirmation {
+	padding: 4px;
+	text-align: center;
+}

@@ -14,6 +14,7 @@ class BetsController extends AppController {
 	    'SourceSportName'
 	);
 	var $components = array('RequestHandler');
+	var $helpers = array('EditBets');
 
 	public function beforeFilter() {
 		$this->Auth->allow('view');
@@ -101,14 +102,6 @@ class BetsController extends AppController {
 		if ($this->Tag->saveBetsWithTag($tagname, $ids)) {
 			$this->Session->setFlash("Saved $tagname");
 		}
-	}
-
-	public function delete($id = null) {
-		if (empty($id)) {
-			$this->Session->setFlash('Invalid id');
-		}
-		$this->delete(array($id));
-		$this->redirect($this->referer());
 	}
 
 	private function superbar($params, $date) {
@@ -821,6 +814,67 @@ class BetsController extends AppController {
 	private function getShare($id) {
 		return base64_encode(Security::cipher("p=$id", 'publicid'));
 	}
+	
+	public function editbets($bets=array()) {
+		if (empty($bets)) {
+			$bets = array();
+		} else {
+			$bets = explode(',', $bets);
+		}
+		
+		if (empty($this->params['form'])) {
+			$bets = $this->UserBet->getAllIds($bets);
+			$this->set('bets', $bets);
+			$this->set('types', $this->UserBet->possibleTypes());
+		} else {
+			$bets = $this->getFormTransformed();
+			
+			$success = true;
+			foreach ($bets as $id => $bet) {
+				$userid = $this->Auth->user('id');
+				if ($this->UserBet->persist($userid, $bet)) {
+					$this->UserBet->id = $id;
+					if (!$this->UserBet->delete()) {
+						$success = false;
+					}
+				} else {
+					$success = false;
+				}
+			}
+			echo $success ? 'true' : 'false';exit;
+		}
+	}
+	
+	private function getFormTransformed() {
+		$bets = array();
+		foreach ($this->params['form'] as $key => $rows) {
+			foreach ($rows as $id => $value) {
+				if (empty($bets[$id])) {
+					$bets[$id] = array();
+				}
+				$bets[$id][$key] = $value;
+			}
+		}
+		
+		$ret = array();
+		// First fill without parlays
+		foreach ($bets as $betid => $bet) {
+			if (empty($bet['parlayid'])) {
+				$bet['parlays'] = array();
+				$ret[$betid] = $bet;
+			}
+		}
+		// Go through and fill the parlays
+		foreach ($bets as $betid => $bet) {
+			if (!empty($bet['parlayid'])) {
+				$parlayid = $bet['parlayid'];
+				if (!empty($ret[$parlayid])) {
+					$ret[$parlayid]['parlays'][] = $bet;
+				}
+			}
+		}
+		return $ret;
+	}
 
 	public function view() {
 		
@@ -873,7 +927,7 @@ class BetsController extends AppController {
 		$this->set('filters', $filters);
 
 		// Display only sql, and nonsql matching bets
-		$bets = $this->UserBet->getAll($userid, null, $sqlcond);
+		$bets = $this->UserBet->getAll($userid, $sqlcond);
 		$bets = $this->reformatBets($bets);
 		$bets = $this->filterNonSql($bets, $cond, array('beton', 'league', 'tag', 'winning'));
 		usort($bets, array($this, '_sort_bets'));

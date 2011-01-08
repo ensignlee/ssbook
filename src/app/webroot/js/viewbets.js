@@ -41,6 +41,50 @@ $(function() {
 		);
 		return false;
 	});
+	
+	$('#editBets').click(function() {
+		var serial = $('#betsForm input[type=checkbox]:checked');
+		var tagids = $.map(serial, function(elm) {
+			var name = $(elm).attr('name');
+			return name.substring(4, name.length-1);
+		});
+		popupEditBetsWindow(tagids);
+	});
+	
+	function popupEditBetsWindow(tagids) {
+		$.getJSON(
+			SS.Cake.base + '/bets/editbets/'+tagids.join(','),
+			{},
+			function (data) {
+				$.modal(data.html, {onShow: function() {
+					setupModalEvents(this);
+				}});
+			}
+		);
+	}
+	
+	function setupModalEvents(modal) {
+		$('#editOkay').click(function() {
+			$.post(
+				SS.Cake.base + '/bets/editbets',
+				$('#modalForm').serialize(),
+				function (data) {
+					if (data == 'true') {
+						location.reload();
+						modal.close();
+					} else {
+						alert('Unable to save data, please try again');
+						return false;
+					}
+				}
+			)
+			return false;
+		});
+		$('#editCancel').click(function() {
+			modal.close();
+			return false;
+		});
+	}
 });
 
 })(jQuery);

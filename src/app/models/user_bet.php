@@ -41,38 +41,83 @@ class UserBet extends AppModel {
 		    'over',
 		    'under'
 		);
-	}
+	}	
 
 	/**
 	 * expects (type, direction, spread, risk, odds, scoreid, book, parlay, game_date)
 	 */
-	public function persist($userid, &$bet) {
+	public function persist($userid, &$bet, $trans=true) {
+		// Begin a transaction
+		if ($trans) {
+			$this->begin();
+		}
+		$errors = array();
+		
 		$this->create();
 		$save = array(
 			'userid' => $userid,
-			'scoreid' => $bet['scoreid'],
-			'game_date' => $bet['date_std'],
+			'scoreid' => array_lookup('scoreid', $bet, null),
+			'game_date' => array_lookup('date_std', $bet, null),
 			'type' => $bet['type'],
-			'direction' => $bet['direction'],
-			'spread' => $bet['spread'],
-			'odds' => $bet['odds'],
-			'risk' => $bet['risk'],
-			'parlayid' => isset($bet['parlayid']) ? $bet['parlayid'] : null,
-			'pt' => isset($bet['pt']) ? $bet['pt'] : null
+			'direction' => array_lookup('direction', $bet, null),
+			'spread' => array_lookup('spread', $bet, 0),
+			'odds' => array_lookup('odds', $bet, -110),
+			'risk' => array_lookup('risk', $bet, 1),
+			'parlayid' => array_lookup('parlayid', $bet, null),
+			'pt' => array_lookup('pt', $bet, null),
 		);
 		$tagname = empty($bet['tag']) ? '' : $bet['tag'];
+		
+		// If we have parlays, then we want to get the max gamedate of all of them		
+		if (!empty($bet['parlays'])) {
+			$gamedate = 0;
+			foreach ($bet['parlays'] as $parlay) {
+				$gamedate = max($gamedate, strtotime($parlay['date_std']));
+			}
+			$save['game_date'] = date('Y-m-d H:i:s', $gamedate);
+		}
 
 		if (!empty($bet['book'])) {
 			$save['sourceid'] = $this->getSaveSource($bet['book']);
 			$bet['sourceid'] = $save['sourceid'];
 		}
+		
 		$success = $this->save($save);
 		if ($success) {
 			$bet['id'] = $this->id;
 			if (!empty($tagname)) {
 				$this->Tag->saveBetsWithTag($tagname, array($bet['id']));
 			}
+		
+			$betid = $this->id;
+		
+			if (!empty($bet['parlays'])) {
+				foreach ($bet['parlays'] as $parlay) {
+					$parlay['parlayid'] = $betid;
+					$parlay['pt'] = $bet['type'];
+					$psuccess = $this->persist($userid, $parlay, false);
+					if (empty($psuccess)) {
+						$errors[] = "Unable to persist game";
+						$success = false;
+					}
+				}
+			}
+		
+			// Need to set the id back to the original
+			$this->id = $betid;
+		} else {
+			$errors[] = "error in saving original";
 		}
+		
+		// Finish transaction
+		if ($trans) {
+			if ($success) {
+				$this->commit();
+			} else {
+				$this->rollback();
+			}
+		}
+		
 		return $success;
 	}	
 
@@ -84,9 +129,18 @@ class UserBet extends AppModel {
 		return $this->SourceType->getOrSet($name);
 	}
 
-	public function getAll($userid, $parlayids = null, $cond = array()) {
-
-		$cond = array_merge($cond, array('userid' => $userid, 'parlayid' => $parlayids));
+	public function getAll($userid, $cond = array()) {
+		$cond = safe_array_merge($cond, array('userid' => $userid));
+		return $this->getAllCond($cond);
+	}
+	
+	public function getAllIds($ids, $cond = array()) {
+		$cond = safe_array_merge($cond, array('UserBet.id' => $ids));
+		return $this->getAllCond($cond);
+	}
+		
+	private function getAllCond($cond) {		
+		
 		$bets = $this->find('all', array(
 			'conditions' => $cond
 		));
@@ -101,7 +155,7 @@ class UserBet extends AppModel {
 			$bet['UserBet']['source'] = $this->SourceType->getName($bet['UserBet']['sourceid']);
 			$bet['UserBet']['bet'] = self::buildBet($bet['UserBet']);
 			if ($bet['UserBet']['type'] == 'parlay' || $bet['UserBet']['type'] == 'teaser') {
-				$bet['UserBet']['Parlay'] = $this->getParlays($userid, $bet['UserBet']['id']);
+				$bet['UserBet']['Parlay'] = $this->getParlays($bet['UserBet']['id']);
 			}
 			$nullRisk = is_null($bet['UserBet']['risk']);
 			if ($nullRisk) {
@@ -113,8 +167,9 @@ class UserBet extends AppModel {
 		return $bets;
 	}
 	
-	public function getParlays($userid, $id) {
-		return $this->getAll($userid, $id);
+	public function getParlays($id, $cond = array()) {
+		$cond = safe_array_merge($cond, array('parlayid' => $id));
+		return $this->getAllCond($cond);
 	}
 
 	public static function calcWinning($score, $bet) {

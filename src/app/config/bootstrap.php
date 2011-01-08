@@ -133,3 +133,14 @@ function numberSafeEmpty($str) {
 }
 
 setlocale(LC_MONETARY, 'en_US');
+
+if (!function_exists('safe_array_merge')) {
+function safe_array_merge($arr1, $arr2) {
+	if (empty($arr1) || !is_array($arr1)) {
+		return $arr2;
+	} else if (empty($arr2) || !is_array($arr2)) {
+		return $arr1;		
+	}
+	return array_merge($arr1, $arr2);
+}
+}

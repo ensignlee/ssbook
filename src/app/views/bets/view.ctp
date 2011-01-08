@@ -4,6 +4,7 @@ $html->css('jquery.contextmenu', 'stylesheet', array('inline' => false));
 
 echo $javascript->link('jquery.flot');
 echo $javascript->link('jquery.contextmenu');
+echo $javascript->link('jquery.simplemodal-1.4.1');
 echo $javascript->link('filtermenu');
 echo $javascript->link('generic');
 echo $javascript->link('viewbets');
@@ -177,11 +178,12 @@ $fullurl = $html->url('/' . $this->params['url']['url'], true). '?'. http_build_
 <?php if (!$isPublic): ?><div id="shareLink" class="clear"><a href="#" class="shortlink" data-url="<?= h($fullurl) ?>">Click to get link to share page</a></div><?php endif;// (!$isPublic): ?>
 <div id="betTable" class="clear">
 	<?php if (!$isPublic): ?>
-	<form method='post' action='<?= $html->url('/bets/modify') ?>'>
+	<form method='post' action='<?= $html->url('/bets/modify') ?>' id="betsForm">
 	<label for='tagvalue'>Tag: </label>
 	<input type='text' name='tagvalue' id='tagvalue' />
 	<input type='submit' name="Tag" value='Tag'  />
 	<input type="submit" name="Delete" value="Delete Bets" />
+	<input type="button" name="Edit" id="editBets" value="Edit Bets" />
 	<?php endif;// (!$isPublic): ?>
 
 	<a name="Bets"><?= $html->link('Reset Filters', '/bets/view') ?></a>

@@ -68,3 +68,9 @@ table.buttons td {
 	padding: 10px;
 	text-align: center;
 }
+.singleBet {
+	background-color: #EEE;
+	padding: 4px;
+	border: 1px solid #DDD;
+	margin: 4px;
+}
