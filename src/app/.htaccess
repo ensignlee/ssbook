@@ -1,5 +1,9 @@
 <IfModule mod_rewrite.c>
     RewriteEngine on
+
+    RewriteCond %{HTTP_HOST} ^sharpbettracker\.com$ [NC]
+    RewriteRule ^(.*)$ http://www.sharpbettracker.com/$1 [R=301,L]
+
     RewriteRule    ^$    webroot/    [L]
     RewriteRule    (.*) webroot/$1    [L]
  </IfModule>
