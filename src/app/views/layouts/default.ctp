@@ -59,7 +59,7 @@ SS.Cake = {
 			<?= $this->Html->image('girls_header.jpg') ?>
 <div id="loginBox">
 <?php
-if (empty($user)) {
+if (empty($user) && empty($hideLogin)) {
 	echo $form->create('User', array('action' => 'login'));
 	echo $form->input('username');
 	echo $form->input('password');

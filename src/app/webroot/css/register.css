@@ -1,0 +1,17 @@
+.registerBox {
+	background-color: #CFE3FF;
+	border: 1px solid black;
+	padding: 5px;
+	margin-top: 5px;
+	width: 600px;
+}
+
+.registerBox label {
+	display: block;
+	width: 200px;
+	clear: left;
+	float: left;
+}
+.registerBox input {
+	float: left
+}

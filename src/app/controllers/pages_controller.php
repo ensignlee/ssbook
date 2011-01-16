@@ -6,7 +6,7 @@ class PagesController extends AppController {
 	var $components = array('Email');
 
 	public function beforeFilter() {
-		$this->Auth->allow('display', 'view', 'enter');
+		$this->Auth->allow('display', 'view', 'enter', 'feedback', 'welcome');
 		parent::beforeFilter();
 	}
 
@@ -20,6 +20,10 @@ class PagesController extends AppController {
 
 	public function enter() {
 		$this->pageTitle = "Enter";
+	}
+	
+	public function welcome() {
+		$this->pageTitle = "Welcome";
 	}
 	
 	public function feedback() {
