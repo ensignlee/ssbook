@@ -20,6 +20,9 @@ class Pinnacle_Log extends Object {
 	}
 }
 
+App::import('Core', 'Controller');
+App::import('Controller', 'Bets');
+
 class Pinnacle extends Pinnacle_Log {
 
 	private $lastid = false;
@@ -33,8 +36,11 @@ class Pinnacle extends Pinnacle_Log {
 		$this->shell = $shell;
 		$this->lastGame = Cache::read('pinnacle_lastGame');
 		$this->sourceid = $this->shell->SourceType->getOrSet('Pinnacle');
+		
+		$this->Bets = new BetsController();
+		$this->Bets->constructClasses();
 	}
-
+	
 	public function match() {
 		try {
 			$this->xml = $this->readXml();
@@ -45,7 +51,12 @@ class Pinnacle extends Pinnacle_Log {
 				if ($match !== false) {
 					$this->matches[] = $match;
 				} else {
-					$this->log("Unable to find match for ".json_encode($game));
+					$match = $this->getSuperbarMatch($game);
+					if ($match !== false) {
+						$this->matches[] = $match;
+					} else {
+						$this->log("Unable to find match for ".json_encode($game));
+					}
 				}
 			}
 			$success = $this->saveMatches();
@@ -74,6 +85,20 @@ class Pinnacle extends Pinnacle_Log {
 		}
 		return $success;
 	}
+	
+	private function getSuperbarMatch($game) {
+		$text = $game['game']['league_name'].' '.$game['game']['visitor'].' @ '.$game['game']['home'];
+		$startdate = date('Y-m-d 00:00:00', strtotime($game['game']['game_date']));
+		$enddate = date('Y-m-d 23:59:59', strtotime($game['game']['game_date']));
+		$this->log("Looking up superbar '$text' ($startdate => $enddate)");
+		$matched = $this->Bets->superbarlookup($text, $startdate, $enddate);
+		if (empty($matched) || count($matched) != 1) {
+			return false;
+		}
+		$keys = array_keys($matched);
+		$game['game']['scoreid'] = $keys[0];
+		return $game;
+	}
 
 	private function findGameMatch($game) {
 		$matched = $this->shell->Score->findMatching($game['game']);
@@ -94,7 +119,15 @@ class Pinnacle extends Pinnacle_Log {
 
 		$out = array();
 		$skipped = 0;
-		$events = (empty($sxml->events) || empty($sxml->events->events)) ? array() : $sxml->events->event;
+		$events = array();
+		if (!empty($sxml->events)) {
+			foreach ($sxml->events->event as $event) {
+				$events[] = $event;
+			}
+		} else {
+			$this->log("Unable to read events", 'error');
+		}
+		
 		$this->log("Found potentially ".count($events)." events");
 		foreach ($events as $event) {
 			$event = $this->parseEvent($event);

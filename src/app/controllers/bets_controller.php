@@ -103,9 +103,23 @@ class BetsController extends AppController {
 			$this->Session->setFlash("Saved $tagname");
 		}
 	}
-
+	
+	
 	private function superbar($params, $date) {
-		$text = $params['text'];
+		$text = array_lookup('text', $params, '');
+		if (!empty($params['startdate']) && !empty($params['enddate'])) {
+			$startdate = $params['startdate'];
+			$enddate = $params['enddate'];
+		} else {
+			$startdate = '';
+			$enddate = '';
+		}
+		$scores = $this->superbarlookup($text, $startdate, $enddate, $date);
+		$this->set('scores', $scores);
+	}
+	
+	public function superbarlookup($text, $startdate='', $enddate='', $date='') {
+
 		$text = strtolower(" $text "); //give us some working room
 		$match = array();
 		if (preg_match('%((0?[1-9]|1[012])(:[0-5]\d){0,2}\s*([AP]M|[ap]m))%', $text, $match)) {
@@ -121,10 +135,10 @@ class BetsController extends AppController {
 				$options['game_date'] = date('Y-m-d', $strdate);
 			}
 		}
-		if (!empty($params['startdate']) && !empty($params['enddate'])) {
+		if (!empty($startdate) && !empty($enddate)) {
 			$options['game_date'] = array(
-			    date('Y-m-d 00:00:00', strtotime($params['startdate'])),
-			    date('Y-m-d 23:59:59', strtotime($params['enddate']))
+			    date('Y-m-d 00:00:00', strtotime($startdate)),
+			    date('Y-m-d 23:59:59', strtotime($enddate))
 			);
 		}
 		
@@ -171,7 +185,7 @@ class BetsController extends AppController {
 		}		
 			
 		$scores = $this->Score->matchOption($options);
-		$this->set('scores', $scores);
+		return $scores;
 	}
 
 	private function getbet($params) {
