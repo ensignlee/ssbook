@@ -252,7 +252,7 @@ class Pinnacle extends Pinnacle_Log {
 		$url = $this->getUrl();
 		$this->log("Fetching $url");
 		$xml = curl_file_get_contents($url);
-		file_put_contents('/tmp/'.date('Ymd').'pinnacle', $xml);
+		file_put_contents('/tmp/'.date('YmdHis').'pinnacle', $xml);
 		return $xml;
 	}
 }
