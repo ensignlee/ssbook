@@ -182,7 +182,7 @@ $fullurl = $html->url('/' . $this->params['url']['url'], true). '?'. http_build_
 	<label for='tagvalue'>Tag: </label>
 	<input type='text' name='tagvalue' id='tagvalue' />
 	<input type='submit' name="Tag" value='Tag'  />
-	<input type="submit" name="Delete" value="Delete Bets" />
+	<input type="submit" name="Delete" id="deleteBets" value="Delete Bets" />
 	<input type="button" name="Edit" id="editBets" value="Edit Bets" />
 	<?php endif;// (!$isPublic): ?>
 

@@ -42,6 +42,10 @@ $(function() {
 		return false;
 	});
 	
+	$('#deleteBets').click(function() {
+		return confirm('Are you sure that you want to delete these bet(s)?');
+	});
+	
 	$('#editBets').click(function() {
 		var serial = $('#betsForm input[type=checkbox]:checked');
 		var tagids = $.map(serial, function(elm) {
