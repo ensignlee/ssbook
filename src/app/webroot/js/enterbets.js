@@ -619,7 +619,7 @@ $.extend(SS.Enterbets.prototype, {
 			if (val.name == type) {
 				bet.find('.type_header').html(_this.astx+val.show);
 				return false;
-			} 
+			}
 		});
 		// Set the other stuff
 		var odd = null;
@@ -712,7 +712,10 @@ $.extend(SS.Enterbets.prototype, {
 			}
 		} else {
 			bet.find('.spread').val('');
-			bet.find('.odds').val('-110');
+			var odds = bet.find('.odds').val();
+			if (!odds) {
+				bet.find('.odds').val('-110');
+			}
 		}
 
 		this.oddsChange(bet, bet.find('.odd').val());
