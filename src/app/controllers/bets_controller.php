@@ -997,7 +997,7 @@ class BetsController extends AppController {
 		$groupStats = array(
 		    'Odds' => $this->calcGroupStats($bets, array(
 			'odds' => array(
-			    new CalcBetween(false, -201),
+			    new CalcBetween(false, -200),
 			    new CalcBetween(-200, -125),
 			    new CalcBetween(-124, -111),
 			    new CalcBetween(-110, -101),
@@ -1005,12 +1005,12 @@ class BetsController extends AppController {
 			    new CalcBetween(111, 124),
 			    new CalcBetween(125, 185),
 			    new CalcBetween(186, 300),
-			    new CalcBetween(301, false)
+			    new CalcBetween(300, false)
 			)
 		    )),
-		    'Risk' => $this->calcGroupStats($bets, array(
+		    'Wager Size' => $this->calcGroupStats($bets, array(
 			'risk' => array(
-			    new CalcBetween(false, 100),
+			    new CalcBetween(false, 101),
 			    new CalcBetween(101, 200),
 			    new CalcBetween(201, 300),
 			    new CalcBetween(301, 400),
@@ -1022,7 +1022,7 @@ class BetsController extends AppController {
 			    new CalcBetween(901, 1000),
 			    new CalcBetween(1001, 1100),
 			    new CalcBetween(1101, 1200),
-			    new CalcBetween(1201, false)
+			    new CalcBetween(1200, false)
 			)
 		    )),
 		    'Bet Type' => $this->calcGroupStats($bets, array(
@@ -1119,10 +1119,10 @@ class CalcBetween implements CalcStat {
 			return false;
 		}
 		if ($this->start === false) {
-			return $val <= $this->stop;
+			return $val < $this->stop;
 		}
 		if ($this->stop === false) {
-			return $val >= $this->start;
+			return $val > $this->start;
 		}
 		return $this->start <= $val && $val <= $this->stop;
 	}
