@@ -433,19 +433,17 @@ $.extend(SS.Enterbets.prototype, {
 		h += '</select></td>';
 		h += '<td class="direction">&nbsp;</td>';
 
-		h += '<td><input type="text" class="spread" name="spread['+iden+']" /></td>';
-		h += '<td><input type="text" class="risk" name="risk['+iden+']" /></td>';
-		h += '<td><input type="text" class="odds" name="odds['+iden+']" /></td>';
-		h += '<td><input type="text" class="towin" name="towin['+iden+']" /></td>';
-		h += '</tr><tr><td colspan="5">&nbsp;</td><td>Book</td><td>Tag</td></tr><tr>';
-		h += '</tr><tr><td colspan="5">&nbsp;</td>';
+		h += '<td><input type="text" class="spread betnumber" name="spread['+iden+']" /></td>';
+		h += '<td><input type="text" class="risk betnumber" name="risk['+iden+']" /></td>';
+		h += '<td><input type="text" class="odds betnumber" name="odds['+iden+']" /></td>';
+		h += '<td><input type="text" class="towin betnumber" name="towin['+iden+']" /></td>';
 		h += '<td><input type="text" class="book" name="book['+iden+']" /></td>';
 		h += '<td><input type="text" class="tag" name="tag['+iden+']" /></td>';
-		var ttl = '<tr><td><input type="checkbox" /></td><td colspan="2">Type</td><td class="type_header">&nbsp;</td><td>'+this.astx+'Risk</td><td>'+this.astx+'Odds</td><td>To Win</td></tr>';
+		var ttl = '<tr><td><input type="checkbox" /></td><td colspan="2">Type</td><td class="type_header">&nbsp;</td><td>'+this.astx+'Risk</td><td>'+this.astx+'Odds</td><td>To Win</td><td>Book</td><td>Tag</td></tr>';
 
 		var datestr = datetime.toString('M/d/yy h:mm tt');
 		var date_std = datetime.toString('yyyy-MM-dd HH:mm:ssZ');
-		var je = $('<div class="bet"><table><tr><td>&nbsp;</td><td colspan="6" class="teamnames"><span class="teamnames_visitor">'+visitor+'</span> @ <span class="teamnames_home">'+home+'</span> <span class="teamnames_datestr">'+datestr+'<input type="hidden" name="date_std['+iden+']" class="date_std" value="'+date_std+'" /></td></td></tr>'+ttl+'<tr>'+h+'</tr></table><div class="close"><img src="'+this.iconurl+'close.png" /></div></div>');
+		var je = $('<div class="bet"><table><tr><td>&nbsp;</td><td colspan="8" class="teamnames"><span class="teamnames_visitor">'+visitor+'</span> @ <span class="teamnames_home">'+home+'</span> <span class="teamnames_datestr">'+datestr+'<input type="hidden" name="date_std['+iden+']" class="date_std" value="'+date_std+'" /></td></td></tr>'+ttl+'<tr>'+h+'</tr></table><div class="close"><img src="'+this.iconurl+'close.png" /></div></div>');
 		return je;
 	},
 
@@ -459,9 +457,9 @@ $.extend(SS.Enterbets.prototype, {
 		h += '</td><td>&nbsp;</td>';
 
 		h += '<td>'+gamesinfo.length+'</td>';
-		h += '<td><input type="text" class="risk" name="risk['+iden+']" /></td>';
-		h += '<td><input type="text" class="odds" name="odds['+iden+']" /></td>';
-		h += '<td><input type="text" class="towin" name="towin['+iden+']" /></td>';
+		h += '<td><input type="text" class="risk betnumber" name="risk['+iden+']" /></td>';
+		h += '<td><input type="text" class="odds betnumber" name="odds['+iden+']" /></td>';
+		h += '<td><input type="text" class="towin betnumber" name="towin['+iden+']" /></td>';
 		h += '<td><input type="text" class="book" name="book['+iden+']" /></td>';
 		h += '</tr><td>&nbsp;</td><td colspan="7" class="gametext">';
 		h += this.gameText(gamesinfo);

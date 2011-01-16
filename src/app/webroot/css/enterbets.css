@@ -1,5 +1,5 @@
 #superbar {
-	width: 600px;
+	width: 650px;
 	font-size: 18px;
 }
 #superbar.focused {
@@ -36,10 +36,13 @@
 .bets td {
 	padding: 4px;
 }
-.bets input[type=text] {
+.bets .bet-parlay .betnumber {
 	width: 60px;
 }
-.bets .book {
+.bets input.betnumber {
+	width: 35px;
+}
+.bets .book, .bets .tag {
 	width: 80px !important;
 }
 
@@ -50,7 +53,7 @@
 #rightsection {
 	margin: 0;
 	padding: 0;
-	margin-left: 340px;
+	margin-left: 290px;
 	padding-left: 5px;
 	border-left: 1px black solid;
 }
@@ -58,7 +61,7 @@
 	margin: 0;
 	padding: 0;
 	padding-left: 5px;
-	width: 320px;
+	width: 280px;
 	float: left;
 }
 h1.head {
@@ -70,12 +73,20 @@ h1.head {
 #accorselect {
 	background-color: #FFE;
 }
+#accorselect ul {
+	list-style: none;
+	padding: 4px;
+}
 #accorselect li {
 	cursor: pointer;
-	margin: 4px;
+	margin: 0;
+}
+#accorselect li {
+	color: #333;
+	font-size: 11px;
 }
 #accorselect li.withodds {
-	color: #333;
+	color: black;
 }
 #accorselect li.hover {
 	color: gray;
