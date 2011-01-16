@@ -130,7 +130,7 @@ class UserBet extends AppModel {
 	}
 
 	public function getAll($userid, $cond = array()) {
-		$cond = safe_array_merge($cond, array('userid' => $userid));
+		$cond = safe_array_merge($cond, array('userid' => $userid, 'parlayid' => null));
 		return $this->getAllCond($cond);
 	}
 	
