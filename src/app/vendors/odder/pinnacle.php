@@ -1,5 +1,16 @@
 <?php
 
+/**
+ * From feed
+ * 
+ * IMPORTANT NOTICE
+ * 
+ * Please refrain from using a very high frequency of calls to the xml feed. 
+ * Pinnacle Sports reserves the right to monitor usage of the XML feed and block the IP address range of any user that abuses this service. 
+ * 
+ * 1 call per minute is considered an acceptable usage of the feed.
+ */
+
 class Pinnacle_Log extends Object {
 	public function log($str, $type = 'debug') {
 		parent::log('['.getmypid().'] '.$str, 'pinnacle_'.date('Ymd'));
@@ -75,7 +86,7 @@ class Pinnacle extends Pinnacle_Log {
 
 	private function getGameInfo() {
 		if (empty($this->xml)) {
-			throw new Exception('Was unable to read XML');
+			throw new Exception('Was unable to read XML text');
 		}
 		$sxml = simplexml_load_string($this->xml);
 		$this->lastGame = (int)$sxml->lastGame;
@@ -83,8 +94,9 @@ class Pinnacle extends Pinnacle_Log {
 
 		$out = array();
 		$skipped = 0;
-		$this->log("Found potentially ".count($sxml->events->event)." events");
-		foreach ($sxml->events->event as $event) {
+		$events = (empty($sxml->events) || empty($sxml->events->events)) ? array() : $sxml->events->event;
+		$this->log("Found potentially ".count($events)." events");
+		foreach ($events as $event) {
 			$event = $this->parseEvent($event);
 			if (!empty($event) && !empty($event['types'])) {
 				$out[] = $event;
@@ -241,7 +253,7 @@ class Pinnacle extends Pinnacle_Log {
 	}
 	
 	private function getUrl() {
-		$url = 'http://xml.pinnaclesports.com/pinnacleFeed.asp';
+		$url = 'http://xml.pinnaclesports.com/pinnacleFeed.aspx';
 		if (!empty($this->lastGame)) {
 			$url .= "?lastGame={$this->lastGame}";
 		}
