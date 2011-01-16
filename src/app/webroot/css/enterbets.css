@@ -80,3 +80,9 @@ h1.head {
 #accorselect li.hover {
 	color: gray;
 }
+.record input, .record button {
+	font-size: 18px;
+	padding: 4px 8px;
+	font-weight: bold;
+	margin: 8px;
+}
