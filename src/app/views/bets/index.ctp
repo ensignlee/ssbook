@@ -1,6 +1,7 @@
 <div id='leftsection'>
 	Date: <input type='text' class='dateselect' name='startdate' value='<?=date('n/j/Y', strtotime('-1 day'))?>' /> -
 	<input type='text' class='dateselect' name='enddate' value='<?=date('n/j/Y', strtotime('+1 week'))?>' />
+	       <h4>Click to see games</h4>
 	<div id='accorselect'>&nbsp;</div>
 </div>
 <div id='rightsection'>
