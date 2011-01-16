@@ -415,6 +415,8 @@ $.extend(SS.Enterbets.prototype, {
 	},
 
 	done : function() {},
+	
+	astx : '<span class="asterix">*</span>',
 
 	/**
 	 * @param <string> iden Identifier "SS[scoreid]" "incremental"
@@ -439,7 +441,7 @@ $.extend(SS.Enterbets.prototype, {
 		h += '</tr><tr><td colspan="5">&nbsp;</td>';
 		h += '<td><input type="text" class="book" name="book['+iden+']" /></td>';
 		h += '<td><input type="text" class="tag" name="tag['+iden+']" /></td>';
-		var ttl = '<tr><td><input type="checkbox" /></td><td colspan="2">Type</td><td class="type_header">&nbsp;</td><td>Risk</td><td>Odds</td><td>To Win</td></tr>';
+		var ttl = '<tr><td><input type="checkbox" /></td><td colspan="2">Type</td><td class="type_header">&nbsp;</td><td>'+this.astx+'Risk</td><td>'+this.astx+'Odds</td><td>To Win</td></tr>';
 
 		var datestr = datetime.toString('M/d/yy h:mm tt');
 		var date_std = datetime.toString('yyyy-MM-dd HH:mm:ssZ');
@@ -451,7 +453,7 @@ $.extend(SS.Enterbets.prototype, {
 		var title = this.titleText(gamesinfo);
 		var h = '<div class="bet-parlay"><table><tr><td>&nbsp;</td><td colspan="7">'+title+'</td></tr>';
 		h += '<tr><td>&nbsp;</td><td colspan="2">Type</td>';
-		h += '<td>Games</td><td>Risk</td><td>Odds</td><td>To Win</td><td>Book</td></tr>';
+		h += '<td>Games</td><td>'+this.astx+'Risk</td><td>'+this.astx+'Odds</td><td>To Win</td><td>Book</td></tr>';
 		h += '<tr><td class="icon">&nbsp;</td><td>';
 		h += '<select name="type['+iden+']"><option value="parlay">Parlay</option><option value="teaser">Teaser</option></select>';
 		h += '</td><td>&nbsp;</td>';
@@ -615,7 +617,7 @@ $.extend(SS.Enterbets.prototype, {
 		var dir = bet.find('.direction select').val();
 		$.each(SS.Enterbets.TYPES, function (key, val) {
 			if (val.name == type) {
-				bet.find('.type_header').text(val.show);
+				bet.find('.type_header').html(_this.astx+val.show);
 				return false;
 			} 
 		});

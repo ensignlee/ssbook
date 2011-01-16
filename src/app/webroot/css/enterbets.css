@@ -86,3 +86,7 @@ h1.head {
 	font-weight: bold;
 	margin: 8px;
 }
+span.asterix {
+	font-size: 10px;
+	color: red;
+}
