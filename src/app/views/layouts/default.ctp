@@ -45,10 +45,12 @@ SS.Cake = {
 				<li><?= $html->link('Enter Bets', '/pages/enter') ?></li>
 				<li><?= $html->link('View Bets', '/pages/view') ?></li>
 				<li class="far-right"><?= $html->link('Register', '/users/create') ?></li>
+				<li class="far-right"><?= $html->link('Feedback', '/pages/feedback') ?></li>
 <?php } else { ?>
 				<li><?= $html->link('Enter Bets', '/bets') ?></li>
 				<li><?= $html->link('View Bets', '/bets/view') ?></li>
 				<li class="far-right"><?= $html->link("Logout ({$user['username']})", '/users/logout') ?></li>
+				<li class="far-right"><?= $html->link('Feedback', '/pages/feedback') ?></li>
 <?php } ?>				
 			</ul>
 			</div>

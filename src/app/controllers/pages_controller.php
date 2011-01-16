@@ -3,6 +3,7 @@
 class PagesController extends AppController {
 	var $name = 'Pages';
 	var $uses = array();
+	var $components = array('Email');
 
 	public function beforeFilter() {
 		$this->Auth->allow('display', 'view', 'enter');
@@ -19,5 +20,25 @@ class PagesController extends AppController {
 
 	public function enter() {
 		$this->pageTitle = "Enter";
+	}
+	
+	public function feedback() {
+		$this->pageTitle = "Feedback";
+		$sent = false;
+		
+		if (!empty($this->params['form'])) {
+			$form = $this->params['form'];
+			$email = $form['email'];
+			$username = $form['username'];
+			$feedback = $form['feedback'];
+			
+			$message = "Email: $email\nUseranme: $username\nFeedback:\n$feedback";
+			$this->Email->from = 'SharpBetTracker App<no-replay@sharpbettracker.com>';
+			$this->Email->to = 'cameron.davison@gmail.com';
+			$this->Email->subject = 'User Feedback';
+			$this->Email->send($message);
+			$sent = true;
+		}
+		$this->set('sent', $sent);
 	}
 }

@@ -301,3 +301,5 @@ Cache::config('default', array(
 
 Configure::write('google.shortlink.hostname', 'http://go.sharpbettracker.com');
 Configure::write('google.shortlink.secret', '');
+
+Configure::write('feedback.email', 'cameron.davison@gmail.com');
