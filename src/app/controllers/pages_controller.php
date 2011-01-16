@@ -32,7 +32,7 @@ class PagesController extends AppController {
 			$username = $form['username'];
 			$feedback = $form['feedback'];
 			
-			$message = "Email: $email\nUseranme: $username\nFeedback:\n$feedback";
+			$message = "Email: $email\nUsername: $username\nFeedback:\n$feedback";
 			$this->Email->from = 'SharpBetTracker App<no-replay@sharpbettracker.com>';
 			$this->Email->to = 'cameron.davison@gmail.com';
 			$this->Email->subject = 'User Feedback';
