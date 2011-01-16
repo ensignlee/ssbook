@@ -202,7 +202,7 @@ class Pinnacle extends Pinnacle_Log {
 				}
 			}
 
-			if (strtolower($p->period_description) == '2nd half') {
+			if (strtolower($p->period_description) == '1st half') {
 				if (isset($p->total)) {
 					$types['half_total'] = array(
 						'odds_home' => "{$p->total->over_adjust}",
