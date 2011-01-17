@@ -103,7 +103,7 @@ if (empty($user) && empty($hideLogin)) {
 				<li class='sep'>|</li>
 				<li><?= $html->link('Enter', '/bets') ?></li>
 				<li class='sep'>|</li>
-				<li><?= $html->link('Create', '/users/create') ?></li>
+				<li><?= $html->link('Register', '/users/create') ?></li>
 			</ul>
 			</div>
 			<div id='copy'>&copy;2010 <a href="http://www.cameroncomputer.com">CameronComputer.com</a></div>
