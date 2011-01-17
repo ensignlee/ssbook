@@ -106,7 +106,7 @@ if (empty($user) && empty($hideLogin)) {
 				<li><?= $html->link('Register', '/users/create') ?></li>
 			</ul>
 			</div>
-			<div id='copy'>&copy;2010 <a href="http://www.cameroncomputer.com">CameronComputer.com</a></div>
+			<div id='copy'>&copy;2011 <a href="http://www.cameroncomputer.com">CameronComputer.com</a></div>
 		</div>
 	</div>
 </body>
