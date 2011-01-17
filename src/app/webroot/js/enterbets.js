@@ -615,7 +615,11 @@ $.extend(SS.Enterbets.prototype, {
 		var dir = bet.find('.direction select').val();
 		$.each(SS.Enterbets.TYPES, function (key, val) {
 			if (val.name == type) {
-				bet.find('.type_header').html(_this.astx+val.show);
+				var txt = val.show;
+				if (txt != '') {
+					txt = _this.astx+txt;
+				}
+				bet.find('.type_header').html(txt);
 				return false;
 			}
 		});
