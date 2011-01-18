@@ -37,8 +37,8 @@ class PagesController extends AppController {
 			$feedback = $form['feedback'];
 			
 			$message = "Email: $email\nUsername: $username\nFeedback:\n$feedback";
-			$this->Email->from = 'SharpBetTracker App<no-replay@sharpbettracker.com>';
-			$this->Email->to = 'cameron.davison@gmail.com';
+			$this->Email->from = 'SharpBetTracker App<no-reply@sharpbettracker.com>';
+			$this->Email->to = Configure::read('feedback.email');
 			$this->Email->subject = 'User Feedback';
 			$this->Email->send($message);
 			$sent = true;
