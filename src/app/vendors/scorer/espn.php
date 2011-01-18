@@ -273,8 +273,16 @@ class Espn_NFL extends Espn_Scorer {
 		}
 		$away = pq(".visitor", $score);
 		$home = pq(".home", $score);
-		$row['visitor'] = pq('.team-name a', $away)->text();
-		$row['home'] = pq('.team-name a', $home)->text();
+		
+		$visitorName = pq('.team-name a', $away)->text();
+		$homeName = pq('.team-name a', $home)->text();
+		if (empty($visitorName) && empty($homeName)) {
+			$visitorName = pq('.team-name', $away)->text();
+			$homeName = pq('.team-name', $home)->text();
+		}
+		
+		$row['visitor'] = $visitorName;
+		$row['home'] = $homeName;
 
 		if (!$preview) {
 			$row['visitor_score_total'] = Espn::replaceNull(pq('.score .final', $away)->text());
