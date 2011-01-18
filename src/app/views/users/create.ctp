@@ -1,4 +1,6 @@
 <h1>Register</h1>
+<img src = /img/SypherV.png></img>
+
 <p>You're one step away from harnessing the power of information to increase your edge betting.</p>
 
 <p>All you have to do is fill out this registration form and you'll be on your way to increasing your profits through analysis of your bets.</p>
