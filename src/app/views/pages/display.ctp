@@ -10,6 +10,11 @@
 <ul>
 <li>Breaking down your bets to show you which bets you are best at and which ones you are ... not so good at. Ever wondered if betting away favorites really is a money burner like a lot of people say? Check for yourself! Maybe you'll find that you're smart enough to choose away favorites that WIN.</li>
 <li>Grading your wagers for you. Have you ever had so many wagers going in a day that it took a ton of work to figure out if you were up or down at the end of the day? Or have you ever had a crummy day and just not wanted to even look at your records, much less enter in your losses? Well, we've got you covered - we'll grade your games for you, show you your record for the day, and how much you're up. You'll spend less time record-keeping and more time winning.</li>
+</ul>
+<p>
+<imgsrc="/img/GraphPlusStats.png"/>
+</p>
+<ul>
 <li>Giving you detailed analysis on your portfolio, like
 <ul>
 <li>What-if analysis: Want to see how your portfolio would look like if you had flat bet everything instead of varying your wager amounts? Our what-if analysis tool will allow you to do just that, showing you the best way to deal with your bankroll to help you earn more.</li>

@@ -16,10 +16,10 @@
 $html->css('register', 'stylesheet', array('inline' => false));
 
 echo $form->create('User', array('action' => 'create'));
-echo $form->input('username');
+echo $form->input('username', array('size' => 50));
 echo $form->input('email', array('size' => 50));
-echo $form->input('password');
-echo $form->input('password2', array('label' => 'Confirm Password', 'type' => 'password'));
+echo $form->input('password', array('size' => 50));
+echo $form->input('password2', array('label' => 'Confirm Password', 'type' => 'password', 'size' => 50));
 echo "<div class='clear'><br />".$form->end('Create')."</div>";
 ?>
 </div>
