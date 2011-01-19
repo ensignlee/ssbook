@@ -1,5 +1,9 @@
 <h1>Register</h1>
-<img src = /img/SypherV.png></img>
+
+<div style='width: 280px; float: left'>
+<img src="/img/SypherV.png" />
+</div>
+<div style='width: 600px; float: left'>
 
 <p>You're one step away from harnessing the power of information to increase your edge betting.</p>
 
@@ -19,3 +23,5 @@ echo $form->input('password2', array('label' => 'Confirm Password', 'type' => 'p
 echo "<div class='clear'><br />".$form->end('Create')."</div>";
 ?>
 </div>
+
+</div><br class='clear' />
