@@ -6,6 +6,7 @@
 </div>
 <div id='rightsection'>
 	<?= $session->flash() ?>
+	<h5>Type in team names to find games</h5>
 	<input type='text' name='superbar' id='superbar' />
 	<div id='enterbets'></div>
 </div>
