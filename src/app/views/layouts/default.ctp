@@ -69,7 +69,7 @@ var _gaq = _gaq || [];
 			</div>
 		</div>
 		<div id="banner">
-			<?= $this->Html->image('girls_header.jpg') ?>
+			<?= $this->Html->image('header.jpg') ?>
 <div id="loginBox">
 <?php
 if (empty($user) && empty($hideLogin)) {
