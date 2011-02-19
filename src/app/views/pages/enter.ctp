@@ -1,4 +1,4 @@
-<h1>Entering Bets Is Easy</h1>
+<h2>Entering Bets Is Easy</h1>
 
 <p>Are you worried that entering in bets will be hard? Don’t be! We’ve designed our interface to be simple and easy to use for you.</p>
 
@@ -24,4 +24,4 @@
 
 <p>And do it all <b>FOR FREE</b>!</p>
 
-<p><a href = "/users/create"><img src = "/img/BetEntryPage.png"></img></a></p>
+<p><a href="/users/create"><img src = "/img/BetEntryPage.png"></a></p>
