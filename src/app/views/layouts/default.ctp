@@ -63,6 +63,7 @@ var _gaq = _gaq || [];
 				<li><?= $html->link('Enter Bets', '/bets') ?></li>
 				<li><?= $html->link('View Bets', '/bets/view') ?></li>
 				<li class="far-right"><?= $html->link("Logout ({$user['username']})", '/users/logout') ?></li>
+				<li class="far-right"><?= $html->link("Profile", '/users/profile') ?></li>
 				<li class="far-right"><?= $html->link('Feedback', '/pages/feedback') ?></li>
 <?php } ?>				
 			</ul>

@@ -53,8 +53,49 @@ class UsersController extends AppController {
 		unset($this->data['User']['password']);
 		unset($this->data['User']['password2']);
 	}
+	
+	public function profile() {
+		$appuser = $this->Auth->user();
+		$appuser = $appuser['User'];
+		$username = $appuser['username'];
+		$email = $appuser['email'];
+		
+		$this->set('username', $username);
+		if (!empty($this->data)) {
+			$user = $this->data['User'];
+			$user['username'] = $username;
+			$message = array();
+			if (empty($user['password']) || empty($user['password2'])) {
+				$pass = 'AOEU1234aeou!@#'; // must be valid password
+				$user['password'] = $pass;
+				$user['password2'] = $pass;
+			} else {
+				$message[] = 'Changed password';
+			}
+			if ($appuser['email'] != $user['email']) {
+				$message[] = 'Changed email';
+			}
+			try {
+				$user['password'] = $this->Auth->password($user['password']);
+				if (!empty($message) && $this->isValidCreate($user, false)) {
+					$this->User->id = $appuser['id'];
+					if ($this->User->save($user)) {
+						$email = $user['email'];
+						$this->Auth->login($user);
+						$this->Session->setFlash("Sucess: ".implode(',', $message));
+					} else {
+						$this->Session->setFlash('Unable to create user');
+					}
+				}
+			} catch (Exception $e) {
+				$this->Session->setFlash($e->getMessage());
+			}
+		}
+		
+		$this->data = array('User' => array('email' => $email));
+	}
 
-	private function isValidCreate($user) {
+	private function isValidCreate($user, $checkexists=true) {
 		
 		if (preg_match("/^[a-zA-Z_.0-9\-]+$/", $user['username']) == 0) {
 			throw new Exception('Username can only contain letters,numbers,underscores,periods, and dashes');
@@ -71,7 +112,7 @@ class UsersController extends AppController {
 		if (!empty($user['password'])) {
 			if (strlen($user['password2']) >= 6) {
 				if ($user['password'] == $this->Auth->password($user['password2'])) {
-					if ($this->User->find('count', array('conditions' => array('username' => $user['username']))) == 0) {
+					if (!$checkexists || $this->User->find('count', array('conditions' => array('username' => $user['username']))) == 0) {
 						return true;
 					} else {
 						throw new Exception('Username already exists');
