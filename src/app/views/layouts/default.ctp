@@ -70,7 +70,11 @@ var _gaq = _gaq || [];
 			</div>
 		</div>
 		<div id="banner" class='clearfix'>
+			<?php if (empty($user)): ?>
+			<?= $this->Html->image('girls_header.jpg') ?>
+			<?php else: ?>
 			<div style="width:675px;height:134px;float:left;padding-left:10px;padding-top:10px"><?= $this->Html->image('header.jpg') ?></div>
+			<?php endif; ?>
 <div id="loginBox">
 <?php
 if (empty($user) && empty($hideLogin)) {
