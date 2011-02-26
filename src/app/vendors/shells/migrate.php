@@ -331,7 +331,7 @@ EOD;
 			exit;
 		}
 		$this->official = $go;
-		$this->ss = new mysqli('localhost', 'root', 'NXnuA1uRgiyA', 'sagestats');
+		$this->ss = new mysqli('localhost', 'root', '', 'sagestats');
 		$this->sourceid = $this->SourceType->getOrSet('SageStats');
 		
 		$this->Auth = new AuthComponent(null);
