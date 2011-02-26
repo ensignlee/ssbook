@@ -151,7 +151,7 @@ class MigrateShell extends Shell {
 			$message = $this->getInactiveMessage($username);
 		}
 		
-		if (false) {
+		if ($this->official) {
 			$this->Email->send($message);
 			sleep(1);
 		} else {
