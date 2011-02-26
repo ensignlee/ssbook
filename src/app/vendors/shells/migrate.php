@@ -222,7 +222,7 @@ class MigrateShell extends Shell {
 			exit;
 		}
 		$this->official = $go;
-		$this->ss = new mysqli('localhost', 'root', '', 'sagestats');		
+		$this->ss = new mysqli('localhost', 'root', 'NXnuA1uRgiyA', 'sagestats');		
 		$this->sourceid = $this->SourceType->getOrSet('SageStats');
 
 		App::import('Component','Auth');
