@@ -1,5 +1,9 @@
 <?php
 
+App::import('Core', 'Controller'); 
+App::import('Component', 'Email');
+App::import('Component','Auth');
+
 class MigrateShell extends Shell {
 	var $uses = array(
 	    'Score',
@@ -34,6 +38,10 @@ class MigrateShell extends Shell {
 		$users = $this->lookupUserInfo($recentUserIds);
 		foreach ($users as $user) {
 			$this->migrate($user);
+		}
+		$inactiveUsers = $this->lookupOtherUserInfo($recentUserIds);
+		foreach ($inactiveUsers as $user) {
+			$this->sendMigrationEmail($user['email'], $user['username']);
 		}
 	}
 
@@ -79,6 +87,7 @@ class MigrateShell extends Shell {
 
 	private function saveSBTUserBet($userbet) {
 		if ($this->official) {
+			$this->UserBet->create();
 			if (!$this->UserBet->save($userbet)) {
 				throw new Exception("Unable to save userbet ".json_encode($userbet));
 			}
@@ -95,6 +104,7 @@ class MigrateShell extends Shell {
 
 	private function saveSBTScore($score) {
 		if ($this->official) {
+			$this->Score->create();
 			if (!$this->Score->save($score)) {
 				throw new Exception("Unable to save score ".json_encode($score));
 			}
@@ -119,10 +129,91 @@ class MigrateShell extends Shell {
 			$this->fillInBet($bet);
 		}
 		unset($bet);
+		$this->log('Transferring '.count($bets).' bets', 'info');
 
 		foreach ($bets as $bet) {
 			$this->saveBet($bet, $userid);
-		}			
+		}
+		
+		$this->sendMigrationEmail($user['email'], $user['username'], $password);
+	}
+	
+	private function sendMigrationEmail($email, $username, $password='') {
+		$this->Email->from = 'Edmund Lee<edmund@sharpbettracker.com>';
+		$this->Email->to = $email;
+		$this->Email->subject = 'Thank you for using SageStats - Changes made for you!';
+		
+		if (!empty($password)) {
+			$this->log('Sending active message to '.$username, 'info');
+			$message = $this->getActiveMessage($username, $password);
+		} else {
+			$this->log('Sending inactive message to '.$username, 'info');
+			$message = $this->getInactiveMessage($username);
+		}
+		
+		if (false) {
+			$this->Email->send($message);
+			sleep(1);
+		} else {
+			echo "send email ".json_encode(array('from'=>$this->Email->from, 'to'=>$this->Email->to, 'subject'=>$this->Email->subject,'message'=>$message));
+		}
+	}
+	
+	private function getInactiveMessage($username) {
+		return <<<EOD
+Dear $username,     
+       
+Thank you for using SageStats. Based on comments and feedback from users like you, we've created a brand new platform to make using the site easier, including:
+
+*A MUCH easier way to enter your bets (completely redesigned!)
+*Faster grading for your wagers
+*Improved filtering to better analyze your wagers
+
+You can also record new types of wagers on the new platform, including:
+*Past bets (so your history doesn't get screwed up when you forget one bet)
+*Parlays/Teasers
+*1st Half / 2nd Half Bets
+*NHL Hockey
+
+You can access the new platform at http://www.sharpbettracker.com/ instead of http://www.sagestats.com/ . Simply create a new user account and you're good to go!
+
+We think you'll find the new user interface a lot more attractive, a lot more useful, and most importantly, *A LOT EASIER TO USE*. We look forward to seeing you there!
+
+Sincerely,
+
+Edmund Lee
+
+P.S. If you want to keep your previous account history, please email me at edmund@sharpbettracker.com with your previous username and we'll take care of it for you!
+EOD;
+	}
+	
+	private function getActiveMessage($username, $password) {
+		return <<<EOD
+Dear $username,
+ 
+Thank you for using SageStats. Based on comments and feedback from users like you, we've created a brand new platform to make using the site easier, including:
+
+*An easier way to enter your bets
+*Faster grading for your wagers
+*Improved filtering to better analyze your wagers
+
+You can also record new types of wagers on the new platform, including:
+*Past bets (so your history doesn't get screwed up when you forget one bet)
+*Parlays/Teasers
+*1st Half / 2nd Half Bets
+*NHL Hockey
+
+You can access the new platform at http://www.sharpbettracker.com/ instead of http://www.sagestats.com/ . We've kept your account history intact, so all you have to do is log in using your SageStats login and you'll be up and running immediately!
+
+We think you'll find the new user interface a lot more attractive, a lot more useful, and most importantly, *A LOT EASIER TO USE*. We look forward to seeing you there!
+
+Sincerely,
+
+Edmund Lee
+SharpBetTracker.com
+
+P.S. One snag though...since we encrypt your passwords, we don't know what they are and so we couldn't move your passwords over as well. We've given you a temporary password for now: $password  Once you login, you can click on the "Profile" button on the top right to change your password to whatever you'd like.
+EOD;
 	}
 
 	private function createUser($user, $password) {
@@ -133,12 +224,21 @@ class MigrateShell extends Shell {
 		}
 		$user['password'] = $password;
 		if ($this->official) {
-			$this->User->save($user);
+			$this->User->create();
+			if (!$this->User->save($user)) {
+				$this->log('Unable to save user '.json_encode($user));
+				return false;
+			} else {
+				$id = $this->User->id;
+				$this->log('Created '.$user['username'].' width id='.$id, 'info');
+				return $id;
+			}
 		} else {
 			echo "save user ".json_encode($user)."\n";
 			return 1;
 		}
-		return $this->User->id;
+		$this->log('Never should get here');
+		return false;
 	}
 
 	private function fillInBet(&$bet) {
@@ -213,6 +313,15 @@ class MigrateShell extends Shell {
 		}
 		return $rows;
 	}
+	
+	private function lookupOtherUserInfo($ids) {
+		$res = $this->ss->query("select id,username,email from user where id not in (".implode(',',$ids).")");
+		$rows = array();
+		while (($row = $res->fetch_assoc()) !== null) {
+			$rows[] = $row;
+		}
+		return $rows;
+	}
 
 	public function startup() {
 		$go = isset($this->params['go']);
@@ -222,11 +331,13 @@ class MigrateShell extends Shell {
 			exit;
 		}
 		$this->official = $go;
-		$this->ss = new mysqli('localhost', 'root', 'NXnuA1uRgiyA', 'sagestats');		
+		$this->ss = new mysqli('localhost', 'root', 'NXnuA1uRgiyA', 'sagestats');
 		$this->sourceid = $this->SourceType->getOrSet('SageStats');
-
-		App::import('Component','Auth');
-		$this->Auth=& new AuthComponent(null);
+		
+		$this->Auth = new AuthComponent(null);
+		$this->Controller = new Controller(); 
+		$this->Email = new EmailComponent(null); 
+		$this->Email->startup($this->Controller); 
 	}
 
 	public function usage() {
