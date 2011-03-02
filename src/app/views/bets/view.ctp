@@ -204,7 +204,6 @@ $fullurl = $html->url('/' . $this->params['url']['url'], true). '?'. http_build_
 		<th class="clickable">Winnings <span class="extra-click" id="filter_winning"><img alt="\/" src="<?= $html->url('/img/icons/green_arrow_down.gif') ?>" /></span></th>
 		<th class="clickable">Book <span class="extra-click" id="filter_book"><img alt="\/" src="<?= $html->url('/img/icons/green_arrow_down.gif') ?>" /></span></th>
 		<th class="clickable">Tags <span class="extra-click" id="filter_tag"><img alt="\/" src="<?= $html->url('/img/icons/green_arrow_down.gif') ?>" /></span></th>
-		<th>View</th>
 	</tr>
 
 	<?php
@@ -253,7 +252,6 @@ function dispBet($html, $i, $bet, $isPublic, &$betTypes) {
 		<td class="number"><?= (empty($i) ? parlayNull($bet['winning']) : nullMoney($bet['winning'])) ?></td>
 		<td><?= $bet['book'] ?></td>
 		<td><?= $bet['tag'] ?></td>
-		<td style="text-align: center"><?= empty($bet['scoreid']) ? '' : $html->link('V', '/bets/v/'.$bet['scoreid']) ?></td>
 	</tr>
 <?php
 }
