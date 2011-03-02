@@ -34,6 +34,25 @@ class MigrateShell extends Shell {
 	);
 
 	public function main() {
+		
+		if (!empty($this->params['migrate']) && !empty($this->params['sbt'])) {
+			$userids = array($this->params['migrate']);
+			$users = $this->lookupUserInfo($userids);
+			foreach ($users as $user) {
+				$this->migrate($user, $this->params['sbt']);
+				break;
+			}
+			return;
+		}
+		if (!empty($this->params['migrate'])) {
+			$userids = array($this->params['migrate']);
+			$users = $this->lookupUserInfo($userids);
+			foreach ($users as $user) {
+				$this->migrate($user);
+			}
+			return;
+		}
+
 		$recentUserIds = $this->getRecentUserIds();
 		$users = $this->lookupUserInfo($recentUserIds);
 		foreach ($users as $user) {
@@ -115,14 +134,28 @@ class MigrateShell extends Shell {
 		return $this->Score->id;
 	}
 
-	private function migrate($user) {
+	private function getUsername($userid) {
+		$user = $this->User->id = $userid;
+		$res = $this->User->read('username');
+		return $res['User']['username'];
+	}
+
+	private function migrate($user, $sbtuid='') {
 		$password = $this->getPass();
 		$this->log("password for {$user['username']} {$user['email']} = $password", 'info');
-		$userid = $this->createUser($user, $password);
-		if (empty($userid)) {
-			$this->log("user already exists, not importing bets", 'info');
-			return false;
+
+		if (empty($sbtuid)) {
+			$userid = $this->createUser($user, $password);
+			if (empty($userid)) {
+				$this->log("user already exists, not importing bets", 'info');
+				return false;
+			}
+		} else {
+			$userid = $sbtuid;
+			$password = '';
 		}
+		$username = $this->getUsername($userid);
+		$this->log("Using $userid, $username", 'info');
 
 		$bets = $this->getUserBets($user['id']);
 		foreach ($bets as &$bet) {
@@ -135,10 +168,10 @@ class MigrateShell extends Shell {
 			$this->saveBet($bet, $userid);
 		}
 		
-		$this->sendMigrationEmail($user['email'], $user['username'], $password);
+		$this->sendMigrationEmail($user['email'], $user['username'], $password, $sbtuid);
 	}
 	
-	private function sendMigrationEmail($email, $username, $password='') {
+	private function sendMigrationEmail($email, $username, $password='', $sbtuid='') {
 		$this->Email->from = 'Edmund Lee<edmund@sharpbettracker.com>';
 		$this->Email->to = $email;
 		$this->Email->subject = 'Thank you for using SageStats - Changes made for you!';
@@ -146,19 +179,37 @@ class MigrateShell extends Shell {
 		if (!empty($password)) {
 			$this->log('Sending active message to '.$username, 'info');
 			$message = $this->getActiveMessage($username, $password);
-		} else {
+		} else if (empty($sbtuid)) {
 			$this->log('Sending inactive message to '.$username, 'info');
 			$message = $this->getInactiveMessage($username);
+		} else {
+			$this->log('Sending migration message to '.$username, 'info');
+			$message = $this->getMigrationMessage($username);
 		}
 		
 		if ($this->official) {
 			$this->Email->send($message);
-			sleep(1);
+			sleep(5);
 		} else {
 			echo "send email ".json_encode(array('from'=>$this->Email->from, 'to'=>$this->Email->to, 'subject'=>$this->Email->subject,'message'=>$message));
 		}
 	}
 	
+	private function getMigrationMessage($username) {
+		return <<<EOD
+Dear $username,     
+       
+Thank you for using SageStats. We have migrated over your bets from sagestats to sharpbettracker. 
+
+Please do not hesitate to contact us if there was a problem.
+
+Sincerely,
+
+Edmund Lee
+
+EOD;
+	}
+
 	private function getInactiveMessage($username) {
 		return <<<EOD
 Dear $username,     
@@ -338,6 +389,12 @@ EOD;
 		$this->Controller = new Controller(); 
 		$this->Email = new EmailComponent(null); 
 		$this->Email->startup($this->Controller); 
+
+		if (isset($this->params['email'])) {
+			$this->sendMigrationEmail('cameron.davison@gmail.com', 'loyd', 'aoeuth');
+			$this->sendMigrationEmail('cameron.davison@gmail.com', 'loyd');
+			exit;
+		}
 	}
 
 	public function usage() {
