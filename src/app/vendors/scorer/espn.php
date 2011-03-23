@@ -32,6 +32,7 @@ class Espn extends Espn_Log {
 		$this->types[] = new Espn_NCAAF_AA();
 		$this->types[] = new Espn_NHL();
 		$this->types[] = new Espn_NCAAB();
+		$this->types[] = new Espn_NCAAB_March();
 
 		$this->setSourceId();
 		$this->date = $this->shell->Score->getLastGameDate($this->sourceid);
@@ -407,6 +408,11 @@ class Espn_NCAAB extends Espn_NBA {
 	}
 }
 	
+class Espn_NCAAB_March extends Espn_NCAAB {
+	public function getUrl($date) {
+		return  sprintf('http://scores.espn.go.com/ncb/scoreboard?date=%s&confId=100', date('Ymd', strtotime($date)));
+	}
+}
 
 class Espn_NBA extends Espn_MLB {
 	

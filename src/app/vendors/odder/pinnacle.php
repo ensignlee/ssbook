@@ -63,7 +63,7 @@ class Pinnacle extends Pinnacle_Log {
 			$this->log("Finished creating $success odd(s)");
 			Cache::write('pinnacle_lastGame', $this->lastGame);
 		} catch (Exception $e) {
-			$this->log('Unable to read odds'.$e->getMessage(), 'error');
+			$this->log('Unable to read odds '.$e->getMessage(), 'error');
 		}
 	}
 	
@@ -111,7 +111,8 @@ class Pinnacle extends Pinnacle_Log {
 
 	private function getGameInfo() {
 		if (empty($this->xml)) {
-			throw new Exception('Was unable to read XML text');
+			$this->log("Was unable to read XML text");
+			return array();
 		}
 		$sxml = simplexml_load_string($this->xml);
 		$this->lastGame = (int)$sxml->lastGame;
