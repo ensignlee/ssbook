@@ -421,7 +421,7 @@ $.extend(SS.Enterbets.prototype, {
 	/**
 	 * @param <string> iden Identifier "SS[scoreid]" "incremental"
 	 */
-	renderBet : function (home, visitor, datetime, type, iden) {
+	renderBet : function (home, homeExtra, visitor, visitExtra, datetime, type, isMLB, iden) {
 		var h = '<td class="icon"><img src="'+this.iconurl+'wrong.png"/></td><td><select class="type" name="type['+iden+']">';
 		$.each(SS.Enterbets.TYPES, function (key, val) {
 			h += '<option value="'+val.name+'"';
@@ -443,7 +443,13 @@ $.extend(SS.Enterbets.prototype, {
 
 		var datestr = datetime.toString('M/d/yy h:mm tt');
 		var date_std = datetime.toString('yyyy-MM-dd HH:mm:ssZ');
-		var je = $('<div class="bet"><table><tr><td>&nbsp;</td><td colspan="8" class="teamnames"><span class="teamnames_visitor">'+visitor+'</span> @ <span class="teamnames_home">'+home+'</span> <span class="teamnames_datestr">'+datestr+'<input type="hidden" name="date_std['+iden+']" class="date_std" value="'+date_std+'" /></td></td></tr>'+ttl+'<tr>'+h+'</tr></table><div class="close"><img src="'+this.iconurl+'close.png" /></div></div>');
+		var vextra = '';
+		var hextra = '';
+		if (isMLB) {
+			vextra = (visitExtra) ? ' ('+visitExtra+')' : '';
+			hextra = (homeExtra) ? ' ('+homeExtra+')' : '';
+		}
+		var je = $('<div class="bet"><table><tr><td>&nbsp;</td><td colspan="8" class="teamnames"><span class="teamnames_visitor">'+visitor+'</span>'+vextra+' @ <span class="teamnames_home">'+home+'</span>'+hextra+' <span class="teamnames_datestr">'+datestr+'<input type="hidden" name="date_std['+iden+']" class="date_std" value="'+date_std+'" /></td></td></tr>'+ttl+'<tr>'+h+'</tr></table><div class="close"><img src="'+this.iconurl+'close.png" /></div></div>');
 		return je;
 	},
 
@@ -781,7 +787,7 @@ $.extend(SS.Enterbets.prototype, {
 	show : function (data) {
 		var num = this.idenNumber++;
 		var iden = 'SS'+data.scoreid+'_'+num;
-		var bet = this.renderBet(data.home, data.visitor, Date.parse(data.game_date), data.type, iden);
+		var bet = this.renderBet(data.home, data.homeExtra, data.visitor, data.visitExtra, Date.parse(data.game_date), data.type, data.isMLB, iden);
 		var _this = this;
 		this.jBets.prepend(bet).ready(function() {
 			_this.setupEvents(bet, data, iden);

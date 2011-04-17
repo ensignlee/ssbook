@@ -185,6 +185,9 @@ class BetsController extends AppController {
 		}		
 			
 		$scores = $this->Score->matchOption($options);
+		foreach ($scores as &$score) {
+			$score['isMLB'] = $this->LeagueType->leagueIsMLB($score['league']);
+		}
 		return $scores;
 	}
 
@@ -194,7 +197,8 @@ class BetsController extends AppController {
 			$score = $this->Score->findById($params['scoreid']);
 			$score = $score['Score'];
 			$league = $score['league'];
-			if ($this->LeagueType->leagueIsMLB($league)) {
+			$isMLB = $this->LeagueType->leagueIsMLB($league);
+			if ($isMLB) {
 				$type = 'moneyline';
 			} else {
 				$type = 'spread';
@@ -204,7 +208,10 @@ class BetsController extends AppController {
 				'scoreid' => $score['id'],
 				'home' => $score['home'],
 				'visitor' => $score['visitor'],
+				'homeExtra' => $score['homeExtra'],
+				'visitExtra' => $score['visitExtra'],
 				'league' => $league,
+				'isMLB' => $isMLB,
 				'game_date' => $score['game_date'],
 				'type' => $type
 			);

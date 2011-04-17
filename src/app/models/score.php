@@ -152,8 +152,25 @@ class Score extends AppModel {
 				$out[$league] = array();
 			}
 			$date = date('n/j/y g:i A', strtotime($game['game_date']));
-			$out[$league][] = array('desc' => "{$game['visitor']} @ {$game['home']} $date", 'scoreid' => $game['id'], 'odds' => isset($odds[$game['id']]));
+			if ($league == 'MLB') {
+				$vpitch = $hpitch = '';
+				if (!empty($game['visitExtra']) && !empty($game['homeExtra'])) {
+					$vpitch = "(".self::abrev($game['visitExtra']).")";
+					$hpitch = "(".self::abrev($game['homeExtra']).")";
+				}
+				$desc = "{$game['visitor']}<span class='smalltext'>$vpitch</span> @ {$game['home']}<span class='smalltext'>$hpitch</span> $date";
+			} else {
+				$desc = "{$game['visitor']} @ {$game['home']} $date";
+			}
+			$out[$league][] = array('desc' => $desc, 'scoreid' => $game['id'], 'odds' => isset($odds[$game['id']]));
 		}
 		return $out;
+	}
+	
+	public static function abrev($str) {
+		if (empty($str) || strlen($str) <= 3) {
+			return $str;
+		}
+		return ucfirst($str[0].$str[1].$str[2]);
 	}
 }
