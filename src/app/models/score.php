@@ -50,7 +50,12 @@ class Score extends AppModel {
 				break;
 			case 'name':
 				if (!is_array($option)) {
-					$conds['or'] = array('home LIKE' => "%$option%", 'visitor LIKE' => "%$option%");
+					$conds['or'] = array(
+					    'home LIKE' => "%$option%", 
+					    'visitor LIKE' => "%$option%", 
+					    'homeExtra LIKE' => "%$option%", 
+					    'visitExtra LIKE' => "%$option%"
+					);
 				} else {
 					$conds['or'] = array('home' => $option, 'visitor' => $option);
 				}
