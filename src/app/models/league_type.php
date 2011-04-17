@@ -43,4 +43,17 @@ class LeagueType extends AppModel {
 
 		return false;
 	}
+	
+	private $mlbNumber = null;
+	public function leagueIsMLB($lid) {
+		if (empty($this->mlbNumber)) {
+			$list = $this->getList();
+			foreach ($list as $id => $row) {
+				if ($row == 'MLB') {
+					$this->mlbNumber = $id;
+				}
+			}
+		}
+		return $lid == $this->mlbNumber;
+	}
 }

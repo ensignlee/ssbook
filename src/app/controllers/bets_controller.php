@@ -193,13 +193,20 @@ class BetsController extends AppController {
 		if (!empty($params['scoreid'])) {
 			$score = $this->Score->findById($params['scoreid']);
 			$score = $score['Score'];
+			$league = $score['league'];
+			if ($this->LeagueType->leagueIsMLB($league)) {
+				$type = 'moneyline';
+			} else {
+				$type = 'spread';
+			}
+			
 			$bet = array(
 				'scoreid' => $score['id'],
 				'home' => $score['home'],
 				'visitor' => $score['visitor'],
-				'league' => $score['league'],
+				'league' => $league,
 				'game_date' => $score['game_date'],
-				'type' => 'spread'
+				'type' => $type
 			);
 			$odds = $this->Odd->latest($params['scoreid']);
 			$bet['odds'] = array();
