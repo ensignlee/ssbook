@@ -892,7 +892,7 @@ class BetsController extends AppController {
 
 	public function view() {
 		
-		$cond = array(
+		$condOrig = array(
 		    'home' => $this->urlGetVar('home'),
 		    'visitor' => $this->urlGetVar('visitor'),
 		    'type' => $this->urlGetVar('type'),
@@ -905,8 +905,8 @@ class BetsController extends AppController {
 		    'odds' => $this->urlGetVar('odds'),
 		    'spread' => $this->urlGetVar('spread'),
 		    'winning' => $this->urlGetVar('winning')
-		);		
-		list($sqlcond, $cond) = $this->fixCond($cond);
+		);
+		list($sqlcond, $cond) = $this->fixCond($condOrig);
 		$this->set('cond', $cond);
 		$this->set('condAsMap', $this->getCondAsMap($cond));
 
@@ -917,7 +917,7 @@ class BetsController extends AppController {
 			$this->sortKey = $sort;
 			$this->sortDir = 'desc';
 		}
-		$this->sortKey = in_array($this->sortKey, array_keys($cond)) ? $this->sortKey : 'default';
+		$this->sortKey = in_array($this->sortKey, array_keys($condOrig)) ? $this->sortKey : 'default';
 		$this->set('sortKey', $this->sortKey);
 		$this->set('sortDir', $this->sortDir);
 
