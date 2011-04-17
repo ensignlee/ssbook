@@ -57,6 +57,14 @@ class Espn extends Espn_Log {
 		}
 		return $tstr;
 	}
+	
+	public static function emptyNull($str) {
+		return empty($str) ? null : $str;
+	}
+	
+	public static function nonbreakingTrim($str) {
+		return mb_trim($str, "\xC2\xA0\n ");
+	}
 
 	public static function addNull($left, $right) {
 		if (is_null($left) || is_null($right)) {
@@ -105,10 +113,17 @@ class Espn extends Espn_Log {
 			new Exception("Unable to create id from score".json_encode($score));
 		}
 		$home = $score['home'];
+		if (!empty($score['homeExtra'])) {
+			$home .= $score['homeExtra'];
+		}
 		$visitor = $score['visitor'];
+		if (!empty($score['visitExtra'])) {
+			$visitor .= $score['visitExtra'];
+		}
 		$league = $score['league'];
 		$date = $score['game_date'];
 
+		$this->log("Making id with $date,$league,$home,$visitor");
 		$id = self::makeId($date, $league, $home, $visitor);
 		return $id;
 	}
@@ -309,18 +324,24 @@ class Espn_NFL extends Espn_Scorer {
 }
 
 class Espn_NHL extends Espn_MLB {
+	
 	public $leagueName = 'NHL';
 	protected $statusLine = 'statusLine2Left';
 
 	public function getUrl($date) {
 		return sprintf('http://scores.espn.go.com/nhl/scoreboard?date=%s', date('Ymd', strtotime($date)));
 	}
+	
+	protected function verify($row) {
+		return true;
+	}
 }
 
 class Espn_MLB extends Espn_Scorer {
 
-	protected $statusLine = 'statusLine2';
 	public $leagueName = 'MLB';
+	protected $statusLine = 'statusLine2';
+	protected $teamname = '.team-name';
 
 	public function getUrl($date) {
 		return sprintf('http://scores.espn.go.com/mlb/scoreboard?date=%s', date('Ymd', strtotime($date)));
@@ -339,19 +360,29 @@ class Espn_MLB extends Espn_Scorer {
 		$out = array();
 		foreach ($scores as $score) {
 			$row = $this->parseScore($score, $time);
-			$out[] = $row;
+			if ($this->verify($row)) {
+				$out[] = $row;
+			} else {
+				$this->log("Did not verify. {$row['home']} @ {$row['visitor']}");
+			}
 		}
 
 		$scores = pq('.mod-scorebox-pregame');
 		foreach ($scores as $score) {
 			$row = $this->parseScore($score, $time);
-			$out[] = $row;
+			if ($this->verify($row)) {
+				$out[] = $row;
+			} else {
+				$this->log("Did not verify. {$row['home']} @ {$row['visitor']}");
+			}
 		}
 
 		return $out;
 	}
-
-	protected $teamname = '.team-name';
+	
+	protected function verify($row) {
+		return !(empty($row['homeExtra']) || empty($row['visitExtra']));
+	}
 
 	protected function parseScore($score, $gametime) {
 		$row = array();
@@ -367,16 +398,24 @@ class Espn_MLB extends Espn_Scorer {
 		if ($parsedtime === false) {
 			$parsedtime = self::createDate("$gametime");
 		}
+		
+		// Adding in the pitchers
+		$homePitcher = pq("div[id$='homeStarter']", $score);
+		$visitPitcher = pq("div[id$='awayStarter']", $score);
+		$row['homeExtra'] = Espn::emptyNull(Espn::nonbreakingTrim(pq('a', $homePitcher)->text()));
+		$row['visitExtra'] = Espn::emptyNull(Espn::nonbreakingTrim(pq('a', $visitPitcher)->text()));
+		
 		$row['game_date'] = $parsedtime;
 		
 		return $row;
 	}
 }
 
-class Espn_NCAAB extends Espn_NBA {
+class Espn_NCAAB extends Espn_NHL {
 
 	public $leagueName = 'NCAAB';
 	protected $teamname = '.team-name .name-link';
+	protected $statusLine = 'statusLine2';
 
 	public function getUrl($date) {
 		return  sprintf('http://scores.espn.go.com/ncb/scoreboard?date=%s&confId=50', date('Ymd', strtotime($date)));
@@ -414,9 +453,8 @@ class Espn_NCAAB_March extends Espn_NCAAB {
 	}
 }
 
-class Espn_NBA extends Espn_MLB {
+class Espn_NBA extends Espn_NHL {
 	
-	protected $statusLine = 'statusLine2Left';
 	public $leagueName = 'NBA';
 
 	public function getUrl($date) {
