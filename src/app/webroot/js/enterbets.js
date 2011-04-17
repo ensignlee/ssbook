@@ -696,20 +696,22 @@ $.extend(SS.Enterbets.prototype, {
 			case 'second_spread':
 				if (dir == 'home') {
 					bet.find('.spread').val(odd.spread_home);
+					bet.find('.odds').val(odd.odds_home);
 				} else {
 					bet.find('.spread').val(odd.spread_visitor);
+					bet.find('.odds').val(odd.odds_visitor);
 				}
-				bet.find('.odds').val('-110');
 				break;
 			case 'total':
 			case 'half_total':
 			case 'second_total':
 				if (dir == 'over') {
 					bet.find('.spread').val(odd.total);
+					bet.find('.odds').val(odd.odds_home);
 				} else {
 					bet.find('.spread').val(odd.total);
+					bet.find('.odds').val(odd.odds_visitor);
 				}
-				bet.find('.odds').val('-110');
 				break;
 			}
 		} else {
