@@ -684,6 +684,9 @@ class BetsController extends AppController {
 	}
 
 	private function getBetOn($userBet, $score) {
+		$hextra = empty($score['homeExtra']) ? '' : " ({$score['homeExtra']})";
+		$vextra = empty($score['visitExtra']) ? '' : " ({$score['visitExtra']})";
+		
 		switch ($userBet['type']) {
 		case 'moneyline':
 		case 'half_moneyline':
@@ -691,7 +694,7 @@ class BetsController extends AppController {
 		case 'spread':
 		case 'half_spread':
 		case 'second_spread':
-			return ($userBet['direction'] == 'home') ? $score['home'] : $score['visitor'];
+			return ($userBet['direction'] == 'home') ? $score['home'].$hextra : $score['visitor'].$vextra;
 		case 'total':
 		case 'half_total':
 		case 'second_total':
