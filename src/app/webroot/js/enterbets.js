@@ -870,7 +870,7 @@ $.extend(SS.Accorselect.prototype, {
 
 			_this.jSelect.find('li[class^=selectgame]').click(function() {
 				var clazz = $(this).attr('class').split('-');
-				var data = {scoreid : clazz[1]};
+				var data = {scoreid : parseInt(clazz[1]), accorselect : 1};
 				_this.Enterbets.add(data);
 				//$(this).parent().toggle('fast');
 				return false;
