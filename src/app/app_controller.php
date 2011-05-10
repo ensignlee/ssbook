@@ -22,4 +22,14 @@ class AppController extends Controller {
 		}
 		return $default;
 	}
+	
+	protected function _div($a, $b) {
+		if (is_null($a) || is_null($b)) {
+			return null;
+		}
+		if (empty($a) || empty($b)) {
+			return 0;
+		}
+		return $a / $b;
+	}
 }
