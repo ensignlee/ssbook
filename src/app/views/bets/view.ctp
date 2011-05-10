@@ -222,9 +222,9 @@ $fullurl = $html->url('/' . $this->params['url']['url'], true). '?'. http_build_
 	<?php if (!$isPublic): ?></form><?php endif;// (!$isPublic): ?>
 </div>
 <?php
-function parlayNull($winning) {
+function parlayNull($winning, $active=1) {
 	if (is_null($winning)) {
-		return '';
+		return $active == 1 ? '' : 'cancelled';
 	}
 	if (empty($winning)) {
 		return 'T';
@@ -249,15 +249,16 @@ function dispBet($html, $i, $bet, $isPublic, &$betTypes) {
 		<td><?= $bet['home'] ?></td>
 		<td class="number"><?= empty($i) ? '' : nullMoney($bet['risk']) ?></td>
 		<td class="number"><?= empty($i) ? '' : $bet['odds'] ?></td>
-		<td class="number"><?= (empty($i) ? parlayNull($bet['winning']) : nullMoney($bet['winning'])) ?></td>
+		<td class="number"><?= empty($i) ? parlayNull($bet['winning'], $bet['active']) : nullMoney($bet['winning'], $bet['active']) ?></td>
 		<td><?= $bet['book'] ?></td>
 		<td><?= $bet['tag'] ?></td>
 	</tr>
 <?php
 }
-function nullMoney($money) {
+
+function nullMoney($money, $active=1) {
 	if (is_null($money)) {
-		return '';
+		return $active == 1 ? '' : 'cancelled';
 	}
 	return money_format('%(n', $money);
 }

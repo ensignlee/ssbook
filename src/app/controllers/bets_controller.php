@@ -719,10 +719,14 @@ class BetsController extends AppController {
 
 		$parlayBetGameDate = 0;
 		$parlays = false;
+		$active = 1;
 		if (!empty($userBet['Parlay'])) {
 			$parlays = $this->reformatBets($userBet['Parlay']);
 			foreach ($parlays as $row) {
 				$parlayBetGameDate = max($parlayBetGameDate, strtotime($row['date']));
+				if ($row['active'] == 0) {
+					$active = 0;
+				}
 			}
 		}
 		$tags = array();
@@ -747,7 +751,8 @@ class BetsController extends AppController {
 		    'direction' => $userBet['direction'],
 		    'tag' => implode(',', $tags),
 		    'parlays' => $parlays,
-		    'created' => $userBet['created']
+		    'created' => $userBet['created'],
+		    'active' => is_null($score['active']) ? $active : $score['active']
 		);
 		return $fields;
 	}

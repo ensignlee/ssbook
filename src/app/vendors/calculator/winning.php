@@ -21,11 +21,17 @@ abstract class Winning_GameType {
 			$bet = $this->getBet();
 			return $this->allGraded($bet['Parlay']);
 		}
+		if ($game['active'] != 1) {
+			return false;
+		}
 		return (!is_null($game['home_score_total']) && !is_null($game['visitor_score_total']));
 	}
 	
 	private function allGraded($games) {
 		foreach ($games as $game) {
+			if ($game['Score']['active'] != 1) {
+				return false;
+			}
 			if (is_null($game['Score']['home_score_total']) || is_null($game['Score']['visitor_score_total'])) {
 				return false;
 			}
