@@ -32,7 +32,7 @@ class Score extends AppModel {
 
 	public function matchOption($options, $limit=20) {
 
-		$conds = array();
+		$conds = array('active' => 1);
 		foreach ($options as $key => $option) {
 			switch($key) {
 			case 'close_date': 
@@ -101,7 +101,8 @@ class Score extends AppModel {
 		$end = date('Y-m-d H:i:s', strtotime($game['game_date']) + $timeframe);
 		$existing_games = $this->find('all', array('conditions' => array(
 			'game_date BETWEEN ? AND ?' => array($start,  $end),
-			'league' => $game['league_id']
+			'league' => $game['league_id'],
+			'active' => 1
 		)));
 
 		$r = explode(' ', $game['home']);
@@ -138,7 +139,7 @@ class Score extends AppModel {
 		$Odd = new Odd();
 
 		$cond = array(
-			'conditions' => array('game_date BETWEEN ? AND ?' => array($startdate, $enddate)),
+			'conditions' => array('active' => 1, 'game_date BETWEEN ? AND ?' => array($startdate, $enddate)),
 			'order' => array('game_date ASC')
 		);
 		$games = $this->find('all', $cond);
@@ -177,5 +178,54 @@ class Score extends AppModel {
 			return $str;
 		}
 		return ucfirst($str[0].$str[1].$str[2]);
+	}
+	
+	public function findBadGames() {
+		$date = strtotime('-3 days');
+		$cond = array(
+		    'home_score_half' => null,
+		    'visitor_score_half' => null,
+		    'home_score_total' => null,
+		    'visitor_score_total' => null,
+		    'active' => 1,
+		    'game_date <=' => date('Y-m-d H:i:s', $date)
+		);
+		return $this->find('all', array('conditions' => $cond));
+	}
+	
+	public function findCloseGames() {
+		$date = strtotime('-90 days');
+		$cond = array(
+		    'home_score_half' => null,
+		    'visitor_score_half' => null,
+		    'home_score_total' => null,
+		    'visitor_score_total' => null,
+		    'active' => 1,
+		    'game_date >=' => date('Y-m-d H:i:s', $date)
+		);
+		$games = $this->find('all', array('conditions' => $cond));
+		$dateTeamArray = array();
+		foreach ($games as $game) {
+			$home = $game['Score']['home'];
+			$visitor = $game['Score']['visitor'];
+			$ymd = date('Y-m-d', strtotime($game['Score']['game_date']));
+			$dh = strtolower($ymd.$home);
+			$dv = strtolower($ymd.$visitor);
+			if (empty($dateTeamArray[$dh])) {
+				$dateTeamArray[$dh] = array();
+			}
+			if (empty($dateTeamArray[$dv])) {
+				$dateTeamArray[$dv] = array();
+			}
+			$dateTeamArray[$dh][] = $game;
+			$dateTeamArray[$dv][] = $game;
+		}
+		$res = array();
+		foreach ($dateTeamArray as $key => $row) {
+			if (count($row) > 1) {
+				$res[] = $row;
+			}
+		}
+		return $res;
 	}
 }
