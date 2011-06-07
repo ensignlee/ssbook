@@ -1,3 +1,4 @@
+<h1>Upcoming Features</h1>
 <p>We're constantly trying to improve things here at SharpBetTracker to
 help us all win more money, and we'd like to work together with you to
 do so!</p> 
@@ -50,7 +51,7 @@ foreach ($features as $feature) {
 	
 	echo "<div class='voteinfo'><h1>$title</h1>";
 	echo "<p>$descr</p>";
-	echo "<div>".$html->link('More Info', '/features/info/'.$fid)."</div></div></div>";
+	echo "<div>".$html->link('Comment', '/features/info/'.$fid)."</div></div></div>";
 }
 
 function dispVotes($up, $down) {

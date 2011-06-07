@@ -147,6 +147,7 @@ class Espn extends Espn_Log {
 				}
 
 				$score['sourceid'] = $this->sourceid;
+				$score['active'] = 1;
 				if (!isset($score['source_gameid'])) {
 					// ESPNs id cannot be trusted
 					$score['source_gameid'] = $this->createSourceGameId($score);
