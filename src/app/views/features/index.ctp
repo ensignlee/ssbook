@@ -32,7 +32,7 @@ foreach ($features as $feature) {
 	$dir = $userVoted ? $userVotes[$fid] : null;
 	
 	$votes = empty($feature['FeatureVote']) ? array('up' => 0, 'down' => 0) : $feature['FeatureVote'];
-	echo "<div class='vote'><div class='votes'>".($votes['up'] + $votes['down'])." votes ("+dispVotes($votes['up'], $votes['down'])+")";
+	echo "<div class='vote'><div class='votes'>".($votes['up'] + $votes['down'])." votes (".dispVotes($votes['up'], $votes['down']).")";
 	
 	$class1 = $class2 = $disabled = '';
 	if ($userVoted) {
@@ -51,11 +51,11 @@ foreach ($features as $feature) {
 	
 	echo "<div class='voteinfo'><h1>$title</h1>";
 	echo "<p>$descr</p>";
-	echo "<div>".$html->link('Comment', '/features/info/'.$fid)."</div></div></div>";
+	echo "<div>".$html->link('Comment', '/features/info/'.$fid)."</div></div>";
 }
 
 function dispVotes($up, $down) {
-    $total = $up + $down;
+    $total = $up - $down;
     if ($total == 0) {
         return 0;
     } else if ($total > 0) {
