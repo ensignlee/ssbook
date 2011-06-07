@@ -59,14 +59,14 @@ var _gaq = _gaq || [];
 				<li><?= $html->link('View Bets', '/pages/view') ?></li>
 				<li class="far-right"><?= $html->link('Register', '/users/create') ?></li>
 				<li class="far-right"><?= $html->link('Feedback', '/pages/feedback') ?></li>
-				<!-- <li class="far-right"><?= $html->link('Upcoming Improvements', '/features/') ?></li> -->
+				<li class="far-right"><?= $html->link('Upcoming Improvements', '/features/') ?></li>
 <?php } else { ?>
 				<li><?= $html->link('Enter Bets', '/bets') ?></li>
 				<li><?= $html->link('View Bets', '/bets/view') ?></li>
 				<li class="far-right"><?= $html->link("Logout ({$user['username']})", '/users/logout') ?></li>
 				<li class="far-right"><?= $html->link("Profile", '/users/profile') ?></li>
 				<li class="far-right"><?= $html->link('Feedback', '/pages/feedback') ?></li>
-				<!-- <li class="far-right"><?= $html->link('Upcoming Improvements', '/features/') ?></li> -->
+				<li class="far-right"><?= $html->link('Upcoming Improvements', '/features/') ?></li>
 <?php } ?>				
 			</ul>
 			</div>
