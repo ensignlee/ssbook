@@ -103,7 +103,7 @@ $(function () {
 			$record = $row['record'];
 
 			echo "<tr><td width='160px'>";
-			if (count($def) == 2) {
+			if (is_array($def) && count($def) == 2) {
 				if ($def[0] === false) {
 					echo "less than {$def[1]}";
 				} else if ($def[1] === false) {

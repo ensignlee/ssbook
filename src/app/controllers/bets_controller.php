@@ -737,10 +737,12 @@ class BetsController extends AppController {
 			$tags[] = trim($tag['name']);
 		}
 
-		$fields = array(
+        $gettime = max($userBetGameDate, $scoreGameDate, $parlayBetGameDate);
+        $fields = array(
 		    'betid' => $userBet['id'],
 		    'scoreid' => $score['id'],
-		    'date' => date('Y-m-d H:i:s', max($userBetGameDate, $scoreGameDate, $parlayBetGameDate)),
+            'gettime' => $gettime,
+		    'date' => date('Y-m-d H:i:s', $gettime),
 		    'league' => $this->getLeague($userBet, $score['league']),
 		    'beton' => $this->getBetOn($userBet, $score),
 		    'type' => $userBet['type'],
@@ -1070,6 +1072,13 @@ class BetsController extends AppController {
 	}
 
 	private function getGroupStats(&$bets) {
+        $leagues = $this->LeagueType->getList();
+        $calcInLeague = array();
+        foreach ($leagues as $league => $name) {
+            $calcInLeague[] = new CalcIn($name);
+        }
+        $todayMidnight = strtotime('23:59:59');
+
 		$groupStats = array(
 		    'Odds' => $this->calcGroupStats($bets, array(
 			'odds' => array(
@@ -1084,7 +1093,7 @@ class BetsController extends AppController {
 			    new CalcBetween(300, false)
 			)
 		    )),
-		    'Wager Size' => $this->calcGroupStats($bets, array(
+		    'Wager' => $this->calcGroupStats($bets, array(
 			'risk' => array(
 			    new CalcBetween(false, 101),
 			    new CalcBetween(101, 200),
@@ -1109,6 +1118,19 @@ class BetsController extends AppController {
 			    new CalcIn('parlay'),
 			    new CalcIn('teaser')
 			)
+		    )),
+		    'League' => $this->calcGroupStats($bets, array(
+			'league' => $calcInLeague
+		    )),
+		    'Date' => $this->calcGroupStats($bets, array(
+			'gettime' => array(
+                new CalcBetween(strtotime('yesterday midnight'), $todayMidnight, "Today"),
+                new CalcBetween(strtotime('-7 days'), $todayMidnight, "Last 7 Days"),
+                new CalcBetween(strtotime('-2 weeks'), $todayMidnight, "Last Two Weeks"),
+                new CalcBetween(strtotime('-1 month'), $todayMidnight, "Last Month"),
+                new CalcBetween(strtotime('-3 months'), $todayMidnight, "Last 3 Months"),
+                new CalcBetween(strtotime('jan 1'), $todayMidnight, "Year to Date")
+            )
 		    ))
 		);
 		return $groupStats;
@@ -1183,12 +1205,14 @@ interface CalcStat {
 class CalcBetween implements CalcStat {
 	private $start;
 	private $stop;
-	public function __construct($start, $stop) {
+    private $msg;
+	public function __construct($start, $stop, $msg=null) {
 		$this->start = $start;
 		$this->stop = $stop;
+        $this->msg = $msg;
 	}
 	public function getDef() {
-		return array($this->start, $this->stop);
+		return empty($this->msg) ? array($this->start, $this->stop) : $this->msg;
 	}
 	public function matches($val) {
 		if (is_null($val)) {
