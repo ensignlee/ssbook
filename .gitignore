@@ -1,0 +1,3 @@
+*.iml
+src/app/config/core.php
+src/app/config/database.php
