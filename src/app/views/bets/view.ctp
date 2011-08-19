@@ -186,7 +186,7 @@ $fullurl = $html->url('/' . $this->params['url']['url'], true). '?'. http_build_
 	<input type="button" name="Edit" id="editBets" value="Edit Bets" />
 	<?php endif;// (!$isPublic): ?>
 
-	<a name="Bets"><?= $html->link('Reset Filters', '/bets/view') ?></a>
+	<a name="Bets"><?= $html->link('Reset Filters', '/bets/view?reset=1') ?></a>
 
 	<table>
 	<tr>

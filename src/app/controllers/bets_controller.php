@@ -13,7 +13,7 @@ class BetsController extends AppController {
 	    'User',
 	    'SourceSportName'
 	);
-	var $components = array('RequestHandler');
+	var $components = array('RequestHandler', 'Cookie');
 	var $helpers = array('EditBets');
 
 	public function beforeFilter() {
@@ -912,8 +912,50 @@ class BetsController extends AppController {
 		return $ret;
 	}
 
+    private static $viewCookieName = "_V";
+
+    private function setViewCookie($arr) {
+        if (!empty($arr) && is_array($arr)) {
+            unset($arr['r']);
+            unset($arr['reset']);
+        }
+        $this->Cookie->write(
+            self::$viewCookieName,
+            empty($arr) ? '' : http_build_query($arr),
+            true,
+            "+20 years"
+        );
+    }
+
+    private function getViewCookie() {
+        $cookie = $this->Cookie->read(self::$viewCookieName);
+        if (empty($cookie)) {
+            return '';
+        } else {
+            return $cookie;
+        }
+    }
+
 	public function view() {
-		
+
+        $publicuserid = $this->getPublicUserId();
+        // setting to false, because we are going to assume to use the cookie if this is false
+        $sort = $this->urlGetVar('sort', false);
+        $isPublic = !empty($publicuserid);
+        $viewCookie = $this->getViewCookie();
+
+        if ($this->urlGetVar('reset', 0) == 1) {
+            $this->setViewCookie('');
+        } else if (!$isPublic && $sort === false && $this->urlGetVar('r', false) === false && !empty($viewCookie)) {
+            $this->redirect('/bets/view?r=1&' . $viewCookie);
+        }
+        if (!$isPublic) {
+            $this->setViewCookie($this->urlParams());
+        }
+        if ($sort === false) {
+            $sort = 'default,desc';
+        }
+
 		$condOrig = array(
 		    'home' => $this->urlGetVar('home'),
 		    'visitor' => $this->urlGetVar('visitor'),
@@ -932,7 +974,6 @@ class BetsController extends AppController {
 		$this->set('cond', $cond);
 		$this->set('condAsMap', $this->getCondAsMap($cond));
 
-		$sort = $this->urlGetVar('sort', 'default,desc');
 		if (strpos($sort, ',') !== false) {
 			list($this->sortKey, $this->sortDir) = explode(',', $sort);
 		} else {
@@ -943,12 +984,11 @@ class BetsController extends AppController {
 		$this->set('sortKey', $this->sortKey);
 		$this->set('sortDir', $this->sortDir);
 
-		$publicuserid = $this->getPublicUserId();
 		$userid = empty($publicuserid) ? $this->Auth->user('id') : $publicuserid;
 		$viewingUser = $this->User->findById($userid);
 		$this->set('viewingUser', $viewingUser);
 
-		$this->set('isPublic', !empty($publicuserid));
+		$this->set('isPublic', $isPublic);
 		$this->set('share', $this->getShare($userid));
 		if (empty($viewingUser)) {
 			$this->redirect('/');

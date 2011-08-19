@@ -22,6 +22,12 @@ class AppController extends Controller {
 		}
 		return $default;
 	}
+
+    protected function urlParams() {
+        $copy = $this->params['url'];
+        unset($copy['url']);
+        return isset($this->params) ? $copy : array();
+    }
 	
 	protected function _div($a, $b) {
 		if (is_null($a) || is_null($b)) {
