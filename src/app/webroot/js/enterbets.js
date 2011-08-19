@@ -284,7 +284,7 @@ SS.Enterbets = function(selector) {
 	this.ajaxUrl = SS.Cake.base + '/bets/ajax/getbet';
 	this.iconurl = SS.Cake.base + '/img/icons/';
 	this.idenNumber = 0;
-}
+};
 
 SS.Enterbets.TYPES = [
 	{name:'spread',desc:"Spread",show:'Spread'},
@@ -296,6 +296,12 @@ SS.Enterbets.TYPES = [
 	{name:'second_spread',desc:"2nd Half Spread",show:'Spread'},
 	{name:'second_total',desc:"2nd Half Total",show:'Total'},
 	{name:'second_moneyline',desc:"2nd Half Moneyline",show:''}
+];
+
+SS.Enterbets.MLB_TYPES = [
+	{name:'spread',desc:"Spread",show:'Spread'},
+	{name:'total',desc:"Total",show:'Total'},
+	{name:'moneyline',desc:"Moneyline",show:''}
 ];
 
 $.extend(SS.Enterbets.prototype, {
@@ -423,7 +429,7 @@ $.extend(SS.Enterbets.prototype, {
 	 */
 	renderBet : function (home, homeExtra, visitor, visitExtra, datetime, type, isMLB, iden) {
 		var h = '<td class="icon"><img src="'+this.iconurl+'wrong.png"/></td><td><select class="type" name="type['+iden+']">';
-		$.each(SS.Enterbets.TYPES, function (key, val) {
+		$.each(isMLB ? SS.Enterbets.MLB_TYPES : SS.Enterbets.TYPES, function (key, val) {
 			h += '<option value="'+val.name+'"';
 			if (val.name == type) {
 				h += ' selected="selected"';

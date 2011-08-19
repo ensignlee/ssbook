@@ -1,3 +1,5 @@
 *.iml
 src/app/config/core.php
 src/app/config/database.php
+src/app/tmp/cache/models/
+src/app/tmp/cache/persistent/
