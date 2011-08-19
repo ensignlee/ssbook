@@ -51,7 +51,7 @@ foreach ($features as $feature) {
 	
 	echo "<div class='voteinfo'><h1>$title</h1>";
 	echo "<p>$descr</p>";
-	echo "<div>".$html->link('Comment', '/features/info/'.$fid)."</div></div>";
+	echo "<div>".$html->link('Comment', '/features/info/'.$fid)."</div></div></div>";
 }
 
 function dispVotes($up, $down) {
