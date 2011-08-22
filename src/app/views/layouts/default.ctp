@@ -73,9 +73,9 @@ var _gaq = _gaq || [];
 		</div>
 		<div id="banner" class='clearfix'>
 			<?php if (empty($user)): ?>
-			<?= $this->Html->image('girls_header.jpg') ?>
+			<div style="width:675px;height:120px;float:left;padding-left:4px;padding-top:0px"><?= $this->Html->image('girls_header.jpg') ?></div>
 			<?php else: ?>
-			<div style="width:675px;height:134px;float:left;padding-left:10px;padding-top:10px"><?= $this->Html->image('header.jpg') ?></div>
+			<div style="width:675px;height:120px;float:left;padding-left:4px;padding-top:0px"><?= $this->Html->image('header.jpg') ?></div>
 			<?php endif; ?>
 <div id="loginBox">
 <?php
