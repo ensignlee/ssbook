@@ -1022,6 +1022,8 @@ class BetsController extends AppController {
 
 		$this->set('betTypes', $this->getBetTypes());
 
+        $this->set('facts', $this->getBetStats($bets));
+
 		$this->set('bets', $bets);
 	}
 
@@ -1196,6 +1198,177 @@ class BetsController extends AppController {
 		}
 		return $this->_cmp_bets($left, $right, $asc);
 	}
+
+    private function getBetStats(&$bets) {
+        $humanBetTypes = $this->getBetTypes();
+
+        $maxWinStreak = new WinLossTie('');
+        $curWinStreak = $maxWinStreak;
+        $maxLoseStreak = new WinLossTie('');
+        $curLoseStreak = $maxLoseStreak;
+
+        $betTypes = array();
+        $days = array();
+        $teams = array();
+
+        foreach ($bets as $key => &$bet) {
+            if (!empty($bet['winning'])) {
+                $winning = $bet['winning'];
+                $betType = $bet['type'];
+                $day = date("n/j/y", strtotime(substr($bet['date'], 0, 10)));
+                $betOn = $bet['beton'];
+                if (!isset($betTypes[$betType])) {
+                    $betTypes[$betType] = new WinLossTie($humanBetTypes[$betType]);
+                }
+                $betTypes[$betType]->addWinning($winning);
+                if (!isset($days[$day])) {
+                    $days[$day] = new WinLossTie($day);
+                }
+                if (!in_array($betType, array('parlay', 'teaser'))) {
+                    $days[$day]->addWinning($winning);
+                    if (!isset($teams[$betOn])) {
+                        $teams[$betOn] = new WinLossTie($betOn);
+                    }
+                    $teams[$betOn]->addWinning($winning);
+                }
+                
+                if ($winning == 0) {
+                    // tie
+                } else if ($winning > 0) {
+                    // win
+                    if (!$curLoseStreak->isEmpty()) {
+                        if ($curLoseStreak->getLoss() > $maxLoseStreak->getLoss()) {
+                            $maxLoseStreak = $curLoseStreak;
+                        }
+                        $curLoseStreak = new WinLossTie('');
+                    }
+                    $curWinStreak->addWinning($winning);
+                } else {
+                    // lose
+                    if (!$curWinStreak->isEmpty()) {
+                        if ($curWinStreak->getWin() > $maxWinStreak->getWin()) {
+                            $maxWinStreak = $curWinStreak;
+                        }
+                        $curWinStreak = new WinLossTie('');
+                    }
+                    $curLoseStreak->addWinning($winning);
+                }
+            }
+        }
+
+        $bestBetType = null;
+        $worstBetType = null;
+        if (!empty($betTypes)) {
+            usort($betTypes, array($this, '_sort_winlosstie_win'));
+            $bestBetType = $betTypes[0];
+            $worstBetType = $betTypes[count($betTypes)-1];
+        }
+
+        $bestBetDay = null;
+        $worstBetDay = null;
+        if (!empty($days)) {
+            usort($days, array($this, '_sort_winlosstie_money'));
+            $bestBetDay = $days[0];
+            $worstBetDay = $days[count($days)-1];
+        }
+
+        $bestTeam = null;
+        $worstTeam = null;
+        if (!empty($teams)) {
+            usort($teams, array($this, '_sort_winlosstie_money'));
+            $bestTeam = $teams[0];
+            $worstTeam = $teams[count($teams)-1];
+        }
+
+        return array(
+            'team_best' => $bestTeam,
+            'team_worst' => $worstTeam,
+            'type_best' => $bestBetType,
+            'type_worst' => $worstBetType,
+            'day_best' => $bestBetDay,
+            'day_worst' => $worstBetDay,
+            'win_streak' => $maxWinStreak,
+            'loss_streak' => $maxLoseStreak
+        );
+    }
+
+    private function _sort_winlosstie_win(WinLossTie &$left, WinLossTie &$right) {
+        $lWP = $left->winPct();
+        $rWP = $right->winPct();
+        if ($lWP == $rWP) {
+            return 0;
+        } else {
+            return $lWP > $rWP ? -1 : 1;
+        }
+    }
+
+    private function _sort_winlosstie_money(WinLossTie &$left, WinLossTie &$right) {
+        $lDW = $left->getDollarsWon();
+        $rDW = $right->getDollarsWon();
+        if ($lDW == $rDW) {
+            return 0;
+        } else {
+            return $lDW > $rDW ? -1 : 1;
+        }
+    }
+}
+
+class WinLossTie {
+    private $win;
+    private $loss;
+    private $tie;
+    private $dollarsWon;
+    private $info;
+
+    public function __construct($info) {
+        $this->win = 0;
+        $this->loss = 0;
+        $this->tie = 0;
+        $this->dollarsWon = 0;
+        $this->info = $info;
+    }
+
+    public function addWinning($winning) {
+        if ($winning == 0) {
+            $this->tie++;
+        } else if ($winning > 0) {
+            $this->win++;
+        } else {
+            $this->loss++;
+        }
+        $this->dollarsWon += $winning;
+    }
+
+    public function isEmpty() {
+        return $this->win == 0 && $this->loss == 0 && $this->tie == 0;
+    }
+
+    public function getDollarsWon() {
+        return $this->dollarsWon;
+    }
+
+    public function getInfo() {
+        return $this->info;
+    }
+
+    public function winPct() {
+        if ($this->win + $this->loss == 0) {
+            return 0;
+        }
+        return $this->win / ($this->win + $this->loss);
+    }
+
+    public function getWin() {
+        return $this->win;
+    }
+
+    public function getLoss() {
+        return $this->loss;
+    }
+
+    public function getTie() {
+        return $this->tie;
+    }
 }
 
 interface CalcStat {

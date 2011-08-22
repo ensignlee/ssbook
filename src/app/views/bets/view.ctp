@@ -169,6 +169,26 @@ $(function () {
 	echo "</div>";
 ?>
 </div>
+<div class="clear clearfix" style="width: 960px; margin: 0 auto; border: 1px solid black">
+    <table class="spaced-table cell-left" style="float: left;">
+        <thead><tr><th>&nbsp;</th><th>&nbsp;</th><th>&nbsp;</th><th>Win %</th><th>Won</th></tr></thead>
+        <tbody>
+        <?= renderWLT("Team that wins me the most money:", $facts['team_best']); ?>
+        <?= renderWLT("Team that burns my money the most:", $facts['team_worst']); ?>
+        <?= renderWLT("Most successful bet type is:", $facts['type_best']); ?>
+        <?= renderWLT("Least successful bet type is:", $facts['type_worst']); ?>
+        </tbody>
+    </table>
+    <table class="spaced-table cell-left" style="float: right;">
+        <thead><tr><th>&nbsp;</th><th>&nbsp;</th><th>&nbsp;</th><th>Win %</th><th>Won</th></tr></thead>
+        <tbody>
+        <?= renderWLT("My best day gambling was:", $facts['day_best']); ?>
+        <?= renderWLT("My worst day gambling was:", $facts['day_worst']); ?>
+        <?= renderWLT("Biggest Win Streak:", $facts['win_streak']); ?>
+        <?= renderWLT("Biggest Losing Streak:", $facts['loss_streak']); ?>
+        </tbody>
+    </table>
+</div>
 <?php
 $urlParams = $this->params['url'];
 unset($urlParams['url']);
@@ -261,4 +281,19 @@ function nullMoney($money, $active=1) {
 		return $active == 1 ? '' : 'cancelled';
 	}
 	return money_format('%(n', $money);
+}
+function renderWLT($label, $wlt) {
+    if (empty($wlt)) {
+        return "<tr><td>$label</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>";
+    } else {
+        return renderWLTNotNull($label, $wlt);
+    }
+}
+function renderWLTNotNull($label, WinLossTie $wlt) {
+
+     $record = $wlt->getWin()."-".$wlt->getLoss()."-".$wlt->getTie();
+     $pct = round($wlt->winPct()*100, 2);
+     $money = '$'. round($wlt->getDollarsWon());
+     $info = Inflector::humanize($wlt->getInfo());
+     return "<tr><td>$label</td><td>$info</td><td class='label'>$record</td><td class='number'>$pct</td><td class='number'>$money</td></tr>";
 }
