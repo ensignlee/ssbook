@@ -292,9 +292,11 @@ class Espn_NFL extends Espn_Scorer {
 		$home = pq(".home", $score);
 		
 		$visitorName = pq('.team-name a', $away)->text();
-		$homeName = pq('.team-name a', $home)->text();
-		if (empty($visitorName) && empty($homeName)) {
+		if (empty($visitorName)) {
 			$visitorName = pq('.team-name', $away)->text();
+		}
+		$homeName = pq('.team-name a', $home)->text();
+		if (empty($homeName)) {
 			$homeName = pq('.team-name', $home)->text();
 		}
 		
@@ -315,6 +317,10 @@ class Espn_NFL extends Espn_Scorer {
 		}
 		if ($status == "TBD") {
 			$this->log("Game is still TBD {$row['visitor']} @ {$row['home']}");
+			return false;
+		}
+		if ($status == "Postponed") {
+			$this->log("This game was postponed {$row['visitor']} @ {$row['home']}");
 			return false;
 		}
 		$row['game_date'] = self::createDate("$dateStr $status");
