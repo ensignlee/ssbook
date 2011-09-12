@@ -20,9 +20,9 @@ class UserBet extends AppModel {
 
 	public function possibleTypes() {
 		return array(
-		    'moneyline' => 'Moneyline',
-		    'half_moneyline' => '1st Half Moneyline',
-		    'second_moneyline' => '2nd Half Moneyline',
+		    'moneyline' => 'M/L',
+		    'half_moneyline' => '1st Half M/L',
+		    'second_moneyline' => '2nd Half M/L',
 		    'spread' => 'Spread',
 		    'half_spread' => '1st Half Spread',
 		    'second_spread' => '2nd Half Spread',
