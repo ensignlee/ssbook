@@ -1259,7 +1259,7 @@ class BetsController extends AppController {
         $bestBetType = null;
         $worstBetType = null;
         if (!empty($betTypes)) {
-            usort($betTypes, array($this, '_sort_winlosstie_win'));
+            usort($betTypes, array($this, '_sort_winlosstie_money'));
             $bestBetType = $betTypes[0];
             $worstBetType = $betTypes[count($betTypes)-1];
         }
