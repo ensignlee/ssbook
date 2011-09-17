@@ -3,23 +3,32 @@
 class UsersController extends AppController {
 
 	var $name = 'Users';
+	var $components = array('Email');
 
 	public function beforeFilter() {
-		$this->Auth->allow(array('create'));
+		$this->Auth->allow(array('create', 'activate'));
 		$this->Auth->autoRedirect = false;
 	}
 	
 	function login() {
-		if ($this->Auth->user()) {
-			if (!empty($this->data) && !empty($this->data['User'])) {
-				$user = $this->data['User'];
-				if (!empty($user['remember'])) {
-					$this->RememberMe->remember($user['username'], $user['password']);
+		$auth_user = $this->Auth->user();
+		if ($auth_user) {
+			// Check if this account has been activated
+			if($auth_user['User']['active']) {
+				if (!empty($this->data) && !empty($this->data['User'])) {
+					$user = $this->data['User'];
+					if (!empty($user['remember'])) {
+						$this->RememberMe->remember($user['username'], $user['password']);
+					}
 				}
-			}
 
-			// Will redirect back to the same page once, to clear the post data, if started here
-			$this->redirect($this->Auth->redirect());
+				// Will redirect back to the same page once, to clear the post data, if started here
+				$this->redirect($this->Auth->redirect());
+			} else {
+				// If account is not active, log them out
+				$this->Auth->logout();
+				$this->RememberMe->delete();
+			}
 		}
 		$error = false;
 		if (!empty($this->data) && !empty($this->data['User'])) {
@@ -41,6 +50,7 @@ class UsersController extends AppController {
 				$this->User->data = $this->data;
 				if ($this->isValidCreate($this->data['User'])) {
 					if ($this->User->save()) {
+						$this->sendActivationEmail($this->User->getLastInsertID());
 						$this->redirect('/pages/welcome');
 						return;
 					}
@@ -52,6 +62,16 @@ class UsersController extends AppController {
 		}
 		unset($this->data['User']['password']);
 		unset($this->data['User']['password2']);
+	}
+
+	function activate($user_id = null, $activation_code = null) {
+		$this->User->id = $user_id;
+		if($this->User->exists() && $activation_code == $this->User->getActivationCode()) {
+			$this->User->saveField('active', 1);
+			$this->redirect('/pages/activated');
+		}
+
+		// If the user hasn't been redirected, they'll see the failure message in activate.ctp
 	}
 	
 	public function profile() {
@@ -195,5 +215,23 @@ class UsersController extends AppController {
 	      }
 	   }
 	   return $isValid;
+	}
+
+	private function sendActivationEmail($user_id) {
+		$this->User->id = $user_id;
+		$user = $this->User->read();
+		$user = $user['User'];
+
+		$activation_url = Router::url(array('controller' => 'users', 'action' => 'activate'), true);
+		$activation_url .= '/'.$user['id'].'/'.$this->User->getActivationCode();
+		$this->set('activation_url', $activation_url);
+		$this->set('username', $user['username']);
+
+		$this->Email->from = 'SharpBetTracker App<no-reply@sharpbettracker.com>';
+		$this->Email->to = $user['email'];
+		$this->Email->subject = 'Please confirm your email address';
+		$this->Email->template = 'activate_account';
+		$this->Email->sendAs = 'text';
+		$this->Email->send();
 	}
 }
