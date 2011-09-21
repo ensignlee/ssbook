@@ -64,13 +64,13 @@ $(function () {
 		<tr>
 			<td><?= "{$record['win']} - {$record['loss']} - {$record['tie']}" ?></td>
 			<td><?= round($record['winningPercentage']*100, 2) ?>%</td>
-			<td>$<?= number_format($record['dollarsWon'], 2) ?></td>
+			<td><?= redMoney($record['dollarsWon']) ?></td>
 		</tr>
 	</table>
 </div>
 <div id="allStats">
 	<table class="spaced-table cell-left">
-		<tr><td>Average Amount Earned Per Bet</td><td class="number">$<?= round($allStats['avgEarned'], 2) ?></td></tr>
+		<tr><td>Average Amount Earned Per Bet</td><td class="number"><?= redMoney(round($allStats['avgEarned'], 2)) ?></td></tr>
 		<tr><td>Average Amount Bet Per Bet</td><td class="number">$<?= round($allStats['avgBet'], 2) ?></td></tr>
 		<tr><td>Average Return on Investment</td><td class="number"><?= round($allStats['roi']*100) ?>%</td></tr>
 		<tr><td>Average Odds Per Bet</td><td class="number"><?= round($allStats['avgOdds']) ?></td></tr>
@@ -117,7 +117,8 @@ $(function () {
 			echo "</td>";
 
 			echo "<td class='label'>{$record['win']} - {$record['loss']} - {$record['tie']}</td>";
-			echo "<td class='number'>$".number_format($record['dollarsWon'], 2)."</td></tr>\n";
+			echo "<td>".round($record['winningPercentage']*100, 2)."%</td>";
+			echo "<td class='number'>".redMoney($record['dollarsWon'])."</td></tr>\n";
 		}
 		echo "</table>";
 	}
@@ -159,7 +160,8 @@ $(function () {
 						$disptype = $betTypes[$half.$type];
 						$dirfav = Inflector::humanize($dir.$favorite);
 						echo "<tr><td>$disptype $dirfav</td><td>{$record['win']} - {$record['loss']} - {$record['tie']}</td>";
-						echo "<td class='number'>$".number_format($record['dollarsWon'], 2)."</td></tr>\n";	
+						echo "<td>".round($record['winningPercentage']*100, 2)."%</td>";
+						echo "<td class='number'>".redMoney($record['dollarsWon'])."</td></tr>\n";	
 					}
 				}
 			}
@@ -280,7 +282,14 @@ function nullMoney($money, $active=1) {
 	if (is_null($money)) {
 		return $active == 1 ? '' : 'cancelled';
 	}
-	return money_format('%(n', $money);
+	return redMoney($money);
+}
+function redMoney($money) {
+	$retval = money_format('%(n', $money);
+	if($money < 0) {
+		$retval = '<span style="color:red">'.$retval.'</span>';
+	}
+	return $retval;
 }
 function renderWLT($label, $wlt) {
     if (empty($wlt)) {
@@ -293,7 +302,7 @@ function renderWLTNotNull($label, WinLossTie $wlt) {
 
      $record = $wlt->getWin()."-".$wlt->getLoss()."-".$wlt->getTie();
      $pct = round($wlt->winPct()*100, 2);
-     $money = '$'. round($wlt->getDollarsWon());
+     $money = redMoney(round($wlt->getDollarsWon()));
      $info = Inflector::humanize($wlt->getInfo());
      return "<tr><td>$label</td><td>$info</td><td class='label'>$record</td><td class='number'>$pct</td><td class='number'>$money</td></tr>";
 }
