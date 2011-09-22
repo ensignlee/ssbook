@@ -117,7 +117,7 @@ $(function () {
 			echo "</td>";
 
 			echo "<td class='label'>{$record['win']} - {$record['loss']} - {$record['tie']}</td>";
-			echo "<td>".round($record['winningPercentage']*100, 2)."%</td>";
+			echo "<td class='number'>".round($record['winningPercentage']*100, 2)."%</td>";
 			echo "<td class='number'>".redMoney($record['dollarsWon'])."</td></tr>\n";
 		}
 		echo "</table>";
@@ -159,8 +159,8 @@ $(function () {
 					if (!empty($record)) {
 						$disptype = $betTypes[$half.$type];
 						$dirfav = Inflector::humanize($dir.$favorite);
-						echo "<tr><td>$disptype $dirfav</td><td>{$record['win']} - {$record['loss']} - {$record['tie']}</td>";
-						echo "<td>".round($record['winningPercentage']*100, 2)."%</td>";
+						echo "<tr><td>$disptype $dirfav</td><td class='label'>{$record['win']} - {$record['loss']} - {$record['tie']}</td>";
+						echo "<td class='number'>".round($record['winningPercentage']*100, 2)."%</td>";
 						echo "<td class='number'>".redMoney($record['dollarsWon'])."</td></tr>\n";	
 					}
 				}
