@@ -102,7 +102,7 @@ class UsersController extends AppController {
 					if ($this->User->save($user)) {
 						$email = $user['email'];
 						$this->Auth->login($user);
-						$this->Session->setFlash("Sucess: ".implode(',', $message));
+						$this->Session->setFlash("Success: ".implode(',', $message));
 					} else {
 						$this->Session->setFlash('Unable to create user');
 					}
