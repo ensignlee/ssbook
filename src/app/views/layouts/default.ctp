@@ -32,6 +32,7 @@ SS.Cake = {
 var _gaq = _gaq || [];
   _gaq.push(['_setAccount', '<?= Configure::read('google.analytics.account') ?>']);
   _gaq.push(['_trackPageview']);
+  _gaq.push(['_trackPageLoadTime']);
 
   (function() {
     var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
