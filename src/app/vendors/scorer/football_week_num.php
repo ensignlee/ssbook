@@ -6,7 +6,7 @@
  *
  * @author loyd
  */
- 
+
 class FootballWeekNum {
 
 	public function weekNum($dateStr) {

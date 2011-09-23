@@ -56,4 +56,18 @@ class LeagueType extends AppModel {
 		}
 		return $lid == $this->mlbNumber;
 	}
+
+	private $footballNumbers = null;
+	public function leagueIsFootball($lid) {
+		if (empty($this->footballNumbers)) {
+			$list = $this->getList();
+			$this->footballNumbers = array();
+			foreach ($list as $id => $row) {
+				if (in_array($row, array('NCAAF', 'NFL'))) {
+					$this->footballNumbers[] = $id;
+				}
+			}
+		}
+		return in_array($lid, $this->footballNumbers);
+	}
 }
