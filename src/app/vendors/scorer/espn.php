@@ -12,30 +12,37 @@ class Espn_Log extends Object {
 	}
 }
 
+App::import('Vendor', 'scorer/football_week_num');
 class Espn extends Espn_Log {
+
+	private $FW;
+	private $Score;
+	private $LeagueType;
+	private $SourceType;
 
 	private $types = null;
 	private $cur = null;
 	private $date = null;
 	private $sourceid = null;
 
-	public function __construct($shell) {
-		$this->shell = $shell;
-		if (empty($this->shell->Score)) {
-			throw new Exception('Unable to find Score model');
-		}
+	public function __construct(Score $Score, LeagueType $LeagueType, SourceType $SourceType, FootballWeekNum $FW) {
+		$this->Score = $Score;
+		$this->LeagueType = $LeagueType;
+		$this->SourceType = $SourceType;
+		$this->FW = $FW;
+
 		$this->types = array();
-		$this->types[] = new Espn_MLB();
-		$this->types[] = new Espn_NBA();
-		$this->types[] = new Espn_NFL();
-		$this->types[] = new Espn_NCAAF();
-		$this->types[] = new Espn_NCAAF_AA();
-		$this->types[] = new Espn_NHL();
-		$this->types[] = new Espn_NCAAB();
-		$this->types[] = new Espn_NCAAB_March();
+		$this->types[] = new Espn_MLB($this->LeagueType);
+		$this->types[] = new Espn_NBA($this->LeagueType);
+		$this->types[] = new Espn_NFL($this->LeagueType);
+		$this->types[] = new Espn_NCAAF($this->LeagueType);
+		$this->types[] = new Espn_NCAAF_AA($this->LeagueType);
+		$this->types[] = new Espn_NHL($this->LeagueType);
+		$this->types[] = new Espn_NCAAB($this->LeagueType);
+		$this->types[] = new Espn_NCAAB_March($this->LeagueType);
 
 		$this->setSourceId();
-		$this->date = $this->shell->Score->getLastGameDate($this->sourceid);
+		$this->date = $this->Score->getLastGameDate($this->sourceid);
 		if (empty($this->date)) {
 			$this->date = date('Y-m-d', strtotime('-30 days'));
 		} else {
@@ -44,9 +51,7 @@ class Espn extends Espn_Log {
 	}
 
 	private function setSourceId() {
-		App::import('Model', 'SourceType');
-		$st = new SourceType();
-		$this->sourceid = $st->getOrSet('ESPN');
+		$this->sourceid = $this->SourceType->getOrSet('ESPN');
 	}
 
 	public static function replaceNull($str) {
@@ -95,7 +100,6 @@ class Espn extends Espn_Log {
 		$both = array(strtolower($home), strtolower($visitor));
 		sort($both); // Do this to keep duplicates popping up from ESPN screwups
 		$league = (int)($league);
-		$date = date('Ymd', strtotime($date));
 		return $date.$league.md5($both[0].$both[1]);
 	}
 
@@ -107,7 +111,7 @@ class Espn extends Espn_Log {
 	 * @param <type> $score
 	 * @return string
 	 */
-	private function createSourceGameId($score) {
+	public function createSourceGameId($score) {
 		if (empty($score['home']) || empty($score['visitor']) || 
 			empty($score['league']) || empty($score['game_date'])) {
 			new Exception("Unable to create id from score".json_encode($score));
@@ -121,7 +125,13 @@ class Espn extends Espn_Log {
 			$visitor .= $score['visitExtra'];
 		}
 		$league = $score['league'];
-		$date = $score['game_date'];
+
+		$isFootball = $this->LeagueType->leagueIsFootball($league);
+		if ($isFootball) {
+			$date = $this->FW->yearNum($score['game_date']).$this->FW->weekNum($score['game_date']);
+		} else {
+			$date = date('Ymd', strtotime($score['game_date']));
+		}
 
 		$this->log("Making id with $date,$league,$home,$visitor");
 		$id = self::makeId($date, $league, $home, $visitor);
@@ -152,24 +162,24 @@ class Espn extends Espn_Log {
 					// ESPNs id cannot be trusted
 					$score['source_gameid'] = $this->createSourceGameId($score);
 				}
-				$this->shell->Score->setToRecord('source_gameid', $score['source_gameid']);
+				$this->Score->setToRecord('source_gameid', $score['source_gameid']);
 
 				// Only remove the game_date if it already exists
-				if (!empty($this->shell->Score->id)) {
+				if (!empty($this->Score->id)) {
 					if (date('H', strtotime($score['game_date'])) <= 0) {
 						unset($score['game_date']);
 					}
-					$league = $this->shell->Score->read('league');
+					$league = $this->Score->read('league');
 					if (empty($league) || $league['Score']['league'] != $score['league']) {
 						$this->log("Score league does not match".json_encode($score), 'error');
 					}
 				}
 				
-				if ($this->shell->Score->save($score)) {
+				if ($this->Score->save($score)) {
 					$success++;
-					$this->log("Saving {$score['visitor']} @ {$score['home']} {$this->shell->Score->id}");
+					$this->log("Saving {$score['visitor']} @ {$score['home']} {$this->Score->id}");
 				} else {
-					$this->log('Unable to save game'.json_encode(array($score, $this->shell->Score->validationErrors)), 'error');
+					$this->log('Unable to save game'.json_encode(array($score, $this->Score->validationErrors)), 'error');
 				}
 			}
 		}
@@ -200,15 +210,18 @@ class Espn extends Espn_Log {
 }
 
 abstract class Espn_Scorer extends Espn_Log {
+	private $LT;
 	protected $league;
 	public $leagueName;
+
+	public function __construct(LeagueType $LT) {
+		$this->LT = $LT;
+	}
 
 	abstract public function getUrl($date);
 	abstract public function parseHtml($html);
 	public function setLeague() {
-		App::import('Model', 'league_type');
-		$lt = new LeagueType();
-		$this->league = $lt->getOrSet($this->leagueName);
+		$this->league = $this->LT->getOrSet($this->leagueName);
 	} 
 
 	public function addDays() {

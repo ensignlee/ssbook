@@ -1,7 +1,17 @@
 <?php
 
+App::import('Vendor', 'scorer/football_week_num');
+/**
+ * @property Score Score
+ * @property LeagueType LeagueType
+ * @property SourceType SourceType
+ */
 class ScoresShell extends Shell {
-	var $uses = array('Score');
+	var $uses = array(
+		'Score',
+		'LeagueType',
+		'SourceType'
+	);
 
 	public function main() {
 		$type = empty($this->params['type']) ? false : $this->params['type'];
@@ -12,7 +22,7 @@ class ScoresShell extends Shell {
 		switch ($type) {
 		case 'espn':
 			App::import('Vendor', 'scorer/espn');
-			$scorer = new Espn($this);
+			$scorer = new Espn($this->Score, $this->LeagueType, $this->SourceType, new FootballWeekNum());
 			break;
 		default:
 			$this->usage();
