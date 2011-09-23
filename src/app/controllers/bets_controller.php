@@ -1112,6 +1112,24 @@ class BetsController extends AppController {
 			    new CalcBetween(1200, false)
 			)
 		    )),
+		    'Spread' => $this->calcGroupStats($bets, array(
+			    'line' => array(
+				    new CalcBetween(13.5, false),
+				    new CalcBetween(10, 13.5),
+				    new CalcBetween(7, 9.5),
+				    new CalcBetween(3.5, 6.5),
+				    new CalcBetween(0.5, 3),
+				    new CalcBetween(-3, -0.5),
+				    new CalcBetween(-6.5, -3.5),
+				    new CalcBetween(-9.5, -7),
+				    new CalcBetween(-13.5, -10),
+				    new CalcBetween(false, -13.5),
+			    )),
+		    array(
+			    'type' => array(
+				    new CalcIn('spread', 'half_spread', 'second_spread')
+			    )
+		    )),
 		    'Bet Type' => $this->calcGroupStats($bets, array(
 			'type' => array(
 			    new CalcIn('spread', 'half_spread', 'second_spread'),
@@ -1138,7 +1156,7 @@ class BetsController extends AppController {
 		return $groupStats;
 	}
 
-	private function calcGroupStats(&$bets, $conditions) {
+	private function calcGroupStats(&$bets, $conditions, $filter_conditions = array()) {
 		$matches = array();
 		foreach ($conditions as $field => $cond) {
 			foreach ($cond as $k => $val) {
@@ -1147,7 +1165,28 @@ class BetsController extends AppController {
 			foreach ($bets as $bet) {
 				foreach ($cond as $k => $CalcStat) {
 					if ($CalcStat->matches($bet[$field])) {
-						$matches[$k]['matching'][] = $bet;
+						// Apply filter conditions, one item from each set needs to match
+						$all_filters_match = true;
+
+						foreach($filter_conditions as $filter_field => $filter_set) {
+							$filter_item_match = false;
+
+							foreach($filter_set as $filter_item) {
+								if($filter_item->matches($bet[$filter_field])) {
+									$filter_item_match = true;
+									break;
+								}
+							}
+
+							if(!$filter_item_match) {
+								$all_filters_match = false;
+								break;
+							}
+						}
+
+						if($all_filters_match) {
+							$matches[$k]['matching'][] = $bet;
+						}
 					}
 				}
 			}
