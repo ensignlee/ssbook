@@ -132,7 +132,7 @@ function numberSafeEmpty($str) {
 }
 }
 
-setlocale(LC_MONETARY, 'en_US');
+setlocale(LC_MONETARY, 'en_US.UTF-8');
 
 if (!function_exists('safe_array_merge')) {
 function safe_array_merge($arr1, $arr2) {
