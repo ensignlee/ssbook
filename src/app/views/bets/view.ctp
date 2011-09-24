@@ -70,8 +70,8 @@ $(function () {
 </div>
 <div id="allStats">
 	<table class="spaced-table cell-left">
-		<tr><td>Average Amount Earned Per Bet</td><td class="number"><?= redMoney(round($allStats['avgEarned'], 2)) ?></td></tr>
-		<tr><td>Average Amount Bet Per Bet</td><td class="number">$<?= round($allStats['avgBet'], 2) ?></td></tr>
+		<tr><td>Average Amount Earned Per Bet</td><td class="number"><?= redMoney($allStats['avgEarned']) ?></td></tr>
+		<tr><td>Average Amount Bet Per Bet</td><td class="number"><?= redMoney($allStats['avgBet']) ?></td></tr>
 		<tr><td>Average Return on Investment</td><td class="number"><?= round($allStats['roi']*100) ?>%</td></tr>
 		<tr><td>Average Odds Per Bet</td><td class="number"><?= round($allStats['avgOdds']) ?></td></tr>
 		<tr><td>Average Breakeven Winning Percentage</td><td class="number"><?= round($allStats['breakEven']*100) ?>%</td></tr>
@@ -285,7 +285,12 @@ function nullMoney($money, $active=1) {
 	return redMoney($money);
 }
 function redMoney($money) {
-	$retval = money_format('%(n', $money);
+	$money = round($money, 2);	// Never display more than 2 decimal digits
+	$format = '%(n';
+	if($money == (int)$money) {
+		$format = '%(.0n';	// Suppress ".00" decimal values
+	}
+	$retval = money_format($format, $money);
 	if($money < 0) {
 		$retval = '<span style="color:red">'.$retval.'</span>';
 	}
