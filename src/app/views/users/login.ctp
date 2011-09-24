@@ -1,11 +1,8 @@
 <?php
 
-if (!$error) {
-	echo "Use the login in the upper right";
+if ($error) {
+	echo $error;
 } else {
-?>
-
-There was an error with your login. Please try again.
-
-<?php
+	echo "Use the login in the upper right";
 }
+?>

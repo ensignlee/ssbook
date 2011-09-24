@@ -11,6 +11,7 @@ class UsersController extends AppController {
 	}
 	
 	function login() {
+		$error = null;
 		$auth_user = $this->Auth->user();
 		if ($auth_user) {
 			// Check if this account has been activated
@@ -28,11 +29,15 @@ class UsersController extends AppController {
 				// If account is not active, log them out
 				$this->Auth->logout();
 				$this->RememberMe->delete();
+				$error = "Your account is not yet active.";
+			       	$error .= " Please check your email and confirm your registration before logging in.";
+				// The hashed version of the password gets left in the password field, so clear it out
+				$this->data['User']['password'] = '';
 			}
-		}
-		$error = false;
-		if (!empty($this->data) && !empty($this->data['User'])) {
-			$error = true;
+		} else if (!empty($this->data) && !empty($this->data['User'])) {
+			// If auth_user didn't get the user's info but we have login form submission data,
+			// authentication must have failed.
+			$error = "Bad username or password.";
 		}
 		$this->set('error', $error);
 	}
