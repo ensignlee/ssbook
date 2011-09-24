@@ -62,7 +62,13 @@ $(function () {
 			<th>Dollars Won</th>
 		</tr>
 		<tr>
-			<td><?= "{$record['win']} - {$record['loss']} - {$record['tie']}" ?></td>
+			<?php
+			$wltRecord = "{$record['win']} - {$record['loss']}";
+			if($record['tie'] != 0) {
+				$wltRecord .= " - {$record['tie']}";	// Only display ties if non-zero
+			}
+			?>
+			<td><?= $wltRecord ?></td>
 			<td><?= round($record['winningPercentage']*100, 2) ?>%</td>
 			<td><?= redMoney($record['dollarsWon']) ?></td>
 		</tr>
@@ -116,7 +122,11 @@ $(function () {
 			}
 			echo "</td>";
 
-			echo "<td class='label'>{$record['win']} - {$record['loss']} - {$record['tie']}</td>";
+			$wltRecord = "{$record['win']} - {$record['loss']}";
+			if($record['tie'] != 0) {
+				$wltRecord .= " - {$record['tie']}";	// Only display ties if non-zero
+			}
+			echo "<td class='label'>".$wltRecord."</td>";
 			echo "<td class='number'>".round($record['winningPercentage']*100, 2)."%</td>";
 			echo "<td class='number'>".redMoney($record['dollarsWon'])."</td></tr>\n";
 		}
@@ -159,7 +169,11 @@ $(function () {
 					if (!empty($record)) {
 						$disptype = $betTypes[$half.$type];
 						$dirfav = Inflector::humanize($dir.$favorite);
-						echo "<tr><td>$disptype $dirfav</td><td class='label'>{$record['win']} - {$record['loss']} - {$record['tie']}</td>";
+						$wltRecord = "{$record['win']} - {$record['loss']}";
+						if($record['tie'] != 0) {
+							$wltRecord .= " - {$record['tie']}";	// Only display ties if non-zero
+						}
+						echo "<tr><td>$disptype $dirfav</td><td class='label'>".$wltRecord."</td>";
 						echo "<td class='number'>".round($record['winningPercentage']*100, 2)."%</td>";
 						echo "<td class='number'>".redMoney($record['dollarsWon'])."</td></tr>\n";	
 					}
@@ -305,7 +319,10 @@ function renderWLT($label, $wlt) {
 }
 function renderWLTNotNull($label, WinLossTie $wlt) {
 
-     $record = $wlt->getWin()."-".$wlt->getLoss()."-".$wlt->getTie();
+     $record = $wlt->getWin()."-".$wlt->getLoss();
+     if($wlt->getTie() != 0) {
+	     $record .= "-".$wlt->getTie();	// Only display ties if non-zero
+     }
      $pct = round($wlt->winPct()*100, 2);
      $money = redMoney(round($wlt->getDollarsWon()));
      $info = Inflector::humanize($wlt->getInfo());
