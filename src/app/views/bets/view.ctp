@@ -135,7 +135,7 @@ $(function () {
 	echo "</div>";
 	?>
 </div>
-<div id="analysisStats" class="stat-style-table clearfix">
+<div id="analysisStats" class="stat-style-table clearfix" style="margin-left: 10px; margin-right: 10px; width: 460px;">
 <?php
 	$types = array('Spread', 'Moneyline', 'Total');
 	$halfs = array('', 'half_', 'second_');
@@ -189,8 +189,8 @@ $(function () {
     <table class="spaced-table cell-left" style="float: left;">
         <thead><tr><th>&nbsp;</th><th>&nbsp;</th><th>&nbsp;</th><th>Win %</th><th>Won</th></tr></thead>
         <tbody>
-        <?= renderWLT("Team that wins me the most money:", $facts['team_best']); ?>
-        <?= renderWLT("Team that burns my money the most:", $facts['team_worst']); ?>
+        <?= renderWLT("Best Team for Me:", $facts['team_best']); ?>
+        <?= renderWLT("Worst Team for Me:", $facts['team_worst']); ?>
         <?= renderWLT("Most successful bet type is:", $facts['type_best']); ?>
         <?= renderWLT("Least successful bet type is:", $facts['type_worst']); ?>
         </tbody>

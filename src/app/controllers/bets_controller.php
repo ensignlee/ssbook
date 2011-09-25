@@ -1095,7 +1095,7 @@ class BetsController extends AppController {
 			    new CalcBetween(300, false)
 			)
 		    )),
-		    'Wager' => $this->calcGroupStats($bets, array(
+		    'Size' => $this->calcGroupStats($bets, array(
 			'risk' => array(
 			    new CalcBetween(false, 101),
 			    new CalcBetween(101, 200),
