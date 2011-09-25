@@ -209,8 +209,9 @@ class Score extends AppModel {
 			$home = $game['Score']['home'];
 			$visitor = $game['Score']['visitor'];
 			$ymd = date('Y-m-d', strtotime($game['Score']['game_date']));
-			$dh = strtolower($ymd.$home);
-			$dv = strtolower($ymd.$visitor);
+			$league = $game['Score']['league'];
+			$dh = strtolower($ymd.$home.$league);
+			$dv = strtolower($ymd.$visitor.$league);
 			if (empty($dateTeamArray[$dh])) {
 				$dateTeamArray[$dh] = array();
 			}
