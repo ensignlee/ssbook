@@ -26,7 +26,7 @@ if ($betTypeParent == 'moneyline') {
 		<th>Direction</th>
 		<?php if ($betTypeParent == 'spread') { ?>
 			<th>Spread</th>
-		<?php } else if ($betTypeParent == 'total') { ?>
+		<?php } else if ($betTypeParent == 'total' || $betTypeParent == 'team_total') { ?>
 			<th>Total</th>
 		<?php } ?>
 		<?php if (!$isParlay) { ?>
@@ -57,6 +57,13 @@ if ($betTypeParent == 'moneyline') {
 				<?php
 				if ($betTypeParent == 'total') {
 					$dirs = array('over' => 'Over', 'under' => 'Under');
+				} else if($betTypeParent == 'team_total') {
+					$dirs = array(
+						'home_over' => $bet['Score']['home'].' Over',
+						'home_under' => $bet['Score']['home'].' Under',
+						'visitor_over' => $bet['Score']['visitor'].' Over',
+						'visitor_under' => $bet['Score']['visitor'].' Under'
+					);
 				} else {
 					$dirs = array('visitor' => $bet['Score']['visitor'], 'home' => $bet['Score']['home']);
 				}

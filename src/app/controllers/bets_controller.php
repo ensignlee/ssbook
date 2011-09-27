@@ -699,6 +699,13 @@ class BetsController extends AppController {
 		case 'half_total':
 		case 'second_total':
 			return Inflector::humanize($userBet['direction']);
+		case 'team_total':
+		case 'half_team_total':
+		case 'second_team_total':
+			$direction = explode('_', $userBet['direction']);
+			$team = ($direction[0] == 'home') ? $score['home'].$hextra : $score['visitor'].$vextra;
+			$over_under = Inflector::humanize($direction[1]);
+			return $team.' '.$over_under;
 		case 'parlay':		
 			return count($userBet['Parlay']).' Team Parlay';
 		case 'teaser':
@@ -1056,7 +1063,8 @@ class BetsController extends AppController {
 		$stat = false;
 		if (!in_array($type, array('parlay','teaser'))) {
 			$stat = $bet['direction'];
-			if (!in_array($type, array('total','half_total','second_total'))) {
+			if (!in_array($type, array('total','half_total','second_total',
+						   'team_total','half_team_total','second_team_total'))) {
 				$stat = $stat.'_'.($this->isFavorite($bet) ? 'favorite' : 'underdog');
 			}
 		}
@@ -1134,6 +1142,7 @@ class BetsController extends AppController {
 			'type' => array(
 			    new CalcIn('spread', 'half_spread', 'second_spread'),
 			    new CalcIn('total', 'half_total', 'second_total'),
+			    new CalcIn('team_total', 'half_team_total', 'second_team_total'),
 			    new CalcIn('moneyline', 'half_moneyline', 'second_moneyline'),
 			    new CalcIn('parlay'),
 			    new CalcIn('teaser')

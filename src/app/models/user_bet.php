@@ -29,6 +29,9 @@ class UserBet extends AppModel {
 		    'total' => 'Total',
 		    'half_total' => '1st Half Total',
 		    'second_total' => '2nd Half Total',
+		    'team_total' => 'Team Total',
+		    'half_team_total' => '1st Half Team Total',
+		    'second_team_total' => '2nd Half Team Total',
 		    'parlay' => 'Parlay',
 		    'teaser' => 'Teaser'
 		);
@@ -39,7 +42,11 @@ class UserBet extends AppModel {
 		    'home',
 		    'visitor',
 		    'over',
-		    'under'
+		    'under',
+		    'home_over',
+		    'home_under',
+		    'visitor_over',
+		    'visitor_under'
 		);
 	}	
 

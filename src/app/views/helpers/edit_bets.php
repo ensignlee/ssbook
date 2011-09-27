@@ -35,6 +35,9 @@ class EditBetsHelper extends AppHelper {
 	    'total' => 'total',
 	    'half_total' => 'total',
 	    'second_total' => 'total',
+	    'team_total' => 'team_total',
+	    'half_team_total' => 'team_total',
+	    'second_team_total' => 'team_total',
 	    'other' => 'other',
 	    'parlay' => 'parlay',
 	    'teaser' => 'parlay'

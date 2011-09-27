@@ -289,18 +289,22 @@ SS.Enterbets = function(selector) {
 SS.Enterbets.TYPES = [
 	{name:'spread',desc:"Spread",show:'Spread'},
 	{name:'total',desc:"Total",show:'Total'},
+	{name:'team_total',desc:"Team Total",show:'Team Total'},
 	{name:'moneyline',desc:"M/L",show:''},
 	{name:'half_spread',desc:"1st Half Spread",show:'Spread'},
 	{name:'half_total',desc:"1st Half Total",show:'Total'},
+	{name:'half_team_total',desc:"1st Half Team Total",show:'Team Total'},
 	{name:'half_moneyline',desc:"1st Half M/L",show:''},
 	{name:'second_spread',desc:"2nd Half Spread",show:'Spread'},
 	{name:'second_total',desc:"2nd Half Total",show:'Total'},
+	{name:'second_team_total',desc:"2nd Half Team Total",show:'Team Total'},
 	{name:'second_moneyline',desc:"2nd Half M/L",show:''}
 ];
 
 SS.Enterbets.MLB_TYPES = [
 	{name:'spread',desc:"Spread",show:'Spread'},
 	{name:'total',desc:"Total",show:'Total'},
+	{name:'team_total',desc:"Team Total",show:'Team Total'},
 	{name:'moneyline',desc:"Moneyline",show:''}
 ];
 
@@ -394,6 +398,9 @@ $.extend(SS.Enterbets.prototype, {
 		case 'total':
 		case 'half_total':
 		case 'second_total':
+		case 'team_total':
+		case 'half_team_total':
+		case 'second_team_total':
 			return info.spread != '';
 		}			
 		return false;
@@ -525,6 +532,15 @@ $.extend(SS.Enterbets.prototype, {
 		case 'half_total':
 		case 'second_total':
 			return game.visitor+' @ '+game.home+' '+game.type+' '+spread;
+		case 'team_total':
+		case 'half_team_total':
+		case 'second_team_total':
+			if (game.direction.substr(0,4) == 'home') {
+				t += game.home;
+			} else {
+				t += game.visitor;
+			}
+			return t+' '+game.type+' '+spread;
 		}
 		return '';
 	},
@@ -646,32 +662,76 @@ $.extend(SS.Enterbets.prototype, {
 			});
 		}
 		var h = '<select name="direction['+iden+']">';
-		var hsel = '';
-		var vsel = '';
-		
-		// Default to visitor for non totals
-		if (!dir && !(type == 'total' || type == 'second_total' || type == 'half_total')) {
-			dir = 'visitor';
-		}
-		// Do not use dir if it is a non total direction
-		if (type == 'total' || type == 'second_total' || type == 'half_total') {
-			if (dir && dir == 'visitor' || dir == 'home') {
-				dir = null;
-			}
-		}
-
-		if (!dir || dir == 'over' || dir == 'home') {
-			hsel = 'selected="selected"';
-		} else {
-			vsel = 'selected="selected"';
-		}
-
 		var home = data.home;
 		var visitor = data.visitor;
-		if (type == 'half_spread' || type == 'half_moneyline' || type == 'spread' || type == 'moneyline' || type == 'second_spread' || type == 'second_moneyline') {
-			h += '<option '+vsel+' value="visitor">'+visitor+'</option><option '+hsel+' value="home">'+home+'</option>';
+		
+		if(type == 'team_total' || type == 'half_team_total' || type == 'second_team_total') {
+			var hosel = '';
+			var husel = '';
+			var vosel = '';
+			var vusel = '';
+
+			switch(dir) {
+				case 'home_over':
+				case 'home':
+					hosel = 'selected="selected"';
+					break;
+				case 'home_under':
+					husel = 'selected="selected"';
+					break;
+				case 'visitor_under':
+				case 'under':
+					vusel = 'selected="selected"';
+					break;
+				case 'visitor_over':
+				case 'visitor':
+				case 'over':
+				default:
+					vosel = 'selected="selected"';
+			}
+
+			h += '<option '+hosel+' value="home_over">'+home+' Over</option>';
+			h += '<option '+husel+' value="home_under">'+home+' Under</option>';
+			h += '<option '+vosel+' value="visitor_over">'+visitor+' Over</option>';
+			h += '<option '+vusel+' value="visitor_under">'+visitor+' Under</option>';
+		} else if(type == 'total' || type == 'half_total' || type == 'second_total') {
+			var osel = '';
+			var usel = '';
+
+			switch(dir) {
+				case 'under':
+				case 'home_under':
+				case 'visitor_under':
+					usel = 'selected="selected"';
+					break;
+				case 'over':
+				case 'home_over':
+				case 'visitor_over':
+				default:
+					osel = 'selected="selected"';
+			}
+
+			h += '<option '+osel+' value="over">Over</option>';
+			h += '<option '+usel+' value="under">Under</option>';
 		} else {
-			h += '<option '+hsel+' value="over">Over</option><option '+vsel+' value="under">Under</option>';
+			var hsel = '';
+			var vsel = '';
+
+			switch(dir) {
+				case 'home':
+				case 'home_over':
+				case 'home_under':
+					hsel = 'selected="selected"';
+					break;
+				case 'visitor':
+				case 'visitor_over':
+				case 'visitor_under':
+				default:
+					vsel = 'selected="selected"';
+			}
+
+			h += '<option '+hsel+' value="home">'+home+'</option>';
+			h += '<option '+vsel+' value="visitor">'+visitor+'</option>';
 		}
 		h += '</select>';
 		var setodd = function() {
@@ -725,6 +785,12 @@ $.extend(SS.Enterbets.prototype, {
 					bet.find('.odds').val(odd.odds_visitor);
 				}
 				break;
+			case 'team_total':
+			case 'half_team_total':
+			case 'second_team_total':
+				// We don't have odds values for this type
+				bet.find('.spread').val('');
+				bet.find('.odds').val('-110');
 			}
 		} else {
 			bet.find('.spread').val('');

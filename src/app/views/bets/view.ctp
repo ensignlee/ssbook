@@ -137,9 +137,9 @@ $(function () {
 </div>
 <div id="analysisStats" class="stat-style-table clearfix" style="margin-left: 10px; margin-right: 10px; width: 460px;">
 <?php
-	$types = array('Spread', 'Moneyline', 'Total');
+	$types = array('Spread', 'Moneyline', 'Total', 'Team Total');
 	$halfs = array('', 'half_', 'second_');
-	$dirs = array('home','visitor','over','under');
+	$dirs = array('home','visitor','over','under', 'home_over', 'home_under', 'visitor_over', 'visitor_under');
 	$favorites = array('', '_favorite', '_underdog');
 
 	$first = true;
@@ -159,15 +159,14 @@ $(function () {
 			$first = false;
 		}
 
-		$label = preg_replace('/[^a-z]+/', '_', strtolower($type));
-		echo "<table class='spaced-table cell-left $hidden show_$label'>";
+		$type_code = preg_replace('/[^a-z]+/', '_', strtolower($type));
+		echo "<table class='spaced-table cell-left $hidden show_$type_code'>";
 		foreach ($halfs as $half) {
 			foreach ($dirs as $dir) {
 				foreach ($favorites as $favorite) {
-					$type = strtolower($type);
-					$record = empty($analysisStats[$half.$type][$dir.$favorite]) ? array() : $analysisStats[$half.$type][$dir.$favorite]; 
+					$record = empty($analysisStats[$half.$type_code][$dir.$favorite]) ? array() : $analysisStats[$half.$type_code][$dir.$favorite]; 
 					if (!empty($record)) {
-						$disptype = $betTypes[$half.$type];
+						$disptype = $betTypes[$half.$type_code];
 						$dirfav = Inflector::humanize($dir.$favorite);
 						$wltRecord = "{$record['win']} - {$record['loss']}";
 						if($record['tie'] != 0) {
