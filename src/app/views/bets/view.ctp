@@ -90,7 +90,7 @@ $(function () {
 	echo "<table class='buttons'><tr>";
 	foreach ($groupStats as $label => $stats) {
 		$perc = round(100/count($groupStats));
-		echo "<td width='$perc%'>$label</td>";
+		echo "<td data-label='wlt$label' width='$perc%'>$label</td>";
 	}
 	echo "</tr></table>";
 	foreach ($groupStats as $label => $stats) {
@@ -102,7 +102,7 @@ $(function () {
 			$first = false;
 		}
 
-		$label = preg_replace('/[^a-z]+/', '_', strtolower($label));
+		$label = preg_replace('/[^a-z]+/', '_', strtolower("wlt$label"));
 		echo "<table class='spaced-table cell-left $hidden show_$label'>";
 		foreach ($stats as $row) {
 			$def = $row['CalcStat']->getDef();
@@ -147,7 +147,7 @@ $(function () {
 	echo "<table class='buttons'><tr>";
 	foreach ($types as $label) {
 		$perc = round(100/count($types));
-		echo "<td width='$perc%'>$label</td>";
+		echo "<td data-label='bt$label' width='$perc%'>$label</td>";
 	}
 	echo "</tr></table>";
 	foreach ($types as $type) {

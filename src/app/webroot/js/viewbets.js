@@ -8,13 +8,13 @@ $(function() {
 	function hideAll(buttonEl) {
 		$(buttonEl).parents('.buttons').find('td').each(function() {
 			if (this != buttonEl) {
-				var text = convertLabel($(this).text());
+				var text = convertLabel($(this).data('label'));
 				$('.show_'+text).css('display', 'none');
 			}
 		});
 	}
 	$('.buttons td').click(function() {
-		var text = convertLabel($(this).text());
+		var text = convertLabel($(this).data('label'));
 		hideAll(this);
 		$('.show_'+text).css('display', 'table');
 	});
