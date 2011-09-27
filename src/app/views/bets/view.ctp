@@ -160,7 +160,7 @@ $(function () {
 		}
 
 		$type_code = preg_replace('/[^a-z]+/', '_', strtolower($type));
-		echo "<table class='spaced-table cell-left $hidden show_$type_code'>";
+		echo "<table class='spaced-table cell-left $hidden show_bt$type_code'>";
 		foreach ($halfs as $half) {
 			foreach ($dirs as $dir) {
 				foreach ($favorites as $favorite) {
