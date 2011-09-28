@@ -230,7 +230,7 @@ class Winning_TotalHalf extends Winning_Total {
 	protected $visitorScore = 'visitor_score_half';
 }
 
-class Winning_TeamTotalHalf extends Winning_Total {
+class Winning_TeamTotalHalf extends Winning_TeamTotal {
 	protected $homeScore = 'home_score_half';
 	protected $visitorScore = 'visitor_score_half';
 }
@@ -252,7 +252,7 @@ class Winning_TotalSecond extends Winning_Total {
 	}
 }
 
-class Winning_TeamTotalSecond extends Winning_Total {
+class Winning_TeamTotalSecond extends Winning_TeamTotal {
 	public function getHomeScore() {
 		$game = $this->getGame();
 		return $game['home_score_total'] - $game['home_score_half'];
