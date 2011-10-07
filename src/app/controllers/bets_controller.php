@@ -37,7 +37,7 @@ class BetsController extends AppController {
 
 	public function modify() {
 		$form = $this->params['form'];
-		$ids = array_keys($this->params['form']['tag']);
+		$ids = empty($form['tag']) ? array() : array_keys($form['tag']);
 
 		if (!empty($form['Delete'])) {
 			$this->deleteMass($ids);
