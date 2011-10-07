@@ -227,6 +227,11 @@ class BetsController extends AppController {
 
 	public function createbets() {
 		$form = $this->params['form'];
+		if (empty($form['type'])) {
+			$this->redirect('/bets/');
+			return;
+		}
+
 		$form = $form + array('parlay' => array(), 'direction' => array(), 'spread' => array());
 		$bets = array();
 		foreach (array_keys($form['type']) as $iden) {
