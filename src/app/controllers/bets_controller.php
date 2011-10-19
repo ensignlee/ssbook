@@ -950,7 +950,7 @@ class BetsController extends AppController {
         }
     }
 
-	public function view() {
+	public function view($img='') {
 
         $publicuserid = $this->getPublicUserId();
         // setting to false, because we are going to assume to use the cookie if this is false
@@ -1008,29 +1008,35 @@ class BetsController extends AppController {
 			$this->redirect('/');
 		}
 
-		// For filters we set them to the list of all bets
-		$bets = $this->UserBet->getAll($userid);
-		$bets = $this->reformatBets($bets);
-		$filters = $this->setFilters($bets,
-			array('home', 'visitor', 'type', 'league', 'beton', 'book', 'tag'),
-			array('risk', 'date', 'spread', 'odds', 'risk', 'winning'));
-		$this->set('filters', $filters);
-
 		// Display only sql, and nonsql matching bets
 		$bets = $this->UserBet->getAll($userid, $sqlcond);
 		$bets = $this->reformatBets($bets);
 		$bets = $this->filterNonSql($bets, $cond, array('beton', 'league', 'tag', 'winning'));
 		usort($bets, array($this, '_sort_bets'));
-
+		
+		$this->set('graphData', $this->graphData($bets));
 		$record = $this->winLossTie($bets);
 		$this->set('record', $record);
+
+		// If this is an image we are now done
+		if ($img === 'img' && $isPublic) {
+			$this->render('img_view', 'image');
+		}
+
+		// For filters we set them to the list of all bets
+		$betsFilters = $this->UserBet->getAll($userid);
+		$betsFilters = $this->reformatBets($betsFilters);
+		$filters = $this->setFilters($betsFilters,
+			array('home', 'visitor', 'type', 'league', 'beton', 'book', 'tag'),
+			array('risk', 'date', 'spread', 'odds', 'risk', 'winning'));
+		$this->set('filters', $filters);
+
 		$allStats = $this->allStats($bets);
 		$this->set('allStats', $allStats);
 		$groupStats = $this->getGroupStats($bets);
 		$this->set('groupStats', $groupStats);
 		$analysisStats = $this->getAnalysisStats($bets);
 		$this->set('analysisStats', $analysisStats);
-		$this->set('graphData', $this->graphData($bets));
 
 		$this->set('betTypes', $this->getBetTypes());
 
