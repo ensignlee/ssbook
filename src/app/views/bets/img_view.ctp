@@ -17,7 +17,8 @@ foreach ($graphData[0] as $point) {
 	$y[] = $point[1];
 }
 
-$graph = new Graph(400,150,'auto');
+$graph = new Graph(400, 150, $cacheKey, 60);
+
 $graph->SetScale("datlin");
 
 // Set theme
@@ -44,7 +45,10 @@ function labelCallback($label) {
 $graph->ygrid->SetFill(true,'#FFFFFF','#FFFFFF');
 
 // X
-list($tickPositions,$minTickPositions) = DateScaleUtils::GetTicks($x,2,true);
+list($tickPositions,$minTickPositions) = DateScaleUtils::GetTicks($x,2);
+if (count($tickPositions) < 2) {
+	list($tickPositions,$minTickPositions) = DateScaleUtils::GetTicks($x,1);
+}
 $graph->xaxis->SetTickPositions($tickPositions,$minTickPositions);
 $graph->xaxis->scale->SetDateFormat('M j');
 $graph->xaxis->SetPos('min');

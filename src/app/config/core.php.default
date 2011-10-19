@@ -102,7 +102,7 @@
  * or in each action using $this->cacheAction = true.
  *
  */
-	//Configure::write('Cache.check', true);
+	Configure::write('Cache.check', true);
 
 /**
  * Defines the default error type when using the log() function. Used for
@@ -294,6 +294,19 @@
  *	));
  *
  */
+
+Cache::config('viewbets', array(
+	'engine' => 'Memcache', //[required]
+ 	'duration'=> 5*60, //[optional]
+	'probability'=> 100, //[optional]
+ 	'prefix' => Inflector::slug(APP_DIR) . '_', //[optional]  prefix every cache file with this string
+	'servers' => array(
+		'127.0.0.1:11211' // localhost, default port 11211
+	), //[optional]
+ 'compress' => false, // [optional] compress data in Memcache (slower, but uses less memory)
+ ));
+
+
 Cache::config('default', array(
 	'engine' => 'File', 
 	'duration' => 3600

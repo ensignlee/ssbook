@@ -35,7 +35,7 @@
 //   MBTTF_DIR $SERVER_SYSTEMROOT/fonts/
 //
 //------------------------------------------------------------------------
-// define('CACHE_DIR','/tmp/jpgraph_cache/');
+define('CACHE_DIR','/tmp/jpgraph_cache/');
 // define('TTF_DIR','/usr/share/fonts/TrueType/');
 // define('MBTTF_DIR','/usr/share/fonts/TrueType/');
 
@@ -74,7 +74,7 @@ define('DEFAULT_GFORMAT','auto');
 // false will still create the image in the cache directory
 // just not use it. By setting USE_CACHE=false no files will even
 // be generated in the cache directory.
-define('USE_CACHE',false);
+define('USE_CACHE',true);
 
 // Should we try to find an image in the cache before generating it?
 // Set this define to false to bypass the reading of the cache and always

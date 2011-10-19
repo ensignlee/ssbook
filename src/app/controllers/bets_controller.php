@@ -951,11 +951,15 @@ class BetsController extends AppController {
     }
 
 	public function view($img='') {
+		$startTime = -microtime(true)*1000;
 
         $publicuserid = $this->getPublicUserId();
         // setting to false, because we are going to assume to use the cookie if this is false
         $sort = $this->urlGetVar('sort', false);
         $isPublic = !empty($publicuserid);
+		if ($isPublic) {
+			$this->log('Public viewing of userid='.$publicuserid, LOG_DEBUG);
+		}
         $viewCookie = $this->getViewCookie();
 
         if ($this->urlGetVar('reset', 0) == 1) {
@@ -1002,34 +1006,83 @@ class BetsController extends AppController {
 		$viewingUser = $this->User->findById($userid);
 		$this->set('viewingUser', $viewingUser);
 
+		$shareId = $this->getShare($userid);
 		$this->set('isPublic', $isPublic);
-		$this->set('share', $this->getShare($userid));
+		$this->set('share', $shareId);
 		if (empty($viewingUser)) {
 			$this->redirect('/');
 		}
 
-		// Display only sql, and nonsql matching bets
-		$bets = $this->UserBet->getAll($userid, $sqlcond);
-		$bets = $this->reformatBets($bets);
-		$bets = $this->filterNonSql($bets, $cond, array('beton', 'league', 'tag', 'winning'));
-		usort($bets, array($this, '_sort_bets'));
-		
-		$this->set('graphData', $this->graphData($bets));
-		$record = $this->winLossTie($bets);
+		$lastUserBet = $this->UserBet->lastBet($userid);
+
+		// please bump version if anything inside changes
+		$version = 1;
+
+		/**
+		 * BET DATA
+		 */
+		$cacheKey = $version.'_'.$userid.'_'.$lastUserBet.'_'.$this->getMemKey($condOrig);
+		$this->set('cacheKey', $cacheKey);
+		$cachedQuery = Cache::read($cacheKey, 'viewbets');
+		if (empty($cachedQuery)) {
+			// Display only sql, and nonsql matching bets
+			$bets = $this->UserBet->getAll($userid, $sqlcond);
+			$bets = $this->reformatBets($bets);
+			$bets = $this->filterNonSql($bets, $cond, array('beton', 'league', 'tag', 'winning'));
+			usort($bets, array($this, '_sort_bets'));
+
+			$graphData = $this->graphData($bets);
+			$record = $this->winLossTie($bets);
+
+			$success = Cache::write($cacheKey, array(
+				'graphData'=>$graphData,
+				'record'=>$record,
+				'bets'=>$bets
+		    ),'viewbets');
+			$this->log("Write $cacheKey to cache was ".($success ? 'good' : (is_null($success) ? 'very bad' : 'bad')), LOG_DEBUG);
+		} else {
+			$this->log("Read $cacheKey from cache", LOG_DEBUG);
+			$graphData = $cachedQuery['graphData'];
+			$record = $cachedQuery['record'];
+			$bets = $cachedQuery['bets'];
+		}
+		$this->set('graphData', $graphData);
 		$this->set('record', $record);
+
+		// record a log of the time
+		$this->log("Took ".round(microtime(true)*1000 + $startTime)."ms for user $userid get bet data", LOG_DEBUG);
+		$startTime = -microtime(true)*1000;
 
 		// If this is an image we are now done
 		if ($img === 'img' && $isPublic) {
 			$this->render('img_view', 'image');
 		}
 
-		// For filters we set them to the list of all bets
-		$betsFilters = $this->UserBet->getAll($userid);
-		$betsFilters = $this->reformatBets($betsFilters);
+		/**
+		 * FILTER CONTENTS
+		 */
+		$cacheKey = $version.'_'.$userid.'_'.$lastUserBet.'_all';
+		$cachedQuery = Cache::read($cacheKey, 'viewbets');
+		if (empty($cachedQuery)) {
+			// For filters we set them to the list of all bets
+			$betsFilters = $this->UserBet->getAll($userid);
+			$betsFilters = $this->reformatBets($betsFilters);
+
+			$success = Cache::write($cacheKey, array(
+				'betsFilters'=>$betsFilters
+		    ),'viewbets');
+			$this->log("Write $cacheKey to cache was ".($success ? 'good' : (is_null($success) ? 'very bad' : 'bad')), LOG_DEBUG);
+		} else {
+			$this->log("Read $cacheKey from cache", LOG_DEBUG);
+			$betsFilters = $cachedQuery['betsFilters'];
+		}
 		$filters = $this->setFilters($betsFilters,
 			array('home', 'visitor', 'type', 'league', 'beton', 'book', 'tag'),
 			array('risk', 'date', 'spread', 'odds', 'risk', 'winning'));
 		$this->set('filters', $filters);
+
+		// record time
+		$this->log("Took ".round(microtime(true)*1000 + $startTime)."ms for user $userid get filter contents", LOG_DEBUG);
 
 		$allStats = $this->allStats($bets);
 		$this->set('allStats', $allStats);
@@ -1043,6 +1096,10 @@ class BetsController extends AppController {
         $this->set('facts', $this->getBetStats($bets));
 
 		$this->set('bets', $bets);
+	}
+
+	private function getMemKey($cond) {
+		return strtolower(str_replace('%', '', str_replace('&', '_', http_build_query($cond))));
 	}
 
 	private function getAnalysisStats(&$bets) {

@@ -136,6 +136,18 @@ class UserBet extends AppModel {
 		return $this->SourceType->getOrSet($name);
 	}
 
+	public function lastBet($userid) {
+		$this->unbindModel(array(
+			'belongsTo' => array('Score'),
+		    'hasAndBelongsToMany' => array('Tag')
+	    ));
+		$bets = $this->find('first', array(
+		    'conditions' => array('userid' => $userid),
+			'order' => array('userid,UserBet.modified Desc')
+		));
+		return empty($bets) ? 0 : strtotime($bets['UserBet']['modified']);
+	}
+
 	public function getAll($userid, $cond = array()) {
 		$cond = safe_array_merge($cond, array('userid' => $userid, 'parlayid' => null));
 		return $this->getAllCond($cond);
