@@ -7,6 +7,11 @@ class AppController extends Controller {
 		parent::beforeFilter();
 
 		$this->RememberMe->check();
+
+		// Suppress debug messages in ajax requests
+		if($this->RequestHandler->isAjax()) {
+			error_reporting(0);
+		}
 	}
 
 	public function beforeRender() {

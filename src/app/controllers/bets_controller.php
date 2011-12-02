@@ -67,24 +67,41 @@ class BetsController extends AppController {
 
 	public function shortlink() {
 		$url = $this->urlGetVar('shorturl', false);
+		$shorturl = $this->make_shortlink($url);
+
+		// There's probably a better way to do this
+		$urlparts = explode('?', $url, 2);
+		$imgurl = $urlparts[0].'/img?'.$urlparts[1];
+
 		$this->set('url', $url);
-		if (!empty($url)) {
+		$this->set('shorturl', $shorturl);
+		$this->set('imgurl', $imgurl);
+	}
+
+	private function make_shortlink($url) {
+		// Use the given URL as a fallback if we fail to shorten it
+		$shorturl = $url;
+
+		if(!empty($url)) {
 			App::import('vendor', 'google_short_link');
 			$GoogleShortLink = new GoogleShortLink(
 				'api',
 				Configure::read('google.shortlink.hostname'),
 				Configure::read('google.shortlink.secret')
 			);
-			$shorturl = $GoogleShortLink->createHashedShortLink($url);
-			if ($shorturl === false) {
-				// Sometime the service has problems
-				$shorturl = $GoogleShortLink->createHashedShortLink($url);
-				if ($shorturl === false) {
-					$shorturl = $url;
-				}
+
+			$gshorturl = $GoogleShortLink->createHashedShortLink($url);
+			if ($gshorturl === false) {
+				// Sometimes the service has problems, so retry once
+				$gshorturl = $GoogleShortLink->createHashedShortLink($url);
 			}
-			$this->set('shorturl', $shorturl);
+
+			if($gshorturl !== false) {
+				$shorturl = $gshorturl;
+			}
 		}
+
+		return $shorturl;
 	}
 
 	private function tag($ids) {

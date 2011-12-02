@@ -31,12 +31,12 @@ $(function() {
 	$('.shortlink').click(function() {
 		var jel = $(this);
 		var thisurl = decodeURIComponent(jel.data('url'));
-		jel.text('Please Wait...');
-		$.getJSON(
+		//jel.text('Please Wait...');
+		$.get(
 			SS.Cake.base + '/bets/shortlink',
 			{shorturl: thisurl},
 			function(data) {
-				jel.parent('div').html('<span>'+data['shorturl']+'</span>');
+				$.modal(data);
 			}
 		);
 		return false;
