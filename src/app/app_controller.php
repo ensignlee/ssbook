@@ -1,6 +1,6 @@
 <?php
 class AppController extends Controller {
-	var $components = array('RememberMe', 'Auth', 'Session');
+	var $components = array('RememberMe', 'Auth', 'Session','RequestHandler');
 	var $helpers = array('Html', 'Javascript', 'Form', 'Session', 'RandomTip');
 
 	public function beforeFilter() {
