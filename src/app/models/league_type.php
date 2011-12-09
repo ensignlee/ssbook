@@ -53,9 +53,10 @@ class LeagueType extends AppModel {
 	public function leagueIsMLB($lid) {
 		if (empty($this->mlbNumbers)) {
 			$list = $this->getList();
+			$this->mlbNumbers = array();
 			foreach ($list as $id => $row) {
 				if (in_array($row, array('MLB','NCAAB'))) {
-					$this->mlbNumbers = $id;
+					$this->mlbNumbers[] = $id;
 				}
 			}
 		}
