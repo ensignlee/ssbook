@@ -68,6 +68,18 @@ table.buttons td {
 	padding: 10px;
 	text-align: center;
 }
+#shareLinkDialog label {
+	width: 175px;
+	float: left;
+	text-align: right;
+	margin-right: 10px;
+}
+#shareLinkDialog div {
+	padding: 5px;
+}
+#shareLinkDialog a {
+	margin: 5px;
+}
 .singleBet {
 	background-color: #EEE;
 	padding: 4px;

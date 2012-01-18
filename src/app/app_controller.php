@@ -1,12 +1,17 @@
 <?php
 class AppController extends Controller {
-	var $components = array('RememberMe', 'Auth', 'Session');
+	var $components = array('RememberMe', 'Auth', 'Session','RequestHandler');
 	var $helpers = array('Html', 'Javascript', 'Form', 'Session', 'RandomTip');
 
 	public function beforeFilter() {
 		parent::beforeFilter();
 
 		$this->RememberMe->check();
+
+		// Suppress debug messages in ajax requests
+		if($this->RequestHandler->isAjax()) {
+			error_reporting(0);
+		}
 	}
 
 	public function beforeRender() {

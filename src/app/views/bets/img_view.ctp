@@ -45,11 +45,9 @@ function labelCallback($label) {
 $graph->ygrid->SetFill(true,'#FFFFFF','#FFFFFF');
 
 // X
-list($tickPositions,$minTickPositions) = DateScaleUtils::GetTicks($x,2);
-if (count($tickPositions) < 2) {
-	list($tickPositions,$minTickPositions) = DateScaleUtils::GetTicks($x,1);
-}
-$graph->xaxis->SetTickPositions($tickPositions,$minTickPositions);
+$num_ticks = 5;
+$autoTicks = DateScaleUtils::GetAutoTicks($x[0], $x[sizeof($x)-1], $num_ticks);
+$graph->xaxis->SetTickPositions($autoTicks[1]);
 $graph->xaxis->scale->SetDateFormat('M j');
 $graph->xaxis->SetPos('min');
 $graph->xaxis->SetFont(FF_VERDANA,FS_NORMAL,9);
