@@ -43,18 +43,24 @@ class LeagueType extends AppModel {
 
 		return false;
 	}
-	
-	private $mlbNumber = null;
+
+	/**
+	 * This is actually saying which things have no first/second half scores
+	 * @param $lid
+	 * @return bool
+	 */
+	private $mlbNumbers = null;
 	public function leagueIsMLB($lid) {
-		if (empty($this->mlbNumber)) {
+		if (empty($this->mlbNumbers)) {
 			$list = $this->getList();
+			$this->mlbNumbers = array();
 			foreach ($list as $id => $row) {
-				if ($row == 'MLB') {
-					$this->mlbNumber = $id;
+				if (in_array($row, array('MLB','NCAAB'))) {
+					$this->mlbNumbers[] = $id;
 				}
 			}
 		}
-		return $lid == $this->mlbNumber;
+		return in_array($lid, $this->mlbNumbers);
 	}
 
 	private $footballNumbers = null;
