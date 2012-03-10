@@ -4,8 +4,12 @@
 require('phpQuery.php');
 
 class Espn_Log extends Object {
+	private $DEBUG=false;
 	public function log($str, $type = 'debug') {
-		parent::log('['.getmypid().'] '.$str, 'espn_'.date('Ymd'));
+		if ($type == 'debug' && !$this->DEBUG) {
+			return;
+		}
+		parent::log('['.getmypid().'] '.$type.' '.$str, 'espn_'.date('Ymd'));
 		if ($type == 'error') {
 			echo $str; // Echo goes to email
 		}
@@ -33,13 +37,14 @@ class Espn extends Espn_Log {
 
 		$this->types = array();
 		$this->types[] = new Espn_MLB($this->LeagueType);
-		$this->types[] = new Espn_NBA($this->LeagueType);
-		$this->types[] = new Espn_NFL($this->LeagueType);
-		$this->types[] = new Espn_NCAAF($this->LeagueType);
-		$this->types[] = new Espn_NCAAF_AA($this->LeagueType);
 		$this->types[] = new Espn_NHL($this->LeagueType);
 		$this->types[] = new Espn_NCAAB($this->LeagueType);
 		$this->types[] = new Espn_NCAAB_March($this->LeagueType);
+		$this->types[] = new Espn_NBA($this->LeagueType);
+		
+//		$this->types[] = new Espn_NFL($this->LeagueType);
+//		$this->types[] = new Espn_NCAAF($this->LeagueType);
+//		$this->types[] = new Espn_NCAAF_AA($this->LeagueType);
 
 		$this->setSourceId();
 		$this->date = $this->Score->getLastGameDate($this->sourceid);
@@ -88,7 +93,7 @@ class Espn extends Espn_Log {
 				$this->loadType($type);
 				$this->parseType();
 				$success = $this->saveType();
-				$this->log("Saving $success game(s)");
+				$this->log("Saving $success game(s)", 'info');
 				sleep(1);
 			} catch (Exception $e) {
 				$this->log($e->getMessage()."\n", 'error');
@@ -120,10 +125,12 @@ class Espn extends Espn_Log {
 		if (!empty($score['homeExtra'])) {
 			$home .= $score['homeExtra'];
 		}
+		$home = trim($home);
 		$visitor = $score['visitor'];
 		if (!empty($score['visitExtra'])) {
 			$visitor .= $score['visitExtra'];
 		}
+		$visitor = trim($visitor);
 		$league = $score['league'];
 
 		$isFootball = $this->LeagueType->leagueIsFootball($league);
@@ -133,7 +140,7 @@ class Espn extends Espn_Log {
 			$date = date('Ymd', strtotime($score['game_date']));
 		}
 
-		$this->log("Making id with $date,$league,$home,$visitor");
+		$this->log("Making id with $date,$league,$home,$visitor", 'info');
 		$id = self::makeId($date, $league, $home, $visitor);
 		return $id;
 	}
@@ -141,7 +148,7 @@ class Espn extends Espn_Log {
 	public function saveType() {
 		$success = 0;
 		if (!empty($this->scores)) {
-			$this->log('Found '.count($this->scores).' to save.');
+			$this->log('Found '.count($this->scores).' to save.', 'info');
 			foreach ($this->scores as $score) {
 
 				if (isset($score['game_date'])) {
@@ -177,7 +184,7 @@ class Espn extends Espn_Log {
 				
 				if ($this->Score->save($score)) {
 					$success++;
-					$this->log("Saving {$score['visitor']} @ {$score['home']} {$this->Score->id}");
+					$this->log("Saving {$score['visitor']} @ {$score['home']} {$this->Score->id}", 'info');
 				} else {
 					$this->log('Unable to save game'.json_encode(array($score, $this->Score->validationErrors)), 'error');
 				}
@@ -203,7 +210,7 @@ class Espn extends Espn_Log {
 		$type->setLeague();
 		$this->cur = $type;
 		$url = $this->cur->getUrl($this->date);
-		$this->log("Looking up $url");
+		$this->log("Looking up $url", 'info');
 		$this->html = curl_file_get_contents($url);
 		file_put_contents('/tmp/'.date('Ymd').$type->leagueName, $this->html);
 	}
@@ -238,7 +245,7 @@ abstract class Espn_Scorer extends Espn_Log {
 	}
 
 	protected function getHalf($score) {
-		return false;
+		return array('','');
 	}
 }
 
@@ -350,7 +357,8 @@ class Espn_NFL extends Espn_Scorer {
 class Espn_NHL extends Espn_MLB {
 	
 	public $leagueName = 'NHL';
-	protected $statusLine = 'statusLine2Left';
+	protected $statusLine = '*[id$=statusLine2Left]';
+	protected $teamname = '.team-name';
 
 	public function getUrl($date) {
 		return sprintf('http://scores.espn.go.com/nhl/scoreboard?date=%s', date('Ymd', strtotime($date)));
@@ -364,8 +372,12 @@ class Espn_NHL extends Espn_MLB {
 class Espn_MLB extends Espn_Scorer {
 
 	public $leagueName = 'MLB';
-	protected $statusLine = 'statusLine2';
-	protected $teamname = '*[id$=TeamName]"';
+	protected $statusLine = '*[id$=statusLine2]';
+	protected $teamname = '*[id$="TeamName"]';
+	protected $finalScores = '.mod-scorebox-final';
+	protected $pregameScores = '.mod-scorebox-pregame';
+	protected $awaySelector = '*[id$="awayHeader"]';
+	protected $homeSelector = '*[id$="homeHeader"]';
 
 	public function getUrl($date) {
 		return sprintf('http://scores.espn.go.com/mlb/scoreboard?date=%s', date('Ymd', strtotime($date)));
@@ -374,30 +386,30 @@ class Espn_MLB extends Espn_Scorer {
 	public function parseHtml($html) {
 		$doc = phpQuery::newDocument($html);
 
-		$date = pq('.key-dates > h2')->text();
+		$date = pq('.key-dates > h2', $doc)->text();
 		if (strpos($date, 'Scores for') === false) {
 			throw new Exception("Unable to find correct date\n".$html);
 		}
 		$time = date('Y-m-d', strtotime(str_replace('Scores for', '', $date)));
 
-		$scores = pq('.final-state');
+		$scores = pq($this->finalScores, $doc);
 		$out = array();
 		foreach ($scores as $score) {
 			$row = $this->parseScore($score, $time);
 			if ($this->verify($row)) {
 				$out[] = $row;
 			} else {
-				$this->log("Did not verify. {$row['home']} @ {$row['visitor']}");
+				$this->log("Did not verify. {$row['home']} @ {$row['visitor']}", 'warn');
 			}
 		}
 
-		$scores = pq('.preview');
+		$scores = pq($this->pregameScores, $doc);
 		foreach ($scores as $score) {
 			$row = $this->parseScore($score, $time);
 			if ($this->verify($row)) {
 				$out[] = $row;
 			} else {
-				$this->log("Did not verify. {$row['home']} @ {$row['visitor']}");
+				$this->log("Did not verify. {$row['home']} @ {$row['visitor']}", 'warn');
 			}
 		}
 
@@ -409,19 +421,28 @@ class Espn_MLB extends Espn_Scorer {
 	}
 
 	protected function parseScore($score, $gametime) {
+		$this->log("Attempting to parse score for $gametime");
+		
 		$row = array();
-		$away = pq(".team.visitor", $score);
-		$home = pq(".team.home']", $score);
-		$row['visitor'] = pq($this->teamname, $away)->text();
-		$row['home'] = pq($this->teamname, $home)->text();
+		$away = pq($this->awaySelector, $score);
+		$home = pq($this->homeSelector, $score);
+		$row['visitor'] = trim(pq($this->teamname, $away)->text());
+		$row['home'] = trim(pq($this->teamname, $home)->text());
+
+		$this->log("Hometeam = [{$row['home']}], Awayteam = [{$row['visitor']}]");
+
 		$row['visitor_score_total'] = Espn::replaceNull(pq('*[id$="awayHeaderScore"]', $away)->text());
 		$row['home_score_total'] = Espn::replaceNull(pq('*[id$="homeHeaderScore"]', $home)->text());
 		$row['league'] = $this->league;
+
+		$this->log("VST = {$row['visitor_score_total']}, HST = {$row['home_score_total']}, league = {$row['league']}");
+
 		$status = Espn::replaceNull(pq($this->statusLine, $score)->text());
 		$parsedtime = self::createDate("$gametime $status");
 		if ($parsedtime === false) {
 			$parsedtime = self::createDate("$gametime");
 		}
+		$this->log("Parsed time = [$parsedtime]");
 		
 		// Adding in the pitchers
 		$homePitcher = pq("div[id$='homeStarter']", $score);
@@ -431,6 +452,7 @@ class Espn_MLB extends Espn_Scorer {
 		$half = $this->getHalf($score);
 		$row['visitor_score_half'] = $half[0];
 		$row['home_score_half'] = $half[1];
+		$this->log("HomeExtra = {$row['homeExtra']}, VisitExtra = {$row['visitExtra']}, VSH = {$row['visitor_score_half']}, HSH = {$row['home_score_half']}");
 		
 		$row['game_date'] = $parsedtime;
 		
@@ -438,14 +460,21 @@ class Espn_MLB extends Espn_Scorer {
 	}
 }
 
-class Espn_NCAAB extends Espn_NHL {
+class Espn_NCAAB extends Espn_MLB {
 
 	public $leagueName = 'NCAAB';
-	protected $teamname = '.team-name a';
 	protected $statusLine = '.game-status';
+	protected $finalScores = '.main-games.final-state';
+	protected $pregameScores = '.main-games.preview';
+	protected $awaySelector = 'div.team.visitor';
+	protected $homeSelector = 'div.team.home';
 
 	public function getUrl($date) {
 		return  sprintf('http://scores.espn.go.com/ncb/scoreboard?date=%s&confId=50', date('Ymd', strtotime($date)));
+	}
+
+	protected function verify($row) {
+		return true;
 	}
 
 	protected function getHalf($score) {
@@ -487,18 +516,6 @@ class Espn_NBA extends Espn_NHL {
 	public function getUrl($date) {
 		return  sprintf('http://scores.espn.go.com/nba/scoreboard?date=%s', date('Ymd', strtotime($date)));
 	}
-	
-	protected function parseScore($score, $gametime) {
-		$row = parent::parseScore($score, $gametime);
-		try {
-			list($visitor, $home) = $this->getHalf($score);
-			$row['visitor_score_half'] = $visitor;
-			$row['home_score_half'] = $home;
-		} catch (Exception $e) {
-			$this->log('Could not find score '.$e->getMessage());
-		}
-		return $row;
-	}
 
 	protected function getHalf($score) {
 		$titles = pq('th[id*="lsh"]', $score);
@@ -521,7 +538,7 @@ class Espn_NBA extends Espn_NHL {
 			}
 		}
 		if (is_null($one) || is_null($two)) {
-			throw new Exception('Unable to locate periods 1 and 2'.json_encode($score));
+			return array('','');
 		}
 		$visitor = pq("td[id$=als{$one}]", $score)->text() + pq("td[id$=als{$two}]", $score)->text();
 		$home = pq("td[id$=hls{$one}]", $score)->text() + pq("td[id$=hls{$two}]", $score)->text();
