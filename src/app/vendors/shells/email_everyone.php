@@ -1,6 +1,6 @@
 <?php
 
-class EmailEveryoneShell {
+class EmailEveryoneShell extends Shell {
 	var $uses = array(
 		'User'
 	);
