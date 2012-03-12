@@ -1,12 +1,10 @@
 <?php
 
+App::import('Core', 'Controller');
+App::import('Component', 'Email');
 class EmailEveryoneShell extends Shell {
 	var $uses = array(
 		'User'
-	);
-
-	var $helpers = array(
-		'Email'
 	);
 
 	private $go = false;
@@ -45,5 +43,7 @@ class EmailEveryoneShell extends Shell {
 		$this->go = isset($this->params['go']);
 		$this->official = isset($this->params['official']);
 		$this->uid = isset($this->params['uid']);
+
+		$this->Email = new EmailComponent(null);
 	}
 }
