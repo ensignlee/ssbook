@@ -10,6 +10,8 @@ class EmailEveryoneShell extends Shell {
 	);
 
 	private $go = false;
+	private $official = false;
+	private $uid = 0;
 
 	public function main() {
 		if ($this->go) {
@@ -25,9 +27,9 @@ class EmailEveryoneShell extends Shell {
 		$user = $this->User->read();
 		$user = $user['User'];
 
-		echo "Emailing $uid {$user['username']}";
+		echo "Emailing $uid {$user['username']}\n";
 
-		if ($this->offical) {
+		if ($this->official) {
 			$this->Email->from = 'Edmund Lee<edmund@sharpbettracker.com>';
 			$this->Email->to = $user['email'];
 			$this->Email->subject = 'Grading Problems Fixed';
@@ -35,7 +37,7 @@ class EmailEveryoneShell extends Shell {
 			$this->Email->sendAs = 'text';
 			$this->Email->send();
 		} else {
-			echo "Not sending email.";
+			echo "Not sending email.\n";
 		}
 	}
 
