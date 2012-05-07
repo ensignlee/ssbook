@@ -40,6 +40,8 @@ class Espn extends Espn_Log {
 		$this->types[] = new Espn_NHL($this->LeagueType);
 		$this->types[] = new Espn_NCAAB($this->LeagueType);
 		$this->types[] = new Espn_NCAAB_March($this->LeagueType);
+		$this->types[] = new Espn_NCAAB_March2($this->LeagueType);
+		$this->types[] = new Espn_NCAAB_March3($this->LeagueType);
 		$this->types[] = new Espn_NBA($this->LeagueType);
 		
 //		$this->types[] = new Espn_NFL($this->LeagueType);
@@ -359,6 +361,12 @@ class Espn_NHL extends Espn_MLB {
 	public $leagueName = 'NHL';
 	protected $statusLine = '*[id$=statusLine2Left]';
 	protected $teamname = '.team-name';
+	protected $finalScores = '.mod-scorebox-final';
+	protected $pregameScores = '.mod-scorebox-pregame';
+	protected $awaySelector = '*[id$="awayHeader"]';
+	protected $homeSelector = '*[id$="homeHeader"]';
+	protected $awayScoreSelector = '*[id$="awayHeaderScore"]';
+	protected $homeScoreSelector = '*[id$="homeHeaderScore"]';
 
 	public function getUrl($date) {
 		return sprintf('http://scores.espn.go.com/nhl/scoreboard?date=%s', date('Ymd', strtotime($date)));
@@ -372,12 +380,14 @@ class Espn_NHL extends Espn_MLB {
 class Espn_MLB extends Espn_Scorer {
 
 	public $leagueName = 'MLB';
-	protected $statusLine = '*[id$=statusLine2]';
+	protected $statusLine = '.game-status';
 	protected $teamname = '*[id$="TeamName"]';
-	protected $finalScores = '.mod-scorebox-final';
-	protected $pregameScores = '.mod-scorebox-pregame';
-	protected $awaySelector = '*[id$="awayHeader"]';
-	protected $homeSelector = '*[id$="homeHeader"]';
+	protected $finalScores = '.mod-scorebox.final-state';
+	protected $pregameScores = '.mod-scorebox.preview';
+	protected $awaySelector = '.team.away';
+	protected $homeSelector = '.team.home';
+	protected $awayScoreSelector = '.finalScore';
+	protected $homeScoreSelector = '.finalScore';
 
 	public function getUrl($date) {
 		return sprintf('http://scores.espn.go.com/mlb/scoreboard?date=%s', date('Ymd', strtotime($date)));
@@ -431,8 +441,8 @@ class Espn_MLB extends Espn_Scorer {
 
 		$this->log("Hometeam = [{$row['home']}], Awayteam = [{$row['visitor']}]");
 
-		$row['visitor_score_total'] = Espn::replaceNull(pq('*[id$="awayHeaderScore"]', $away)->text());
-		$row['home_score_total'] = Espn::replaceNull(pq('*[id$="homeHeaderScore"]', $home)->text());
+		$row['visitor_score_total'] = Espn::replaceNull(pq($this->awayScoreSelector, $away)->text());
+		$row['home_score_total'] = Espn::replaceNull(pq($this->homeScoreSelector, $home)->text());
 		$row['league'] = $this->league;
 
 		$this->log("VST = {$row['visitor_score_total']}, HST = {$row['home_score_total']}, league = {$row['league']}");
@@ -506,6 +516,16 @@ class Espn_NCAAB extends Espn_MLB {
 class Espn_NCAAB_March extends Espn_NCAAB {
 	public function getUrl($date) {
 		return  sprintf('http://scores.espn.go.com/ncb/scoreboard?date=%s&confId=100', date('Ymd', strtotime($date)));
+	}
+}
+class Espn_NCAAB_March2 extends Espn_NCAAB {
+	public function getUrl($date) {
+		return  sprintf('http://scores.espn.go.com/ncb/scoreboard?date=%s&confId=56', date('Ymd', strtotime($date)));
+	}
+}
+class Espn_NCAAB_March3 extends Espn_NCAAB {
+	public function getUrl($date) {
+		return  sprintf('http://scores.espn.go.com/ncb/scoreboard?date=%s&confId=55', date('Ymd', strtotime($date)));
 	}
 }
 
