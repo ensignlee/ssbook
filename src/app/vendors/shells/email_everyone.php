@@ -13,8 +13,10 @@ class EmailEveryoneShell extends Shell {
 
 	public function main() {
 		if ($this->go) {
-			$users = $this->User->find(array('conditions' => array('active' => 1)));
-			var_dump($users);exit;
+			$users = $this->User->find('all', array('conditions' => array('active' => 1)));
+			foreach ($users as $user) {
+				$this->email($user['User']['id']);
+			}
 		} else if (!empty($this->uid)) {
 			$this->email($this->uid);
 		}
@@ -34,6 +36,7 @@ class EmailEveryoneShell extends Shell {
 			$this->Email->template = 'fixed_grading';
 			$this->Email->sendAs = 'text';
 			$this->Email->send();
+			sleep(10);
 		} else {
 			echo "Not sending email.\n";
 		}
@@ -46,6 +49,6 @@ class EmailEveryoneShell extends Shell {
 
 		$this->Controller = new Controller();
 		$this->Email = new EmailComponent(null);
-		$this->Email->startup($this->Controller);
+		$this->Email->initialize($this->Controller);
 	}
 }
