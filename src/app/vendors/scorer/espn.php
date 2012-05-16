@@ -478,6 +478,8 @@ class Espn_NCAAB extends Espn_MLB {
 	protected $pregameScores = '.main-games.preview';
 	protected $awaySelector = 'div.team.visitor';
 	protected $homeSelector = 'div.team.home';
+	protected $awayScoreSelector = '.final[id$="awayHeaderScore"]';
+	protected $homeScoreSelector = '.final[id$="homeHeaderScore"]';
 
 	public function getUrl($date) {
 		return  sprintf('http://scores.espn.go.com/ncb/scoreboard?date=%s&confId=50', date('Ymd', strtotime($date)));
@@ -532,12 +534,21 @@ class Espn_NCAAB_March3 extends Espn_NCAAB {
 class Espn_NBA extends Espn_NHL {
 	
 	public $leagueName = 'NBA';
+	protected $statusLine = '.game-status';
+	protected $teamname = '*[id$="TeamName"]';
+	protected $finalScores = '.mod-scorebox.final-state';
+	protected $pregameScores = '.mod-scorebox.preview';
+	protected $awaySelector = '.team.away';
+	protected $homeSelector = '.team.home';
+	protected $awayScoreSelector = '.finalScore';
+	protected $homeScoreSelector = '.finalScore';
 
 	public function getUrl($date) {
 		return  sprintf('http://scores.espn.go.com/nba/scoreboard?date=%s', date('Ymd', strtotime($date)));
 	}
 
 	protected function getHalf($score) {
+/*
 		$titles = pq('th[id*="lsh"]', $score);
 		$periods = array();
 		foreach ($titles as $title) {
@@ -562,6 +573,9 @@ class Espn_NBA extends Espn_NHL {
 		}
 		$visitor = pq("td[id$=als{$one}]", $score)->text() + pq("td[id$=als{$two}]", $score)->text();
 		$home = pq("td[id$=hls{$one}]", $score)->text() + pq("td[id$=hls{$two}]", $score)->text();
+ */
+		$visitor = pq("[id$=alsh1]", $score)->text() + pq("[id$=alsh2]", $score)->text();
+		$home = pq("[id$=hlsh1]", $score)->text() + pq("[id$=hlsh2]", $score)->text();
 		return array($visitor, $home);
 	}
 }
