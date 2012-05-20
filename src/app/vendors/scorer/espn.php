@@ -214,7 +214,7 @@ class Espn extends Espn_Log {
 		$url = $this->cur->getUrl($this->date);
 		$this->log("Looking up $url", 'info');
 		$this->html = curl_file_get_contents($url);
-		file_put_contents('/tmp/'.date('Ymd').$type->leagueName, $this->html);
+		file_put_contents('/tmp/prod/'.date('Ymd-His-').$type->leagueName, $this->html);
 	}
 }
 
