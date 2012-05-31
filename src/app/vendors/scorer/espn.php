@@ -454,6 +454,22 @@ class Espn_MLB extends Espn_Scorer {
 		}
 		$this->log("Parsed time = [$parsedtime]");
 		
+		// adjust total scores for future MLB games to null:null
+		// this code may be reused by subclasses and we are very specific here 
+
+		$gamehhmmss = substr($parsedtime,-8);
+
+		if ($this->leagueName == 'MLB') {
+		if (preg_match('#^\d\d:\d\d:\d\d$#', $gamehhmmss, $matches)) {
+		// observation:
+		//   future games have their actual start time HH:MM:SS
+		//   graded games have their start time showing up as 00:00:00
+		if ($gamehhmmss != '00:00:00') {
+		if ($row['visitor_score_total'] == 0 && $row['home_score_total'] == 0) {
+			$row['visitor_score_total'] = null;
+			$row['home_score_total'] = null;
+		}}}}
+		
 		// Adding in the pitchers
 		$homePitcher = pq("div[id$='homeStarter']", $score);
 		$visitPitcher = pq("div[id$='awayStarter']", $score);
