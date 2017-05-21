@@ -45,7 +45,8 @@ class EmailEveryoneShell extends Shell {
 	public function startup() {
 		$this->go = isset($this->params['go']);
 		$this->official = isset($this->params['official']);
-		$this->uid = isset($this->params['uid']);
+		if(isset($this->params['uid']))
+		$this->uid = intval($this->params['uid']);
 
 		$this->Controller = new Controller();
 		$this->Email = new EmailComponent(null);
